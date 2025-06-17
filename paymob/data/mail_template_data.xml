@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="online_payment_receipt_mail_template" model="mail.template">
+            <field name="name">Online Payment Receipt</field>
+            <field name="model_id" ref="payment.model_payment_transaction"/>
+            <field name="subject">The Clean freak Invoice _ Online Payment Receipt {{ object.name }}</field>
+            <field name="email_from">{{ (user.email_formatted or object.user_id.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="body_html" type="html">
+<div>
+    <p>Dear <t t-out="object.partner_id.name or ''"/>,
+    </p>
+    <p>
+        We are pleased to confirm that we have successfully received your payment for the recent
+        cleaning service. Please find your payment receipt attached for your reference.
+    </p>
+    <p>
+        Invoice Number:
+        <t t-out="object.reference or ''"/>
+        <br/>
+        Amount Paid:
+        <t t-out="format_amount(object.amount, object.currency_id) or ''"/>
+        <br/>
+        Payment Method:
+        <t t-out="object.invoice_ids.payment_method_selection"/>
+    </p>
+    <p>
+        Thank you for choosing <strong t-out="object.company_id.name or ''"/>.
+        We truly appreciate your support and look forward to serving you again in the future.
+    </p>
+    <p>
+        If you have any questions or need further assistance, feel free to reach out.
+    </p>
+    Best regards,
+    <t t-if="object.invoice_ids.user_id.signature">
+        <br/>
+        <t t-out="object.invoice_ids.user_id.signature or ''">--
+            <br/>
+        </t>
+    </t>
+</div>
+            </field>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+    </data>
+</odoo>
