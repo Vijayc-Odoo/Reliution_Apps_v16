@@ -40,6 +40,15 @@ class PaymobController(http.Controller):
         billing_data = intention_detail.get("billing_data")
         payment_methods = intention.get("payment_methods", [])
         transaction_order_id = transaction.get("order", {}).get("id", [])
+        extras=intention.get("extras").get('creation_extras')
+        if extras:
+            transaction_reference=extras.get('transaction_reference',"S0")
+            # t_invoice_id = request.env['account.move'].sudo().search([('name', '=', transaction_reference.split('-')[0])])
+            # t_sale_order_id = request.env['sale.order'].sudo().search([('name', '=', transaction_reference.split('-')[0])])
+            if transaction_reference:
+                t_invoice_id=request.env['account.move'].sudo().search([('name','=',transaction_reference.split('-')[0])])
+                t_sale_order_id=request.env['sale.order'].sudo().search([('name','=',transaction_reference.split('-')[0])])
+                company_id=t_invoice_id.company_id.id or t_sale_order_id.company_id.id
         if billing_data.get("first_name") == ".":
             name = billing_data.get("last_name")
         else:
@@ -51,15 +60,16 @@ class PaymobController(http.Controller):
                     request.env["res.partner"]
                     .sudo()
                     .search(
-                        [("name", "=", name), ("email", "=", billing_data.get("email"))]
+                        [("name", "=", name), ("email", "=", billing_data.get("email"))],
                     )
                 )
+
                 payment_transaction_id = (
                     request.env["payment.transaction"]
                     .sudo()
                     .search(
                         [
-                            ("partner_id", "=", partner_id.id),
+                            ("partner_id", "=", partner_id[0].id),
                             ("state", "=", "draft"),
                             ("amount", "=", transaction.get("amount_cents") / 100.0),
                         ],
@@ -79,9 +89,9 @@ class PaymobController(http.Controller):
                                     limit=1,
                                 )
                                 if (
-                                    payment_method_id
-                                    and payment_method_id.provider_ids[0].sudo().code
-                                    == "paymob"
+                                        payment_method_id
+                                        and payment_method_id.provider_ids[0].sudo().code
+                                        == "paymob"
                                 ):
                                     currency_id = (
                                         request.env["res.currency"]
@@ -93,33 +103,85 @@ class PaymobController(http.Controller):
                                     bank_type_journal_id = (
                                         request.env["account.journal"]
                                         .sudo()
-                                        .search([("type", "=", "bank")], limit=1)
+                                        .search([("type", "=", "bank"), ("company_id", "=", company_id)],
+                                                limit=1)
                                     )
                                     payment_id = (
                                         request.env["account.payment"]
                                         .sudo()
                                         .create(
                                             {
+                                                "company_id": company_id,
                                                 "payment_type": "inbound",
                                                 "partner_id": partner_id[0].id,
-                                                "amount": transaction.get(
+                                                "amount": 55 + transaction.get(
                                                     "amount_cents"
                                                 )
-                                                / 100.0,
+                                                          / 100.0,
                                                 "currency_id": currency_id.id,
                                                 "date": date.today(),
                                                 "journal_id": bank_type_journal_id.id,
-                                                "payment_method_selection": "link",
+                                                # "payment_method_selection": "link",
                                             }
                                         )
                                     )
                                     payment_id.action_post()
                                     payment_id.action_validate()
+
+                                    if transaction.get('success') or transaction.get('pending'):
+                                        if t_sale_order_id:
+                                            if t_sale_order_id.state in ['draft', 'sent']:
+                                                t_sale_order_id.action_confirm()
+
+                                    payment_transaction_id = (
+                                        request.env["payment.transaction"]
+                                        .sudo()
+                                        .search(
+                                            [('reference', '=', intention.get('extras').get('creation_extras').get(
+                                                'transaction_reference'))],
+                                            limit=1,
+                                        )
+                                    )
+                                    if payment_transaction_id.invoice_ids:
+                                        invoice_id = payment_transaction_id.invoice_ids[0]
+                                        # payment_id = self._create_payment(
+                                        #     invoice_id,
+                                        #     transaction.get("amount_cents") / 100.0,
+                                        #     payment_transaction_id,
+                                        # )
+                                        payment_transaction_id.sudo().write(
+                                            {
+                                                "state": "done",
+                                                "paymob_transaction_id": transaction.get("id"),
+                                                "paymob_order_id": transaction_order_id,
+                                                # "payment_id": payment_id,
+                                                "is_post_processed": False,
+                                                # "provider_reference": "paymob-" + payment_transaction_id.invoice_ids[
+                                                #     0].name,
+                                            }
+                                        )
+                                        json_data["state"] = True
+                                    else:
+                                        if payment_transaction_id:
+                                            # payment_id = self._create_payment_using_website(
+                                            #     t_sale_order_id,
+                                            #     transaction.get("amount_cents") / 100.0,
+                                            #     payment_transaction_id,
+                                            # )
+                                            payment_transaction_id.sudo().write(
+                                                {
+                                                    "state": "done",
+                                                    "paymob_transaction_id": transaction.get("id"),
+                                                    "paymob_order_id": transaction_order_id,
+                                                    # "payment_id": payment_id,
+                                                    "is_post_processed": False,
+                                                    # "provider_reference": "paymob-" + payment_transaction_id.invoice_ids[
+                                                    #     0].name,
+                                                }
+                                            )
+                                            json_data["state"] = True
                 else:
-                    if (
-                        payment_transaction_id.sale_order_ids
-                        and not payment_transaction_id.invoice_ids
-                    ):
+                    if (payment_transaction_id.sale_order_ids and not payment_transaction_id.invoice_ids):
                         order_id = payment_transaction_id.sale_order_ids[0]
                         if order_id.state != "sale":
                             order_id.action_confirm()
@@ -150,7 +212,7 @@ class PaymobController(http.Controller):
 
                             invoice_id.sudo().write(
                                 {
-                                    "payment_method_selection": "link",
+                                    # "payment_method_selection": "link",
                                     "advance_payment": True,
                                     "total_amount_payable": transaction.get(
                                         "amount_cents"
@@ -166,10 +228,10 @@ class PaymobController(http.Controller):
 
                             # Action post to validate the invoice
                             invoice_id.sudo().action_post()
-                            payment_id = self._create_payment(
-                                invoice_id,
-                                transaction.get("amount_cents") / 100.0,
-                            )
+                            # payment_id = self._create_payment(
+                            #     invoice_id,
+                            #     9 + transaction.get("amount_cents") / 100.0,
+                            # )
                             payment_transaction_id.sudo().write(
                                 {
                                     "state": "done",
@@ -185,16 +247,26 @@ class PaymobController(http.Controller):
                             payment_id = self._create_payment(
                                 invoice_id,
                                 transaction.get("amount_cents") / 100.0,
+                                payment_transaction_id,
                             )
                             payment_transaction_id.sudo().write(
                                 {
                                     "state": "done",
                                     "paymob_transaction_id": transaction.get("id"),
                                     "paymob_order_id": transaction_order_id,
+                                    "payment_id": payment_id,
+                                    "is_post_processed":True,
+                                    "provider_reference": "paymob-" + payment_transaction_id.invoice_ids[0].name,
                                 }
                             )
-
                             json_data["state"] = True
+                            # a = invoice_id.get_portal_url()
+                            # return {
+                            #     'type': 'ir.actions.act_url',
+                            #     'target': 'self',
+                            #     'url': invoice_id.get_portal_url(),
+                            # }
+
         else:
             if not transaction.get("success"):
                 integration_id = transaction.get("integration_id")
@@ -229,11 +301,10 @@ class PaymobController(http.Controller):
             _logger.info("Paymob Normalized JSON data")
             return self._handle_transaction(normalized_data)
 
-    def _create_payment(self, invoice, amount):
+    def _create_payment(self, invoice, amount, payment_transaction_id):
         bank_journal = (
-            request.env["account.journal"]
-            .sudo()
-            .search([("type", "=", "bank")], limit=1)
+            request.env["account.journal"].sudo().search(
+                [("type", "=", "bank"), ("company_id", "=", invoice.company_id.id)], limit=1)
         )
         payment_register = (
             request.env["account.payment.register"]
@@ -249,14 +320,15 @@ class PaymobController(http.Controller):
                     "partner_id": invoice.partner_id.id,
                     "payment_type": "inbound",
                     "partner_type": "customer",
-                    "payment_method_selection": "link",
+                    # "payment_method_selection": "link",
                 }
             )
         )
         payment = payment_register._create_payments()
-        payment.write({"activity_user_id": invoice.invoice_user_id.id})
-        payment.action_validate()
+        payment.sudo().write({"activity_user_id": invoice.invoice_user_id.id})
+        payment.sudo().action_validate()
         return payment
+
 
     def _handle_transaction(self, json_data):
         received_hmac = request.httprequest.args.get("hmac") or json_data.get(
@@ -280,8 +352,8 @@ class PaymobController(http.Controller):
         try:
             if json_data["obj"].get("payment_key_claims")["extra"].get("api_source"):
                 if (
-                    json_data["obj"]["payment_key_claims"]["extra"]["api_source"]
-                    == "SHOPIFY"
+                        json_data["obj"]["payment_key_claims"]["extra"]["api_source"]
+                        == "SHOPIFY"
                 ):
                     # search for the transaction based on the email or phone number
 
@@ -320,7 +392,7 @@ class PaymobController(http.Controller):
                         )
 
                     elif json_data["obj"]["payment_key_claims"]["billing_data"].get(
-                        "phone_number"
+                            "phone_number"
                     ):
                         transaction = (
                             request.env["payment.transaction"]
@@ -496,26 +568,26 @@ class PaymobController(http.Controller):
             data["source_data_sub_type"] = data["source_data"]["sub_type"]
 
             concatenated_string = (
-                str(data["amount_cents"])
-                + str(data["created_at"])
-                + str(data["currency"])
-                + str(data["error_occured"])
-                + str(data["has_parent_transaction"])
-                + str(data["id"])
-                + str(data["integration_id"])
-                + str(data["is_3d_secure"])
-                + str(data["is_auth"])
-                + str(data["is_capture"])
-                + str(data["is_refunded"])
-                + str(data["is_standalone_payment"])
-                + str(data["is_voided"])
-                + str(data["order"])
-                + str(data["owner"])
-                + str(data["pending"])
-                + str(data["source_data_pan"])
-                + str(data["source_data_sub_type"])
-                + str(data["source_data_type"])
-                + str(data["success"])
+                    str(data["amount_cents"])
+                    + str(data["created_at"])
+                    + str(data["currency"])
+                    + str(data["error_occured"])
+                    + str(data["has_parent_transaction"])
+                    + str(data["id"])
+                    + str(data["integration_id"])
+                    + str(data["is_3d_secure"])
+                    + str(data["is_auth"])
+                    + str(data["is_capture"])
+                    + str(data["is_refunded"])
+                    + str(data["is_standalone_payment"])
+                    + str(data["is_voided"])
+                    + str(data["order"])
+                    + str(data["owner"])
+                    + str(data["pending"])
+                    + str(data["source_data_pan"])
+                    + str(data["source_data_sub_type"])
+                    + str(data["source_data_type"])
+                    + str(data["success"])
             )
             calculated_hmac = hmac.new(
                 key.encode("utf-8"), concatenated_string.encode("utf-8"), hashlib.sha512
@@ -533,9 +605,9 @@ class PaymobController(http.Controller):
         """
         try:
             if (
-                "hmac" in callback_data
-                and "transaction" in callback_data
-                and not callback_data.get("state")
+                    "hmac" in callback_data
+                    and "transaction" in callback_data
+                    and not callback_data.get("state")
             ):
                 normalized_data = {
                     "type": "TRANSACTION",
