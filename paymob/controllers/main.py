@@ -260,12 +260,6 @@ class PaymobController(http.Controller):
                                 }
                             )
                             json_data["state"] = True
-                            # a = invoice_id.get_portal_url()
-                            # return {
-                            #     'type': 'ir.actions.act_url',
-                            #     'target': 'self',
-                            #     'url': invoice_id.get_portal_url(),
-                            # }
 
         else:
             if not transaction.get("success"):
