@@ -1,7 +1,7 @@
 import logging
 import pprint
 import re
-from odoo import _, models, fields
+from odoo import _, models, fields , api
 from odoo.addons.payment import utils as payment_utils
 from odoo.exceptions import UserError, ValidationError
 from requests import request
@@ -18,6 +18,14 @@ class PaymentTransaction(models.Model):
     paymob_transaction_id = fields.Char(string="Paymob Transaction Id")
     paymob_order_id = fields.Char(string="Paymob Order Id")
 
+    @api.model
+    def write(self,vals):
+        a=super().write(vals)
+        return a
+
+    def create(self,vals):
+        b=super().create(vals)
+        return b
     def _get_specific_rendering_values(self, processing_values):
         """Override of payment to return Paymob-specific rendering values.
 
@@ -75,7 +83,8 @@ class PaymentTransaction(models.Model):
         """
         if self.provider_code != "paymob":
             return
-
+        # if not self.partner_id.mobile:
+        #     raise ValidationError("Plese enter the mobile number")
         base_url = self.provider_id._paymob_get_api_url()
         mixed_integrations = None
 
@@ -83,6 +92,7 @@ class PaymentTransaction(models.Model):
             mixed_integrations = self._handle_omn_payment_payload_case(base_url)
 
         paymob_api_url = f"{base_url}v1/intention/"
+        # paymob_api_url = f"{base_url}/payment/paymob/return"
         # headers
         headers = {
             "Authorization": f"Token {self.provider_id.paymob_secret_key}",
@@ -135,8 +145,8 @@ class PaymentTransaction(models.Model):
                 "first_name": first_name or ".",
                 "last_name": last_name or ".",
                 "street": self.partner_address or "",
-                "phone_number": re.sub(r"[^\d]", "", self.partner_id.mobile)
-                or re.sub(r"[^\d]", "", self.partner_id.phone),
+                "phone_number": re.sub(r"[^\d]", "", self.partner_id.mobile) or re.sub(r"[^\d]", "", self.partner_id.phone),
+
                 "city": self.partner_city or "",
                 "country": self.partner_country_id.code or "",
                 "email": self.partner_email or "",

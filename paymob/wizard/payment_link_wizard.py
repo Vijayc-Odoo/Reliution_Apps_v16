@@ -17,6 +17,16 @@ class InheritPaymentLinkWizard(models.TransientModel):
     def _compute_link(self):
         if self._context.get("using_paymob"):
             for payment_link in self:
+                invoice_id = False
+                if payment_link.res_model == "account.move":
+                    invoice_id = self.env[payment_link.res_model].browse(
+                        payment_link.res_id
+                    )
+
+                # Raise the pop up when the user click on paymob link without invoice confirm
+                if invoice_id and (invoice_id.state not in "posted"):
+                    raise ValidationError("Please confirm the invoice")
+
                 related_document = self.env[payment_link.res_model].browse(
                     payment_link.res_id
                 )
@@ -47,6 +57,9 @@ class InheritPaymentLinkWizard(models.TransientModel):
                         "email": payment_link.partner_id.email or "",
                         "state": payment_link.partner_id.state_id.name or "",
                     },
+                    "extras":{
+                        "partner_id":payment_link.partner_id.id,
+                    }
                 }
 
                 # Check if HMAC key is set for Paymob
@@ -89,9 +102,7 @@ class InheritPaymentLinkWizard(models.TransientModel):
                         "last_state_change": datetime.datetime.now(),
                         "partner_id": self.partner_id.id,
                         "partner_email": self.partner_id.email or "",
-                        "partner_phone": self.partner_id.mobile
-                        or self.partner_id.phone
-                        or self.partner_id.whatsapp_number,
+                        "partner_phone": self.partner_id.mobile or self.partner_id.phone or self.partner_id.whatsapp_number,
                         "invoice_ids": [(4, invoice_id.id)],
                     }
                 )
