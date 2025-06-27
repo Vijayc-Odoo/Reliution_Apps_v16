@@ -38,8 +38,8 @@ class PaymobController(http.Controller):
         intention = json_data.get("intention")
         intention_detail = intention.get("intention_detail", {})
         billing_data = intention_detail.get("billing_data")
-        partner_id=int(billing_data.get('first_name').split('+')[0])
-        billing_data['first_name']=billing_data.get('first_name').split('+')[1]
+        # partner_id=int(billing_data.get('first_name').split('+')[0])
+        # billing_data['first_name']=billing_data.get('first_name').split('+')[1]
         payment_methods = intention.get("payment_methods", [])
         transaction_order_id = transaction.get("order", {}).get("id", [])
         extras=intention.get("extras").get('creation_extras')
@@ -62,7 +62,7 @@ class PaymobController(http.Controller):
                     request.env["res.partner"]
                     .sudo()
                     .search(
-                        [("id","=",partner_id),("name", "=", name), ("email", "=", billing_data.get("email"))],
+                        [("name", "=", name), ("email", "=", billing_data.get("email"))],
                     )
                 )
 
@@ -71,7 +71,7 @@ class PaymobController(http.Controller):
                     .sudo()
                     .search(
                         [
-                            ("partner_id", "=", partner_id[0].id),
+                            ("partner_id", "=",extras.get("partner_id",partner_id[0].id)),
                             ("state", "=", "draft"),
                             ("amount", "=", transaction.get("amount_cents") / 100.0),
                         ],
