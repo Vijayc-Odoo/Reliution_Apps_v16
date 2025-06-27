@@ -38,6 +38,8 @@ class PaymobController(http.Controller):
         intention = json_data.get("intention")
         intention_detail = intention.get("intention_detail", {})
         billing_data = intention_detail.get("billing_data")
+        partner_id=int(billing_data.get('first_name').split('+')[0])
+        billing_data['first_name']=billing_data.get('first_name').split('+')[1]
         payment_methods = intention.get("payment_methods", [])
         transaction_order_id = transaction.get("order", {}).get("id", [])
         extras=intention.get("extras").get('creation_extras')
@@ -60,7 +62,7 @@ class PaymobController(http.Controller):
                     request.env["res.partner"]
                     .sudo()
                     .search(
-                        [("name", "=", name), ("email", "=", billing_data.get("email"))],
+                        [("id","=",partner_id),("name", "=", name), ("email", "=", billing_data.get("email"))],
                     )
                 )
 
@@ -114,7 +116,7 @@ class PaymobController(http.Controller):
                                                 "company_id": company_id,
                                                 "payment_type": "inbound",
                                                 "partner_id": partner_id[0].id,
-                                                "amount": 55 + transaction.get(
+                                                "amount": transaction.get(
                                                     "amount_cents"
                                                 )
                                                           / 100.0,
@@ -319,7 +321,12 @@ class PaymobController(http.Controller):
             )
         )
         payment = payment_register._create_payments()
-        payment.sudo().write({"activity_user_id": invoice.invoice_user_id.id})
+        payment_method_id = request.env["account.payment.method.line"].sudo().search([('name','=','Paymob')])
+        payment.sudo().write({
+            "activity_user_id": invoice.invoice_user_id.id,
+            "payment_method_line_id":payment_method_id.id,
+            "payment_transaction_id":payment_transaction_id.id,
+        })
         payment.sudo().action_validate()
         return payment
 
