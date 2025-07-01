@@ -145,7 +145,9 @@ class PaymentTransaction(models.Model):
                 "first_name": first_name or ".",
                 "last_name": last_name or ".",
                 "street": self.partner_address or "",
-                "phone_number": re.sub(r"[^\d]", "", self.partner_id.mobile) or re.sub(r"[^\d]", "", self.partner_id.phone),
+                # "phone_number": re.sub(r"[^\d]", "", self.partner_id.mobile) or re.sub(r"[^\d]", "", self.partner_id.phone) ,
+                "phone_number": re.sub(r"[^\d]", "", self.partner_id.phone) ,
+                # "phone_number": "1252415120",
 
                 "city": self.partner_city or "",
                 "country": self.partner_country_id.code or "",
@@ -154,8 +156,12 @@ class PaymentTransaction(models.Model):
             },
             "extras": {
                 "transaction_reference": self.reference,
+                "sale_order_id":self.sale_order_ids.id,
+                "invoice_id":self.invoice_ids.mapped('id')
+
             },
             "notification_url": notification_url,
+            "redirection_url":  f"{base_url}payment/status",
         }
         if not self.provider_id.paymob_hmac:
             _logger.error("Paymob HMAC key is not set, won't create intent")
@@ -183,7 +189,7 @@ class PaymentTransaction(models.Model):
                     _logger.error("Paymob: received unknown data: %s", response_data)
                     pass
             raise UserError(
-                f"Failed to create Paymob transaction. Please try again. {next(iter(response_data.values()))[0]}"
+                f"Failed to create Paymob transaction. Check Country and Currency and Please try again. {next(iter(response_data.values()))[0]}"
             )
 
         _logger.info("Paymob intent response: %s", pprint.pformat(response_data))

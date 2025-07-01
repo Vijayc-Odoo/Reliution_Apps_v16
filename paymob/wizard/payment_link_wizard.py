@@ -34,6 +34,10 @@ class InheritPaymentLinkWizard(models.TransientModel):
 
                 # Retrieve Paymob account details
                 provider_id = self.env['payment.provider'].search([('code', '=', 'paymob')], limit=1)
+
+                if not provider_id.payment_method_ids:
+                    raise ValidationError("Sorry, the Paymob payment method is not active.")
+
                 base_url = provider_id._paymob_get_api_url()
                 paymob_api_url = f"{base_url}v1/intention/"
 
@@ -58,8 +62,11 @@ class InheritPaymentLinkWizard(models.TransientModel):
                         "state": payment_link.partner_id.state_id.name or "",
                     },
                     "extras":{
+                        "transaction_reference": invoice_id.name,
                         "partner_id":payment_link.partner_id.id,
-                    }
+                        # "invoice_id":invoice_id,
+                    },
+                    # "redirection_url": f"{base_url}payment/status",
                 }
 
                 # Check if HMAC key is set for Paymob
