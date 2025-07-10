@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="partner_address_autofill.RcsAddressAutoFill">
+        <div ><!--t-attf-class="rcs_js_cls_addresses_dropdown dropdown-menu " #{addresses.length ? 'show' : ''} -->
+            <field name="rcs_contact_google_location"/>
+            <input type="text" placeholder="Type..."/>
+            <a class="dropdown-item rcs_js_cls_address_dropdown_item">
+<!--               t-foreach="address" t-as="address1">-->
+<!--               t-att-data-place-id="address['place_id']">-->
+                <t t-deebug=""/>
+                <i class="fa fa-map-marker fa-f w" role="img"/>
+<!--                <t t-out="address['field_registryfield_registryfield_registryfield_registry']"/>-->
+<!--                <t t-out="address"/>-->
+
+                <span>hello</span>
+            </a>
+<!--            <img style="padding-right:10px; float:right;" src="/sh_contact_address_google_place/static/src/img/pw_by_google.png" alt="Powered by Google"/>-->
+        </div>
+    </t>
+</templates>
