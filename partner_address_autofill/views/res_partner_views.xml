@@ -6,7 +6,7 @@
 			<field name="inherit_id" ref="base.view_partner_form"/> 
 			<field name="arch" type="xml">
 				<field name='street' position="before">
-					<field name='rcs_contact_google_location' placeholder='Enter Location' widget='rcs_address_auto_complete' class='oe_edit_only'/>
+					<field name='rcs_contact_google_location' placeholder='Enter Location new' widget='rcs_address_auto_complete' class='oe_edit_only  o_field_field_partner_autocomplete'/>
 				</field>
 				<div class="o_address_format" position="attributes">
 					<attribute name="class" add="rcs_custom_address_format" separator=" "/>
