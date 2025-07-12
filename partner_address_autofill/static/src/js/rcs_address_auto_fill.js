@@ -39,8 +39,8 @@ export class RcsAddressAutoFill extends CharField {
     async _selectItem(ev){
         debugger;
         document.querySelector('#enterLocation').value = ev.currentTarget.dataset.placeName;
-//        ev.currentTarget.dataset.placeId
-        this.nm = ev.currentTarget.dataset.placeName;
+        ev.currentTarget.dataset.placeId
+        ev.currentTarget.dataset.placeName
         const detailAddress = await rpc("/rcs_detail_gmap/address",{address: ev.currentTarget.dataset.placeId,place_id: ev.currentTarget.dataset.placeName})
         this.state.results=[]
 //        await this.props.record.update({'street':'Vijay','street2':'chudasama','city':'Keshod','zip':362220,'country_id':{'id':104,'display_name':'India'},'country_code':'IN'})
@@ -49,9 +49,8 @@ export class RcsAddressAutoFill extends CharField {
             'street2':detailAddress.street2,
             'city':detailAddress.city,
             'zip':detailAddress.zip,
-            'rcs_contact_google_location':this.nm,
-            'state_id':[588],
-            'country_id': [104] ,
+            'state_id':[detailAddress.state],
+            'country_id': [detailAddress.country] ,
 //            'country_code':'IN'
         })
     }

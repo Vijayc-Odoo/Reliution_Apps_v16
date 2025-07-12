@@ -10,12 +10,12 @@ class RcsContactAddressGooglePlace(http.Controller):
 
     def get_proper_address(self, results):
         # Initialize fields
-        street = city = zip = street2 = country_code = ""
-        state = country = False
+        street = city = zip = street2 = country_code = state_code = ""
+        state = country = state_id = country_id = False
         for res in results:
             t = res.get('types')[0]
             d = res.get('longText')
-            if street and t in ['route','neighborhood']:
+            if street and t in ['route', 'neighborhood']:
                 street = street + ","
             if 'route' in t:
                 street = d
@@ -23,6 +23,7 @@ class RcsContactAddressGooglePlace(http.Controller):
                 city = d
             if 'administrative_area_level_1' in t:
                 state = d
+                state_code = res.get('shortText')
             if 'postal_code' in t:
                 zip = d
             if 'country' in t:
@@ -37,14 +38,19 @@ class RcsContactAddressGooglePlace(http.Controller):
             if 'sublocality_level_2' in t:
                 street2 = street2 + d
             print(t, d)
+        if state:
+            state_id = request.env['res.country.state'].search([('name', '=', state), ('code', '=', state_code)]).id
+        if country_code:
+            country_id = request.env['res.country'].search([('name', '=', country), ('code', '=', country_code)]).id
+
         return {
             'street': street,
             'street2': street2,
             'city': city,
-            'state': state,
             'zip': zip,
-            'country': country,
-            'country_code':country_code,
+            'country': country_id or False,
+            'state': state_id or False,
+            'country_code': country_code,
         }
 
     # this method is used to request and search the places
@@ -63,9 +69,12 @@ class RcsContactAddressGooglePlace(http.Controller):
                 # 'X-Goog-FieldMask': '*',
                 'X-Goog-FieldMask': '',
             }
-
+            country_code=False
+            if company.rcs_google_country:
+                country_code=company.rcs_google_country.code
             payload = {
                 'input': partial_address,
+                'includedRegionCodes':country_code or ""
                 # 'textQuery': partial_address,
                 # "pageSize": 5,
                 # 'regionCode':'CA',
@@ -91,8 +100,8 @@ class RcsContactAddressGooglePlace(http.Controller):
             headers = {
                 'X-Goog-Api-Key': company.rcs_google_api_key,
                 'Content-Type': 'application/json',
-                'X-Goog-FieldMask': '*',
-                # 'X-Goog-FieldMask': 'id,displayName,formattedAddress,plusCode,addressComponents',
+                # 'X-Goog-FieldMask': '*',
+                'X-Goog-FieldMask': 'id,name,displayName,formattedAddress,addressComponents',
             }
 
             url = f'https://places.googleapis.com/v1/places/{address}'
@@ -100,5 +109,6 @@ class RcsContactAddressGooglePlace(http.Controller):
             result = response.json()
             print(result)
             # self.get_proper_address(result.get('addressComponents'))
-
+            if not result:
+                return []
         return self.get_proper_address(result.get('addressComponents'))

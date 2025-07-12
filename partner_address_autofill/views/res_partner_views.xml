@@ -8,6 +8,7 @@
 				<field name='street' position="before">
 					<field name='rcs_contact_google_location' placeholder='Enter Location new' widget='rcs_address_auto_complete' class='oe_edit_only  o_field_field_partner_autocomplete'/>
 				</field>
+<!--				<div class="rcs_address_dropdown_container position-relative"/>-->
 				<div class="o_address_format" position="attributes">
 					<attribute name="class" add="rcs_custom_address_format" separator=" "/>
 				</div>

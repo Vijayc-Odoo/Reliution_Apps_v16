@@ -2,49 +2,43 @@
 <templates xml:space="preserve">
 
     <t t-name="partner_address_autofill.RcsAddressAutoFill">
-        <div ><!--t-attf-class="rcs_js_cls_addresses_dropdown dropdown-menu " #{addresses.length ? 'show' : ''} -->
-            <!--            <field name="rcs_contact_google_location"/>-->
-<!--            <t t-call="web.CharField" id="enterLocation" t-on-input="_onInput"/>-->
-            <input id="enterLocation" type="text" placeholder="Type..." t-on-input="_onInput" t-att-value="props.record.data.rcs_contact_google_location"/>
-            <!--            <a class="dropdown-item rcs_js_cls_address_dropdown_item"-->
-            <!--                    t-foreach="state.results" t-as="address" t-key="address.id" t-on-click="_selectItem">-->
-            <!--&lt;!&ndash;                               t-att-data-place-id="address['id']">&ndash;&gt;-->
-            <!--                <t t-debug=""/>-->
-            <!--                <i class="fa fa-map-marker fa-f w" role="img" t-on-click="_selectItem"/>-->
-            <!--                &lt;!&ndash;                <t t-out="address['field_registry']"/>&ndash;&gt;-->
-            <!--                                <t t-out="address['formattedAddress']" t-on-click="_selectItem"/>-->
-            <!--                &lt;!&ndash;                <t t-out="address"/>&ndash;&gt;-->
-            <!--&lt;!&ndash;                <span t-on-click="_selectItem">hello</span>&ndash;&gt;-->
-            <!--            </a>-->
-
+        <div>
+            <input id="enterLocation" type="text" placeholder="Type..." t-on-input="_onInput"/>
+<!--                   t-att-value="props.record.data.rcs_contact_google_location"/>-->
             <div t-if="state.results.length"
                  class="rcs_js_cls_addresses_dropdown dropdown-menu show "
                  style="display: white; position: absolute; z-index: 999;">
-                            <a class="dropdown-item rcs_js_cls_address_dropdown_item"
-                               t-foreach="state.results" t-as="address" t-key="address.id" t-on-click="_selectItem"  t-att-data-place-id="address['id']" t-att-data-place-name="address['placeName']">
-<!--                               t-att-data-place-id="address['id']">-->
-                                <t t-debug=""/>
-                                <i class="fa fa-map-marker fa-f w" role="img" t-on-click="_selectItem"/>
-                                <!--                <t t-out="address['field_registry']"/>-->
-                                <t t-out="address['placeName']" t-on-click="_selectItem"/>
-                                <!--                <t t-out="address"/>-->
-                                <!--                <span t-on-click="_selectItem">hello</span>-->
-            </a>
-<!--                <img style="padding-right:10px; float:right;" src="/partner_address_autofill/static/src/img/pw_by_google.png" alt="Powered by Google"/>-->
-                      </div>
-            <!--                        <img style="padding-right:10px; float:right;" src="/sh_contact_address_google_place/static/src/img/pw_by_google.png" alt="Powered by Google"/>-->
+                <a class="dropdown-item rcs_js_cls_address_dropdown_item"
+                   t-foreach="state.results" t-as="address" t-key="address.id" t-on-click="_selectItem"
+                   t-att-data-place-id="address['id']" t-att-data-place-name="address['placeName']">
+                    <t t-debug=""/>
+                    <i class="fa fa-map-marker fa-f w" role="img" t-on-click="_selectItem"/>
+                    <t t-out="address['placeName']" t-on-click="_selectItem"/>
+                </a>
+            </div>
         </div>
     </t>
-    <!--    <t t-name="myaddressautofill">-->
-    <!--    <a class="dropdown-item rcs_js_cls_address_dropdown_item">-->
-    <!--    &lt;!&ndash;                t-foreach="this.address" t-as="address" t-key="address.id"&ndash;&gt;-->
-    <!--        &lt;!&ndash;               t-att-data-place-id="address['id']">&ndash;&gt;-->
-    <!--        <t t-debug=""/>-->
-    <!--        <i class="fa fa-map-marker fa-f w" role="img" t-on-click="_selectItem"/>-->
-    <!--        &lt;!&ndash;                <t t-out="address['field_registry']"/>&ndash;&gt;-->
-    <!--        &lt;!&ndash;                <t t-out="address['formattedAddress']"/>&ndash;&gt;-->
-    <!--        &lt;!&ndash;                <t t-out="address"/>&ndash;&gt;-->
-    <!--        <span t-on-click="_selectItem">hello</span>-->
-    <!--            </a>-->
-    <!--    </t>-->
 </templates>
+
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<templates xml:space="preserve">-->
+
+<!--  <t t-name="partner_address_autofill.RcsAddressAutoFill">-->
+<!--    <div t-attf-class="rcs_js_cls_addresses_dropdown dropdown-menu"-->
+<!--         style="position: absolute; z-index: 999;">-->
+<!--&lt;!&ndash;        <a class="dropdown-item rcs_js_cls_address_dropdown_item"&ndash;&gt;-->
+<!--&lt;!&ndash;           t-foreach="addresses" t-as="address" t-key="address.place_id"&ndash;&gt;-->
+<!--&lt;!&ndash;           t-on-click="_selectItem"&ndash;&gt;-->
+<!--&lt;!&ndash;           t-att-data-place-id="address['place_id']"&ndash;&gt;-->
+<!--&lt;!&ndash;           t-att-data-place-name="address['description']">&ndash;&gt;-->
+<!--&lt;!&ndash;            <i class="fa fa-map-marker fa-fw" role="img"/>&ndash;&gt;-->
+<!--&lt;!&ndash;            <t t-out="address['description']"/>&ndash;&gt;-->
+<!--&lt;!&ndash;        </a>&ndash;&gt;-->
+<!--&lt;!&ndash;        <img style="padding-right:10px; float:right;"&ndash;&gt;-->
+<!--&lt;!&ndash;             src="/sh_contact_address_google_place/static/src/img/pw_by_google.png"&ndash;&gt;-->
+<!--&lt;!&ndash;             alt="Powered by Google"/>&ndash;&gt;-->
+<!--        <h1>Hello</h1>-->
+<!--    </div>-->
+<!--</t>-->
+
+<!--</templates>-->
