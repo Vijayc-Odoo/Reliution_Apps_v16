@@ -36,13 +36,20 @@ export class RcsAddressAutoFill extends CharField {
         this._searchPlace(value);
     }
 
+    onBlurInput(ev){
+        console.log("hello Blur");
+        document.querySelector('#enterLocation').value = "";
+        this.state.results=[]
+        this.state.query=""
+    }
+
     async _selectItem(ev){
         debugger;
-        document.querySelector('#enterLocation').value = ev.currentTarget.dataset.placeName;
+        document.querySelector('#enterLocation').value = "";
         ev.currentTarget.dataset.placeId
         ev.currentTarget.dataset.placeName
-        const detailAddress = await rpc("/rcs_detail_gmap/address",{address: ev.currentTarget.dataset.placeId,place_id: ev.currentTarget.dataset.placeName})
-        this.state.results=[]
+        const detailAddress = await rpc("/rcs_detail_gmap/address",{address: ev.currentTarget.dataset.placeId,place_id: ev.currentTarget.dataset.placeId})
+
 //        await this.props.record.update({'street':'Vijay','street2':'chudasama','city':'Keshod','zip':362220,'country_id':{'id':104,'display_name':'India'},'country_code':'IN'})
         await this.props.record.update({
             'street':detailAddress.street,
@@ -53,6 +60,7 @@ export class RcsAddressAutoFill extends CharField {
             'country_id': [detailAddress.country] ,
 //            'country_code':'IN'
         })
+        this.state.results=[]
     }
 
     async _searchPlace(value){

@@ -5,9 +5,11 @@ import requests
 from odoo.http import request
 from odoo import http, fields
 
+URL = 'https://places.googleapis.com/v1/places'
 
 class RcsContactAddressGooglePlace(http.Controller):
 
+    # this method is used to prepare data in proper formate and make dicnory
     def get_proper_address(self, results):
         # Initialize fields
         street = city = zip = street2 = country_code = state_code = ""
@@ -61,38 +63,33 @@ class RcsContactAddressGooglePlace(http.Controller):
         if len(partial_address) < company.rcs_google_api_search_char:
             return []
 
+        country_code = False
+        if company.rcs_google_country:
+            country_code = company.rcs_google_country.code
+
         if company and company.rcs_is_enable_google_api_key and company.rcs_google_api_key:
             headers = {
                 'X-Goog-Api-Key': company.rcs_google_api_key,
                 'Content-Type': 'application/json',
-                # 'X-Goog-FieldMask': 'places.id,places.name,places.displayName,places.formattedAddress',
-                # 'X-Goog-FieldMask': '*',
-                'X-Goog-FieldMask': '',
+                'X-Goog-FieldMask': 'suggestions.placePrediction.text.text,suggestions.placePrediction.placeId'
             }
-            country_code=False
-            if company.rcs_google_country:
-                country_code=company.rcs_google_country.code
+
             payload = {
                 'input': partial_address,
                 'includedRegionCodes':country_code or ""
-                # 'textQuery': partial_address,
-                # "pageSize": 5,
-                # 'regionCode':'CA',
             }
-            url = 'https://places.googleapis.com/v1/places:autocomplete'
-            response = requests.post(url, headers=headers, json=payload)
+
+            response = requests.post(f'{URL}:autocomplete', headers=headers, json=payload)
             result = response.json()
             results = result.get('suggestions')
-            # results = result.get('places')
             if result:
                 places = [{'placeName': res.get('placePrediction').get('text').get('text'),
                            'id': res.get('placePrediction').get('placeId')} for res in results]
-                # places = [{'formattedAddress': res.get('formattedAddress'), 'id': res.get('id')} for res in results]
-                print(places)
                 return places
             return []
         return []
 
+    # this method is used to request and search by place id and prepare the address
     @http.route("/rcs_detail_gmap/address", type='json', auth='user')
     def rcs_fill_gmap_address(self, address, place_id):
         company = request.env.user.company_id or request.env.company
@@ -100,15 +97,12 @@ class RcsContactAddressGooglePlace(http.Controller):
             headers = {
                 'X-Goog-Api-Key': company.rcs_google_api_key,
                 'Content-Type': 'application/json',
-                # 'X-Goog-FieldMask': '*',
                 'X-Goog-FieldMask': 'id,name,displayName,formattedAddress,addressComponents',
             }
 
-            url = f'https://places.googleapis.com/v1/places/{address}'
-            response = requests.get(url, headers=headers)
+            response = requests.get(f'{URL}/{place_id}', headers=headers)
             result = response.json()
             print(result)
-            # self.get_proper_address(result.get('addressComponents'))
             if not result:
                 return []
         return self.get_proper_address(result.get('addressComponents'))
