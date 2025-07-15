@@ -39,8 +39,21 @@ export class RcsAddressAutoFill extends CharField {
     onBlurInput(ev){
         console.log("hello Blur");
         document.querySelector('#enterLocation').value = "";
-        this.state.results=[]
-        this.state.query=""
+//        this.state.results=[]
+//        this.state.query=""
+
+//        this.props.record.save().then(() => {
+//            this.state.results=[]
+//            this.state.query=""
+//            console.log("✅ Record saved from blur input");
+//        }).catch((err) => {
+//            console.warn("❌ Save failed:", err);
+//        });
+//        this.props.record.discard().then(() => {
+//            console.log("✅ Record Discard from blur input");
+//        }).catch((err) => {
+//            console.warn("❌ Save failed:", err);
+//        });
     }
 
     async _selectItem(ev){
