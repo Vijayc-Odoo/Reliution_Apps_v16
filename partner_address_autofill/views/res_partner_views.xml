@@ -3,7 +3,7 @@
 	<record id="rcs_contact_address_google_form_view_inherit" model="ir.ui.view">
 		<field name="name">sh.contact.address.google.form.view.inherit</field>
 		<field name="model">res.partner</field>
-			<field name="inherit_id" ref="base.view_partner_form"/> 
+			<field name="inherit_id" ref="base.view_partner_form"/>
 			<field name="arch" type="xml">
 				<field name='street' position="before">
 					<field name='rcs_contact_google_location' placeholder='Enter Location new' widget='rcs_address_auto_complete' class='oe_edit_only  o_input'/>
