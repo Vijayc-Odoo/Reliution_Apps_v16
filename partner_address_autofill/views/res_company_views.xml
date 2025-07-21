@@ -9,7 +9,7 @@
 					<field name="rcs_is_enable_google_api_key"/>
 					<field name='rcs_google_api_key' invisible="rcs_is_enable_google_api_key == False" required="rcs_is_enable_google_api_key == True"/>
 					<field name="rcs_google_api_search_char" invisible="rcs_is_enable_google_api_key == False"/>
-					<field name="rcs_google_country" invisible="rcs_is_enable_google_api_key == False"/>
+					<field name="rcs_google_country1"  invisible="rcs_is_enable_google_api_key == False"/>
 				</field>
  		</field>
 	</record>

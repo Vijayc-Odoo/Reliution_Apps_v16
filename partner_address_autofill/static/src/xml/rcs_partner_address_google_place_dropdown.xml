@@ -7,7 +7,6 @@
             <div t-if="state.results.length" id="rcs_dropdown_item"
                  class="rcs_js_cls_addresses_dropdown dropdown-menu show"
                  style="display: white; position: absolute; z-index: 999;">
-                <!--                    <t t-debug=""/>-->
                 <a class="dropdown-item rcs_js_cls_address_dropdown_item"
                    t-foreach="state.results" t-as="address" t-key="address.id"
                    t-on-click="_selectItem"
@@ -19,5 +18,6 @@
             </div>
         </div>
          <t t-out="props.record.data[this.props.name] or props.record[this.props.name]" t-class="text-muted" t-att-id="'rcs_address'" />
+<!--        <t t-out="props.record.data.rcs_contact_google_location"/>-->
     </t>
 </templates>

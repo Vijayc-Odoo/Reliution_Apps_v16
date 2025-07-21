@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rcs_address_field_mapping,access.rcs.address.field.mapping,model_rcs_address_field_mapping,base.group_user,1,1,1,1
+access_rcs_address_field_mapping_line,access.rcs.address.field.mapping.line,model_rcs_address_field_mapping_line,base.group_user,1,1,1,1

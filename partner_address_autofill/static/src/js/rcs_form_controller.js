@@ -4,8 +4,8 @@ import { FormController } from "@web/views/form/form_controller";
 
 patch(FormController.prototype, {
     clearDropDown(){
-        if(document.querySelector('#enterLocation')){
-            document.querySelector('#enterLocation').value = "";
+        if(document.querySelectorAll('#enterLocation')){
+            document.querySelectorAll('#enterLocation').value = "";
         }
 
         if (document.querySelector('#rcs_dropdown_item')) {

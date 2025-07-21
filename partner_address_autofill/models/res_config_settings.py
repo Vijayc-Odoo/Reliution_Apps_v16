@@ -11,4 +11,5 @@ class ResConfigSettings(models.TransientModel):
     rcs_is_enable_google_api_key = fields.Boolean(related="company_id.rcs_is_enable_google_api_key",string="Enable Google API",readonly=False)
     rcs_google_api_key = fields.Char(related="company_id.rcs_google_api_key",string="Key",readonly=False)
     rcs_google_api_search_char = fields.Integer(related="company_id.rcs_google_api_search_char" ,string="Search Charactor",readonly=False)
-    rcs_google_country = fields.Many2one('res.country', related="company_id.rcs_google_country" ,string="Search Perticular Country",readonly=False)
+    # rcs_google_country = fields.Many2one('res.country', related="company_id.rcs_google_country" ,string="Search Perticular Country",readonly=False)
+    rcs_google_country1 = fields.Many2many('res.country', related="company_id.rcs_google_country1" ,string="Search Perticular Country",readonly=False)

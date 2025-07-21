@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rcs_address_field_mapping_tree" model="ir.ui.view">
+        <field name="name">rcs.address.field.mapping.tree</field>
+        <field name="model">rcs.address.field.mapping</field>
+        <field name="arch" type="xml">
+            <list string="Address Field Mapping">
+                <field name="model_id"/>
+                <!--                <field name="STREET"/>-->
+                <!--                <field name="CITY"/>-->
+
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rcs_address_field_mapping_form" model="ir.ui.view">
+        <field name="name">rcs.address.field.mapping.form</field>
+        <field name="model">rcs.address.field.mapping</field>
+        <field name="arch" type="xml">
+            <form string="Address Field Mapping">
+                <sheet>
+                    <group>
+                        <field name="model_id"/>
+
+                        <field name="widget_field_id" context="{'rcs_field_widget':True}"/>
+                        <!--                        <field name="STREET" domain="[('model_id','=',model_id)]"/>-->
+                        <!--                        <field name="CITY"/>-->
+                        <field name="line_ids">
+                            <list editable="bottom" create="1" delete="1">
+                                <field name="label"/>
+<!--                                <field name="fields_type" invisible="0"/>-->
+                                <field name="field_id" domain="fields_type"  />
+                            </list>
+                        </field>
+
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rcs_address_field_mapping" model="ir.actions.act_window">
+        <field name="name">Address Field Mapping</field>
+        <field name="res_model">rcs.address.field.mapping</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_rcs_address_root" name="RCS Address"/>
+    <menuitem id="menu_rcs_address_field_mapping" name="Field Mapping" parent="menu_rcs_address_root"
+              action="action_rcs_address_field_mapping"/>
+</odoo>

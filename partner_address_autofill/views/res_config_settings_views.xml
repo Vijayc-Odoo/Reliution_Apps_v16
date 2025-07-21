@@ -44,8 +44,9 @@
                             <div class="o_setting_left_pane"> </div>
                             <div class="o_setting_right_pane">
                                 <div class="content-group">
-                                    <label for='rcs_google_country' class='mr-3'> </label>
-                                    <field name='rcs_google_country' class="oe_inline ms-2" invisible="rcs_is_enable_google_api_key == False" />
+                                    <label for='rcs_google_country1' class='mr-3'> </label>
+<!--                                    <field name='rcs_google_country' class="oe_inline ms-2" invisible="rcs_is_enable_google_api_key == False" />-->
+                                    <field name='rcs_google_country1'  widget="many2many_tags" class="oe_inline ms-2" invisible="rcs_is_enable_google_api_key == False" />
                                 </div>
                             </div>
                         </div>
