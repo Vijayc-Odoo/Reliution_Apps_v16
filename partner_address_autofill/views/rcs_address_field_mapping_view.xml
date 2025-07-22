@@ -40,16 +40,6 @@
         <field name="view_mode">list,form</field>
     </record>
 
-<!--     <menuitem name="Activities"-->
-<!--        id="menu_mail_activities_section"-->
-<!--        parent="base.menu_custom"-->
-<!--        sequence="2" />-->
-<!--    <menuitem-->
-<!--      id="menu_mail_activities"-->
-<!--      action="mail_activity_action"-->
-<!--      parent="mail.menu_mail_activities_section"-->
-<!--      sequence="10"/>-->
-
     <menuitem id="menu_rcs_address_root" name="RCS Address" parent="base.menu_custom" sequence="2"/>
     <menuitem id="menu_rcs_address_field_mapping" name="Field Mapping" parent="menu_rcs_address_root"
               action="action_rcs_address_field_mapping"/>

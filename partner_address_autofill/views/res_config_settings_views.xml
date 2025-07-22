@@ -24,7 +24,6 @@
 
                         <div class="col-12 col-lg-12 o_setting_box" style="width:100%"
                              invisible="rcs_is_enable_google_api_key == False ">
-                            <!--	                    <div class="col-12 col-lg-12 o_setting_box" style="width:100%" >-->
                             <div class="o_setting_left_pane"> </div>
                             <div class="o_setting_right_pane">
                                 <div class="content-group">

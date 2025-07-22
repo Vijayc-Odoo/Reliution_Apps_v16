@@ -4,7 +4,7 @@
         <record id="rcs_address_mapping_res_partner" model="rcs.address.field.mapping">
             <field name="model_id" ref="base.model_res_partner"/>
             <!-- Use search to find the custom widget field dynamically -->
-                    <field name="widget_field_id" search="[('model_id.model', '=', 'res.partner'), ('name', '=', 'rcs_contact_google_location')]"/>
+            <field name="widget_field_id" search="[('model_id.model', '=', 'res.partner'), ('name', '=', 'rcs_contact_google_location')]"/>
         </record>
 
         <!-- Mapping Lines -->
