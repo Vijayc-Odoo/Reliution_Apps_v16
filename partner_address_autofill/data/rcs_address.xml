@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="rcs_address_mapping_res_partner" model="rcs.address.field.mapping">
+            <field name="model_id" ref="base.model_res_partner"/>
+            <!-- Use search to find the custom widget field dynamically -->
+                    <field name="widget_field_id" search="[('model_id.model', '=', 'res.partner'), ('name', '=', 'rcs_contact_google_location')]"/>
+        </record>
+
+        <!-- Mapping Lines -->
+            <record id="rcs_address_mapping_line_street" model="rcs.address.field.mapping.line">
+                <field name="mapping_id" ref="rcs_address_mapping_res_partner"/>
+                <field name="fields_type"  eval="[('model_id', '=', ref('base.model_res_partner')), ('ttype', 'in', ['char', 'text', 'html'])]"/>
+                <field name="label">STREET</field>
+                <field name="field_id" ref="base.field_res_partner__street"/>
+            </record>
+
+            <record id="rcs_address_mapping_line_street2" model="rcs.address.field.mapping.line">
+                <field name="mapping_id" ref="rcs_address_mapping_res_partner"/>
+                <field name="fields_type"  eval="[('model_id', '=', ref('base.model_res_partner')), ('ttype', 'in', ['char', 'text', 'html'])]"/>
+                <field name="label">STREET2</field>
+                <field name="field_id" ref="base.field_res_partner__street2"/>
+            </record>
+
+            <record id="rcs_address_mapping_line_city" model="rcs.address.field.mapping.line">
+                <field name="mapping_id" ref="rcs_address_mapping_res_partner"/>
+                <field name="fields_type"  eval="[('model_id', '=', ref('base.model_res_partner')), ('ttype', 'in', ['char', 'text', 'html'])]"/>
+                <field name="label">CITY</field>
+                <field name="field_id" ref="base.field_res_partner__city"/>
+            </record>
+
+            <record id="rcs_address_mapping_line_zip" model="rcs.address.field.mapping.line">
+                <field name="mapping_id" ref="rcs_address_mapping_res_partner"/>
+                <field name="fields_type"  eval="[('model_id', '=', ref('base.model_res_partner')), ('ttype', 'in', ['char', 'text', 'html', 'integer'])]"/>
+                <field name="label">ZIP</field>
+                <field name="field_id" ref="base.field_res_partner__zip"/>
+            </record>
+
+            <record id="rcs_address_mapping_line_country" model="rcs.address.field.mapping.line">
+                <field name="mapping_id" ref="rcs_address_mapping_res_partner"/>
+                <field name="fields_type"  eval="[('model_id', '=', ref('base.model_res_partner')), ('ttype', 'in', ['char', 'text', 'html']), ('relation', '=', 'res.country')]"/>
+                <field name="label">COUNTRY</field>
+                <field name="field_id" ref="base.field_res_partner__country_id"/>
+            </record>
+
+            <record id="rcs_address_mapping_line_state" model="rcs.address.field.mapping.line">
+                <field name="mapping_id" ref="rcs_address_mapping_res_partner"/>
+                <field name="fields_type"  eval="[('model_id', '=', ref('base.model_res_partner')), ('ttype', 'in', ['char', 'text', 'html']), ('relation', '=', 'res.country.state')]"/>
+                <field name="label">STATE</field>
+                <field name="field_id" ref="base.field_res_partner__state_id"/>
+            </record>
+    </data>
+</odoo>

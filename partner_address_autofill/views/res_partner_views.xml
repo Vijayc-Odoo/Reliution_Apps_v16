@@ -6,14 +6,10 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <field name='street' position="before">
-                <field name='rcs_contact_google_location' placeholder='Enter Location new'
+                <field name='rcs_contact_google_location' placeholder='Enter Location'
                        widget='rcs_address_auto_complete' class='oe_edit_only  o_input'/>
             </field>
-            <field name='email' position="after">
-                <field name='test_field' placeholder='Enter Location new' widget='rcs_address_auto_complete'
-                       class='oe_edit_only  o_input'/>
-            </field>
-            <!--				<div class="rcs_address_dropdown_container position-relative"/>-->
+<!--            				<div class="rcs_address_dropdown_container position-relative"/>-->
             <div class="o_address_format" position="attributes">
                 <attribute name="class" add="rcs_custom_address_format" separator=" "/>
             </div>

@@ -7,9 +7,6 @@
     "summary": "Paymob is the leading financial services enabler in the MENA-P region.",
     "depends": [
         'base',
-        'crm',
-        "payment",
-        "account",
     ],
     "data": [
         'security/ir.model.access.csv',
@@ -17,6 +14,9 @@
         'views/res_partner_views.xml',
         'views/res_company_views.xml',
         'views/res_config_settings_views.xml',
+    ],
+    'demo': [
+        'data/rcs_address.xml',
     ],
     'assets': {
         'web.assets_backend': [

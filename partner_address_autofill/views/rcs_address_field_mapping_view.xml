@@ -6,9 +6,6 @@
         <field name="arch" type="xml">
             <list string="Address Field Mapping">
                 <field name="model_id"/>
-                <!--                <field name="STREET"/>-->
-                <!--                <field name="CITY"/>-->
-
             </list>
         </field>
     </record>
@@ -20,15 +17,13 @@
             <form string="Address Field Mapping">
                 <sheet>
                     <group>
-                        <field name="model_id"/>
+                        <field name="model_id" placeholder="Select The Model" required="True"/>
 
-                        <field name="widget_field_id" context="{'rcs_field_widget':True}"/>
-                        <!--                        <field name="STREET" domain="[('model_id','=',model_id)]"/>-->
-                        <!--                        <field name="CITY"/>-->
+                        <field name="widget_field_id" placeholder="Select widget target field"/>
                         <field name="line_ids">
-                            <list editable="bottom" create="1" delete="1">
+                            <list editable="bottom">
                                 <field name="label"/>
-<!--                                <field name="fields_type" invisible="0"/>-->
+                                <field name="fields_type" column_invisible="True"/>
                                 <field name="field_id" domain="fields_type"  />
                             </list>
                         </field>
@@ -45,7 +40,17 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <menuitem id="menu_rcs_address_root" name="RCS Address"/>
+<!--     <menuitem name="Activities"-->
+<!--        id="menu_mail_activities_section"-->
+<!--        parent="base.menu_custom"-->
+<!--        sequence="2" />-->
+<!--    <menuitem-->
+<!--      id="menu_mail_activities"-->
+<!--      action="mail_activity_action"-->
+<!--      parent="mail.menu_mail_activities_section"-->
+<!--      sequence="10"/>-->
+
+    <menuitem id="menu_rcs_address_root" name="RCS Address" parent="base.menu_custom" sequence="2"/>
     <menuitem id="menu_rcs_address_field_mapping" name="Field Mapping" parent="menu_rcs_address_root"
               action="action_rcs_address_field_mapping"/>
 </odoo>

@@ -18,6 +18,5 @@
             </div>
         </div>
          <t t-out="props.record.data[this.props.name] or props.record[this.props.name]" t-class="text-muted" t-att-id="'rcs_address'" />
-<!--        <t t-out="props.record.data.rcs_contact_google_location"/>-->
     </t>
 </templates>

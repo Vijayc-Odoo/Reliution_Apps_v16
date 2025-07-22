@@ -4,20 +4,20 @@ import { FormController } from "@web/views/form/form_controller";
 
 patch(FormController.prototype, {
     clearDropDown(){
-        if(document.querySelectorAll('#enterLocation')){
-            document.querySelectorAll('#enterLocation').value = "";
+    //  Clear input field and dropdown list data
+        if(document.querySelector('#enterLocation')){
+            document.querySelectorAll('#enterLocation').forEach(el => {
+                el.value = "";
+            });
         }
-
         if (document.querySelector('#rcs_dropdown_item')) {
             document.querySelector('#rcs_dropdown_item').remove()
-        } else {
-            console.log("Dropdown does NOT exist");
         }
-        console.log("Discard Method Call");
     },
 
     get actionMenuItems() {
         const items =super.actionMenuItems;
+        //Clear the dropdown list when clicking on the form controller
         this.clearDropDown();
         return items;
     }
