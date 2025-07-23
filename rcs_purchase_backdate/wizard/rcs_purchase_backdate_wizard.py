@@ -28,7 +28,7 @@ class BackdateWizard(models.TransientModel):
             else:
                 self.is_boolean = False
 
-    def open_backdate_wizard(self):
+    def open_rcs_backdate_wizard(self):
         active_ids = self.env.context.get('active_ids')
 
         return {
