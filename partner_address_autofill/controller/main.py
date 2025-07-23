@@ -45,8 +45,6 @@ class RcsContactAddressGooglePlace(http.Controller):
             if type == 'country':
                 data['country_name'] = long
                 data['country_code'] = short
-            # if type == 'neighborhood':
-            #     data['street'] += (", " if data['street'] else "") + long
             if type == 'neighborhood' or type == 'sublocality_level_1' or type == 'sublocality_level_2':
                 data['street2'] += (", " if data['street2'] else "") + long
 
@@ -118,7 +116,6 @@ class RcsContactAddressGooglePlace(http.Controller):
         result = response.json()
         results = result.get('suggestions')
         if not results:
-            print("Not Result Found")
             return []
 
         # Extract and return suggestions
