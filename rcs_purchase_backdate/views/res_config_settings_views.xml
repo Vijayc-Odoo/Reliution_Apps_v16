@@ -1,33 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="sh_purchase_backdate_res_config_settings" model="ir.ui.view">
-        <field name="name">Purchase Backdate Settings</field>
+    <record id="rcs_purchase_backdate_res_config_settings" model="ir.ui.view">
+        <field name="name">Backdate Purchase Settings</field>
         <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="purchase.res_config_settings_view_form_purchase" />
+        <field name="inherit_id" ref="purchase.res_config_settings_view_form_purchase"/>
         <field name="arch" type="xml">
             <app name="purchase" position="inside">
                 <block title="Purchase Backdate Settings" name="purchase_backdate">
-                    <setting>
-                        <field name="backdate_for_purchase_order" />
-                    </setting>
-                    <setting invisible="not backdate_for_purchase_order">
-                        <field name="remark_for_purchase_order" />
-                        <div class="content-group" invisible="not remark_for_purchase_order or not backdate_for_purchase_order">
-                            <div class="mt8">
-                                <field class="oe_inline" name="remark_mandatory_for_purchase_order" />
-                                <label for="remark_mandatory_for_purchase_order"/>
+                    <div class="row mt16 o_settings_container">
+
+                        <!--                         Backdate Toggle -->
+                        <div class="col-12 o_setting_box" style="width:100%">
+                            <div class="o_setting_left_pane">
+                                <field name="purchase_order_backdate"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="purchase_order_backdate"/>
                             </div>
                         </div>
-                    </setting>
+                        <!--                        <setting name="purchase_order_backdate" string="Enable Purchase Order Backdate">-->
+                        <!--                            <field name="purchase_order_backdate"/>-->
+                        <!--                        </setting>-->
 
-                    <setting invisible="not backdate_for_purchase_order" >
-                        <field name="backdate_for_bill"/>
-                    </setting>
-                    <setting invisible="not backdate_for_purchase_order" >
-                        <field name="backdate_for_stock_move"/>
-                    </setting>
+                        <!-- Conditional Settings Row -->
+                        <div class="row" invisible="purchase_order_backdate == False">
+
+                            <!-- Left Column -->
+                            <div class="col-6">
+                                <!-- Bill Backdate -->
+                                <div class="o_setting_box">
+                                    <div class="o_setting_left_pane">
+                                        <field name='bill_backdate' class="oe_inline ms-2"/>
+                                    </div>
+                                    <div class="o_setting_right_pane">
+                                        <label for='bill_backdate' class='mr-3'/>
+                                    </div>
+                                </div>
+
+                                <!-- Receipt Backdate -->
+                                <div class="o_setting_box">
+                                    <div class="o_setting_left_pane">
+                                        <field name='stock_move_backdate' class="oe_inline ms-2"/>
+                                    </div>
+                                    <div class="o_setting_right_pane">
+                                        <label for='stock_move_backdate' class='mr-3'/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-6">
+                                <!-- Notes for PO -->
+                                <div class="o_setting_box">
+                                    <div class="o_setting_left_pane">
+                                        <field name='rcs_notes_for_purchase_order' class="oe_inline ms-2"/>
+                                    </div>
+                                    <div class="o_setting_right_pane">
+                                        <label for='rcs_notes_for_purchase_order' class='mr-3'/>
+                                    </div>
+                                </div>
+
+                                <!-- Notes Mandatory -->
+                                <div class="o_setting_box" invisible="rcs_notes_for_purchase_order == False">
+                                    <div class="o_setting_left_pane">
+                                        <field name='rcs_notes_mandatory_for_purchase_order' class="oe_inline ms-2"/>
+                                    </div>
+                                    <div class="o_setting_right_pane">
+                                        <label for='rcs_notes_mandatory_for_purchase_order' class='mr-3'/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </block>
             </app>
         </field>
     </record>
+
 </odoo>

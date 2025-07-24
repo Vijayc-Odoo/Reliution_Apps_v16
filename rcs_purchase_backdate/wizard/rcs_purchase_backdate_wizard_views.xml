@@ -11,9 +11,9 @@
                             <field name="purchase_order_ids" widget="many2many_tags" invisible="1" />
                             <field name="company_id" invisible="1" />
                             <field name="date_planned" />
-                            <field name="remarks" invisible="not is_remarks" required="is_remarks_mandatory and is_boolean" />
-                            <field name="is_remarks" invisible="1" />
-                            <field name="is_remarks_mandatory" invisible="1" />
+                            <field name="rcs_notes" invisible="not is_rcs_notes" required="is_rcs_notes_mandatory and is_boolean" />
+                            <field name="is_rcs_notes" invisible="1" />
+                            <field name="is_rcs_notes_mandatory" invisible="1" />
                             <field name="is_boolean" invisible="1" />
                         </group>
                     </group>

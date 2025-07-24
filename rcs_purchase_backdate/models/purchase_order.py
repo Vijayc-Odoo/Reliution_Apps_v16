@@ -4,18 +4,18 @@ from odoo import fields, models, api
 from datetime import date
 
 
-class PurchaseOrder(models.Model):
+class RcsPurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    remarks = fields.Text(string="Remarks")
-    is_remarks = fields.Boolean(
-        related="company_id.remark_for_purchase_order", string="Is Remarks")
-    is_remarks_mandatory = fields.Boolean(
-        related="company_id.remark_mandatory_for_purchase_order", string="Is remarks mandatory")
+    rcs_notes = fields.Text(string="Notes")
+    is_rcs_notes = fields.Boolean(
+        related="company_id.rcs_notes_for_purchase_order", string="Is Notes")
+    is_rcs_notes_mandatory = fields.Boolean(
+        related="company_id.rcs_notes_mandatory_for_purchase_order", string="Is Notes mandatory")
     is_boolean = fields.Boolean()
 
     @api.onchange('date_order')
-    def onchange_date_order(self):
+    def _onchange_date_order(self):
         if self.date_order:
             if str(self.date_order.date()) < str(date.today()):
                 self.is_boolean = True
@@ -24,7 +24,7 @@ class PurchaseOrder(models.Model):
 
     def button_confirm(self, force=False):
         res = super().button_confirm()
-        if self.company_id.backdate_for_purchase_order:
+        if self.company_id.purchase_order_backdate:
             self.write({
                 'date_approve': self.date_order
             })
@@ -55,19 +55,19 @@ class PurchaseOrder(models.Model):
             'invoice_payment_term_id': self.payment_term_id.id,
             'invoice_line_ids': [],
             'company_id': self.company_id.id,
-            'invoice_date': self.date_approve if self.company_id.backdate_for_bill else date.today(),
-            'remarks_for_purchase': self.remarks if self.remarks else False
+            'invoice_date': self.date_approve if self.company_id.bill_backdate else date.today(),
+            'rcs_notes_for_purchase': self.rcs_notes if self.rcs_notes else False
         }
         return invoice_vals
 
 
-class PurchaseOrderLine(models.Model):
+class RcsPurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     def _prepare_stock_move_vals(self, picking, price_unit, product_uom_qty, product_uom):
         res = super()._prepare_stock_move_vals(
             picking, price_unit, product_uom_qty, product_uom)
-        if self.company_id.backdate_for_stock_move:
+        if self.company_id.stock_move_backdate:
             res.update({
                 'date': self.order_id.date_order,
                 'date_deadline': self.order_id.date_order,

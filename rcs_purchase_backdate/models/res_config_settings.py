@@ -3,29 +3,29 @@
 from odoo import fields, models
 
 
-class ResCompany(models.Model):
+class RcsResCompany(models.Model):
     _inherit = 'res.company'
 
-    backdate_for_purchase_order = fields.Boolean(
-        "Enable Backdate for Purchase Order")
-    remark_for_purchase_order = fields.Boolean(
-        "Enable Remark for Purchase Order")
-    remark_mandatory_for_purchase_order = fields.Boolean(
-        "Remark Mandatory for Purchase Order")
-    backdate_for_bill = fields.Boolean("Bill has Same Backdate")
-    backdate_for_stock_move = fields.Boolean("Receipts has Same Backdate ")
+    purchase_order_backdate = fields.Boolean(
+        "Enable Custom Date for Purchase Orders")
+    rcs_notes_for_purchase_order = fields.Boolean(
+        "Enable Purchase Order Notes")
+    rcs_notes_mandatory_for_purchase_order = fields.Boolean(
+        "Require Notes for Purchase Orders")
+    bill_backdate = fields.Boolean("Sync Bill Date with Purchase Order Date")
+    stock_move_backdate = fields.Boolean("Sync Receipt Date with Purchase Order Date ")
 
 
-class ResConfigSettings(models.TransientModel):
+class RcsResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    backdate_for_purchase_order = fields.Boolean(
-        "Enable Backdate for Purchase Order", related="company_id.backdate_for_purchase_order", readonly=False)
-    remark_for_purchase_order = fields.Boolean(
-        "Enable Remark for Purchase Order", related="company_id.remark_for_purchase_order", readonly=False)
-    remark_mandatory_for_purchase_order = fields.Boolean(
-        "Remark Mandatory for Purchase Order", related="company_id.remark_mandatory_for_purchase_order", readonly=False)
-    backdate_for_bill = fields.Boolean(
-        "Bill has Same Backdate", related="company_id.backdate_for_bill", readonly=False)
-    backdate_for_stock_move = fields.Boolean(
-        "Receipts has Same Backdate ", related="company_id.backdate_for_stock_move", readonly=False)
+    purchase_order_backdate = fields.Boolean(
+        "Enable Custom Date for Purchase Orders", related="company_id.purchase_order_backdate", readonly=False)
+    rcs_notes_for_purchase_order = fields.Boolean(
+        "Enable Purchase Order Notes", related="company_id.rcs_notes_for_purchase_order", readonly=False)
+    rcs_notes_mandatory_for_purchase_order = fields.Boolean(
+        "Require Notes for Purchase Orders", related="company_id.rcs_notes_mandatory_for_purchase_order", readonly=False)
+    bill_backdate = fields.Boolean(
+        "Sync Bill Date with Purchase Order Date", related="company_id.bill_backdate", readonly=False)
+    stock_move_backdate = fields.Boolean(
+        "Sync Receipt Date with Purchase Order Date", related="company_id.stock_move_backdate", readonly=False)

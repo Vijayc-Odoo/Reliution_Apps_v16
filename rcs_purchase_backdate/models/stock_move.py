@@ -3,17 +3,17 @@
 from odoo import fields, models
 
 
-class StockMove(models.Model):
+class RcsStockMove(models.Model):
     _inherit = 'stock.move'
 
-    remarks_for_purchase = fields.Text(
-        string="Remarks for Purchase", related="picking_id.remarks_for_purchase")
-    is_remarks_for_purchase = fields.Boolean(
-        related="company_id.remark_for_purchase_order", string="Is Remarks for Purchase")
+    rcs_notes_for_purchase = fields.Text(
+        string="Notes for Purchase", related="picking_id.rcs_notes_for_purchase")
+    is_rcs_notes_for_purchase = fields.Boolean(
+        related="company_id.rcs_notes_for_purchase_order", string="Is Notes for Purchase")
 
     def write(self, vals):
         for rec in self:
-            if rec.company_id.backdate_for_stock_move:
+            if rec.company_id.stock_move_backdate:
                 if rec.picking_id:
                     vals['date'] = rec.picking_id.scheduled_date
         return super().write(vals)

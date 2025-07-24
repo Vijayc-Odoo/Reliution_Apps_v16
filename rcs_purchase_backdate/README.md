@@ -1,7 +1,7 @@
 
 About
 ============
-In odoo, while you confirm the RFQ it will take the current date as confirmation date and you can not change the date after confirming it so our module is useful for confirm purchase orders with selected confirmation backdate. You can put a custom backdate and remarks in the purchase. You can mass assign backdate in one click. When you mass assign backdate, it asks for remarks in the mass assign wizard. This selected date and remarks are also reflects in the receipts, stock moves, product moves, bill & journal entries.
+In odoo, while you confirm the RFQ it will take the current date as confirmation date and you can not change the date after confirming it so our module is useful for confirm purchase orders with selected confirmation backdate. You can put a custom backdate and notes in the purchase. You can mass assign backdate in one click. When you mass assign backdate, it asks for notes in the mass assign wizard. This selected date and notes are also reflects in the receipts, stock moves, product moves, bill & journal entries.
 
 
 Installation

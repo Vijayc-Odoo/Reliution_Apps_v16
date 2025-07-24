@@ -6,8 +6,8 @@
         <field name="inherit_id" ref="stock.view_move_form" />
         <field name="arch" type="xml">
             <group name="main_grp_col1" position="inside">
-                <field name="remarks_for_purchase" invisible="not remarks_for_purchase or not is_remarks_for_purchase" />
-                <field name="is_remarks_for_purchase" invisible="1" />
+                <field name="rcs_notes_for_purchase" invisible="not rcs_notes_for_purchase or not is_rcs_notes_for_purchase" />
+                <field name="is_rcs_notes_for_purchase" invisible="1" />
             </group>
         </field>
     </record>
