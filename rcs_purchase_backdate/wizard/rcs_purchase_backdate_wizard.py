@@ -20,7 +20,7 @@ class BackdateWizard(models.TransientModel):
         related="company_id.rcs_notes_mandatory_for_purchase_order", string="Is Notes mandatory")
     is_boolean = fields.Boolean()
 
-    backdate_for_stock_move=fields.Boolean("Recept BackDate")
+    backdate_for_stock_move=fields.Boolean("Receipt BackDate")
     backdate_for_bill=fields.Boolean("Bill BackDate")
 
 

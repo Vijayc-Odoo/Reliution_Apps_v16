@@ -22,8 +22,6 @@
     "auto_install": False,
     "installable": True,
     "application": True,
-    # "images": ["static/description/background.png", ],
     "license": "OPL-1",
-    # "price": 20,
     "currency": "EUR"
 }
