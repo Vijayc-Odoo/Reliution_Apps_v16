@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="view_mail_message_form_to_cc">
+        <field name="name">mail.message.form.to.cc.inherit</field>
+        <field name="model">mail.message</field>
+        <field name="inherit_id" ref="mail.mail_message_view_form" />
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='is_internal']" position="after">
+                <field name="is_odoo_mail_message"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_ids']" position="after">
+                <field name="email_msg_to"/>
+                <field name="email_msg_cc"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

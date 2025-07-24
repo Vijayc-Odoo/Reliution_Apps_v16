@@ -1,0 +1,657 @@
+/* @odoo-module*/
+import { registry } from '@web/core/registry';
+import { Component , useRef , useState, onWillStart ,onMounted} from '@odoo/owl'
+import { useService } from "@web/core/utils/hooks";
+import { MailBody } from './MailBody'
+import { SentMail } from './SentMail'
+import { MessageView } from './MessageView'
+import { ComposeMail } from './ComposeMail'
+import { ImportDialog } from './AttachmentMail'
+import { session } from "@web/session";
+/**
+ * odooMail component for handling mail-related functionalities.
+ * @extends Component
+ */
+class odooMail extends  Component {
+    setup() {
+        this.mailState = useState({
+            loadLogo: "",
+            loadMail: [],
+            getCount: "",
+            outBox: "",
+            mode: "tree",
+            formData: {},
+            mailType: "all"
+        })
+        this.dialogService = useService("dialog")
+        this.root = useRef('root');
+        this.action = useService('action')
+        this.orm = useService('orm')
+        this.selectedMails = []
+        onMounted(() => {
+            this.allMailView()
+        })
+        onWillStart(async ()=> {
+            this.mailState.loadLogo = await this.orm.call('mail.icon','load_logo',[])
+//            this.allMailView()
+            this.getCount()
+        })
+    }
+
+     /**
+     * Method to get the count of different mail categories.
+     */
+    async getCount(){
+        this.mailState.getCount = await this.orm.call('mail.mail','get_mail_count',[])
+    }
+    /**
+     * Method to compose a new mail.
+     */
+    async composeMail(){
+     this.dialogService.add(ComposeMail, {
+        loadMail: (mail) => {
+            this.mailState.loadMail.unshift(mail)
+            this.getCount()
+        }
+     })
+    }
+    /**
+     * Method triggered on click of the "Select All" checkbox.
+     * @param {Object} ev - Event object.
+     */
+    onClickSelectAll(ev) {
+        const checked = ev.target.checked
+        this.env.bus.trigger("SELECT:ALL", { checked })
+    }
+    /**
+     * Getter method to get props for MailBody component.
+     * @returns {Object} - Props for MailBody component.
+     */
+    get mailProps() {
+        return {
+            onSelectMail: this.onSelectMail.bind(this),
+            starMail: this.starMail.bind(this),
+            openMail: this.openMail.bind(this),
+            mailType: this.mailType,
+        }
+    }
+       /**
+     * Method to reset the mail view.
+     */
+    resetView(){
+        this.mailState.formData = {}
+        this.mailState.mode = "tree"
+    }
+    /**
+     * Method to open a specific mail.
+     * @param {Object} mail - Mail object.
+     */
+    openMail(mail) {
+        this.mailState.formData = mail
+        this.mailState.mode = "form"
+    }
+     /**
+     * Method to star or unstar a mail.
+     * @param {Number} mail - Mail ID.
+     * @param {Boolean} type - Type of action (star or unstar).
+     */
+    starMail(mail, type){
+        if (type) {
+            this.mailState.getCount.starred_count ++
+        }
+        else this.mailState.getCount.starred_count --
+    }
+     /**
+     * Method triggered on selecting or deselecting a mail.
+     * @param {Number} mailId - Mail ID.
+     * @param {Boolean} check - Checked or not.
+     */
+    onSelectMail(mailId, check) {
+        if (check) {
+            this.selectedMails.push(mailId)
+        }
+        else {
+            this.selectedMails.filter(item => item !== mailId)
+        }
+    }
+    /**
+     * Getter method to get the mail type.
+     * @returns {String} - Current mail type.
+     */
+    get mailType() {
+        return this.mailState.mailType
+    }
+      /**
+     * Method to archive selected mails.
+     * @param {Object} event - Event object.
+     */
+    //content na header ma aa call thase
+    async archiveMail(event){
+          if (this.selectedMails.length){
+                this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
+                 await this.orm.call('mail.mail','archive_mail',[this.selectedMails])
+                 this.getCount()
+                 this.selectedMails = []
+            }
+    }
+    /**
+     * Method to refresh the page.
+     * @param {Object} event - Event object.
+     */
+    refreshPage(event){
+      window.location.reload()
+    }
+     /**
+     * Method to delete selected mails.
+     * @param {Object} event - Event object.
+     */
+    async deleteMail(event){
+            if (this.selectedMails.length){
+                this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
+                 await this.orm.call('mail.mail','delete_mail',[this.selectedMails])
+                 this.getCount()
+                 this.selectedMails = []
+            }
+    }
+
+    async restoreMail(event) {
+        if (this.selectedMails.length) {
+            await this.orm.call('mail.mail', 'restore_mail', [this.selectedMails]);
+            this.getCount();
+            this.allMailView();
+        }
+    }
+
+    async inboxMailView () {
+        const root = this.root.el;
+        root.querySelector('.inbox')?.classList.add('active');
+        root.querySelector('.all_mail')?.classList.remove('active');
+        root.querySelector('.sent')?.classList.remove('active');
+        root.querySelector('.archieved-mail')?.classList.remove('active');
+        root.querySelector('.trash-mail')?.classList.remove('active');
+        root.querySelector('.outbox')?.classList.remove('active');
+        this.mailState.mailType = 'inbox';
+        this.resetView();
+        this.mailState.loadMail = await this.orm.call('mail.mail', 'get_inbox_mails', []);
+
+    }
+
+
+    /**
+     * Method to view all mails.
+     */
+     async allMailView() {
+             const root = this.root.el;
+             root.querySelector('.all_mail')?.classList.add('active');
+             root.querySelector('.archieved-mail')?.classList.remove('active');
+             root.querySelector('.sent-mail')?.classList.remove('active');
+             root.querySelector('.outbox')?.classList.remove('active');
+             root.querySelector('.sent')?.classList.remove('active');
+             root.querySelector('.trash-mail')?.classList.remove('active');
+             root.querySelector('.inbox')?.classList.remove('active');
+        this.mailState.mailType = 'all'
+        this.resetView()
+        this.mailState.loadMail = await this.orm.searchRead('mail.mail',[],[], { order: "create_date desc"})
+//        this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', this.uid]],[], { order: "create_date desc"})
+     }
+
+
+//    async allMailView(){
+//            await $(this.root.el.querySelector('.all_mail')).addClass('active');
+//            $(this.root.el.querySelector('.archieved-mail')).removeClass('active');
+//            $(this.root.el.querySelector('.sent-mail')).removeClass('active');
+//            $(this.root.el.querySelector('.outbox')).removeClass('active');
+//            $(this.root.el.querySelector('.sent')).removeClass('active');
+//        this.mailState.mailType = 'all'
+//        this.resetView()
+//        this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', session.uid]],[], { order: "create_date desc"})
+//    }
+
+      /**
+     * Method to view starred mails.
+     */
+    async starredMail(){
+        const root = this.root.el;
+        root.querySelector('.sent-mail')?.classList.add('active');
+        root.querySelector('.archieved-mail')?.classList.remove('active');
+        root.querySelector('.outbox')?.classList.remove('active');
+        root.querySelector('.sent')?.classList.remove('active');
+        root.querySelector('.all_mail')?.classList.remove('active');
+        root.querySelector('.trash-mail')?.classList.remove('active');
+        root.querySelector('.inbox')?.classList.remove('active');
+        this.mailState.mailType = "starred"
+        this.resetView()
+        this.mailState.loadMail = await this.orm.call('mail.mail','get_starred_mail',[])
+    }
+
+//    async starredMail(){
+//        $(this.root.el.querySelector('.sent-mail')).addClass('active');
+//        $(this.root.el.querySelector('.archieved-mail')).removeClass('active');
+//        $(this.root.el.querySelector('.outbox')).removeClass('active');
+//        $(this.root.el.querySelector('.sent')).removeClass('active');
+//        $(this.root.el.querySelector('.all_mail')).removeClass('active');
+//        this.mailState.mailType = "starred"
+//        this.resetView()
+//        this.mailState.loadMail = await this.orm.call('mail.mail','get_starred_mail',[])
+//    }
+
+     /**
+     * Method to view archived mails.
+     */
+     async archivedMail(){
+        const root = this.root.el
+        root.querySelector('.archieved-mail')?.classList.add('active');
+        root.querySelector('.sent-mail')?.classList.remove('active');
+        root.querySelector('.outbox')?.classList.remove('active');
+        root.querySelector('.sent')?.classList.remove('active');
+        root.querySelector('.all_mail')?.classList.remove('active');
+        root.querySelector('.trash-mail')?.classList.remove('active');
+        root.querySelector('.inbox')?.classList.remove('active');
+        this.mailState.mailType = 'archive'
+        this.resetView()
+        this.mailState.loadMail = await this.orm.call('mail.mail','get_archived_mail',[])
+    }
+
+//    async archivedMail(){
+//        $(this.root.el.querySelector('.archieved-mail')).addClass('active');
+//        $(this.root.el.querySelector('.sent-mail')).removeClass('active');
+//        $(this.root.el.querySelector('.outbox')).removeClass('active');
+//        $(this.root.el.querySelector('.sent')).removeClass('active');
+//        $(this.root.el.querySelector('.all_mail')).removeClass('active');
+//        this.mailState.mailType = 'archive'
+//        this.resetView()
+//        this.mailState.loadMail = await this.orm.call('mail.mail','get_archived_mail',[])
+//    }
+
+    /**
+    * Method in which deleted mails are move to trash.
+    */
+    async trashView() {
+        const root = this.root.el
+        root.querySelector('.trash-mail')?.classList.add('active');
+        root.querySelector('.archieved-mail')?.classList.remove('active');
+        root.querySelector('.sent-mail')?.classList.remove('active');
+        root.querySelector('.outbox')?.classList.remove('active');
+        root.querySelector('.sent')?.classList.remove('active');
+        root.querySelector('.all_mail')?.classList.remove('active');
+        root.querySelector('.inbox')?.classList.remove('active');
+
+        this.mailState.mailType = 'trash';
+        this.resetView();
+        this.mailState.loadMail = await this.orm.call('mail.mail', 'get_trash_mail', []);
+    }
+
+     /**
+     * Method to view outbox mails.
+     */
+
+    async outboxMailView(){
+       const root = this.root.el
+       root.querySelector('.outbox')?.classList.add('active');
+       root.querySelector('.archieved-mail')?.classList.remove('active');
+       root.querySelector('.sent-mail')?.classList.remove('active');
+       root.querySelector('.sent')?.classList.remove('active');
+       root.querySelector('.all_mail')?.classList.remove('active');
+       root.querySelector('.trash-mail')?.classList.remove('active');
+       root.querySelector('.inbox')?.classList.remove('active');
+           this.mailState.mailType = "outbox"
+           this.resetView()
+           this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', session.uid],['state', '=', 'exception']],[], { order: "create_date desc"})
+    }
+
+//   async outboxMailView(){
+//   $(this.root.el.querySelector('.outbox')).addClass('active');
+//   $(this.root.el.querySelector('.archieved-mail')).removeClass('active');
+//   $(this.root.el.querySelector('.sent-mail')).removeClass('active');
+//   $(this.root.el.querySelector('.sent')).removeClass('active');
+//   $(this.root.el.querySelector('.all_mail')).removeClass('active');
+//    this.mailState.mailType = "outbox"
+//    this.resetView()
+//    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', session.uid],['state', '=', 'exception']],[], { order: "create_date desc"})
+//    }
+      /**
+     * Method to view sent mails.
+     */
+    async sentMail(){
+       const root = this.root.el
+       root.querySelector('.sent')?.classList.add('active');
+       root.querySelector('.archieved-mail')?.classList.remove('active');
+       root.querySelector('.sent-mail')?.classList.remove('active');
+       root.querySelector('.outbox')?.classList.remove('active');
+       root.querySelector('.all_mail')?.classList.remove('active');
+       root.querySelector('.inbox')?.classList.remove('active');
+    this.resetView()
+
+//    const queryString = window.location.hash.split('?')[1] || "";
+//    const params = new URLSearchParams(queryString);
+//    const uid = params.get('uid');
+
+    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['state', '=', 'sent'], ['is_trashed', '=', false]],[], { order: "create_date desc"})
+//    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', this.env.uid],['state', '=', 'sent'],['is_trashed', '=', false]], [], { order: "create_date desc" });
+//    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', session.uid],['state', '=', 'sent']],[], { order: "create_date desc"})
+    }
+
+
+//    async sentMail(){
+//       $(this.root.el.querySelector('.sent')).addClass('active');
+//       $(this.root.el.querySelector('.archieved-mail')).removeClass('active');
+//       $(this.root.el.querySelector('.sent-mail')).removeClass('active');
+//       $(this.root.el.querySelector('.outbox')).removeClass('active');
+//       $(this.root.el.querySelector('.all_mail')).removeClass('active');
+//    this.resetView()
+//    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', session.uid],['state', '=', 'sent']],[], { order: "create_date desc"})
+//    }
+    /**
+     * Method to redirect to the calendar view.
+     */
+     redirectCalender(){
+     this.action.doAction({
+                name: "Calender",
+                type: 'ir.actions.act_window',
+                res_model: 'calendar.event',
+                view_mode: 'calendar,tree',
+                view_type: 'calendar',
+                views: [[false, 'calendar'], [false, 'tree']],
+                target: 'current',
+            });
+    }
+     /**
+     * Method to redirect to the contacts view.
+     */
+    redirectContacts(){
+    this.action.doAction({
+                name: "Contacts",
+                type: 'ir.actions.act_window',
+                res_model: 'res.partner',
+                view_mode: 'kanban,form,tree,activity',
+                view_type: 'kanban',
+                views: [[false, 'kanban'], [false, 'form'], [false, 'tree'], [false, 'activity']],
+                target: 'current',
+            });
+    }
+    /**
+     * Method to search mails based on user input.
+     */
+    searchMail(){
+      var value= this.root.el.querySelector(".header-search-input").value.toLowerCase()
+      var inboxItems = this.root.el.querySelectorAll(".inbox-message-item");
+      inboxItems.forEach(item => {
+      var itemText = item.textContent.toLowerCase();
+      item.style.display = itemText.includes(value) ? "" : "none";
+    })
+    }
+}
+odooMail.template = 'OdooMail'
+odooMail.components = {
+    MailBody, SentMail, ComposeMail,MessageView,ImportDialog
+}
+registry.category('actions').add('odoo_mail', odooMail);
+
+------------------------
+import threading
+import smtplib
+from email.mime.text import MIMEText
+
+def send_email(recipient, subject, body, sender_email, password):
+    # ... (Code to create message object)
+    try:
+        with smtplib.SMTP('smtp.example.com', 587) as server:
+            server.starttls()
+            server.login(sender_email, password)
+            server.send_message(message)
+            print(f"Email sent to {recipient}")
+    except Exception as e:
+        print(f"Error sending email to {recipient}: {e}")
+
+def main():
+    recipients = ['recipient1@example.com', 'recipient2@example.com', ...]
+    threads = []
+    for recipient in recipients:
+        thread = threading.Thread(target=send_email, args=(recipient, "Subject", "Body", "sender@example.com", "password"))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+if __name__ == "__main__":
+    main()
+---------------------
+/* @odoo-module */
+import { Component } from '@odoo/owl';
+import { useService } from "@web/core/utils/hooks";
+import { useState, onMounted, markup, useRef } from "@odoo/owl";
+import { ComposeReplyDialog } from './ComposeReplyDialog.js';
+import { ComposeForwardDialog } from './ComposeForwardDialog.js';
+import { useMailUtils } from './MailUtils.js';
+
+/**
+ * MessageView component for displaying a message and its thread.
+ * @extends Component
+ */
+export class MessageView extends Component {
+    setup() {
+        this.root = useRef("root-mail");
+        this.action = useService("action");
+        this.orm = useService("orm");
+        this.mailUtils = useMailUtils();
+        this.state = useState({
+            thread: [], // For entire thread
+            attachments: {}
+        });
+
+        onMounted(this.fetchThread);
+    }
+
+    async fetchThread() {
+        const thread = await this.orm.call('mail.mail', 'get_mail_thread', [this.props.mail.id]);
+        this.state.thread = thread;
+        // Fetch attachments for each mail (optional)
+        for (const mail of thread) {
+            if (mail.attachment_ids && mail.attachment_ids.length) {
+                const result = await this.orm.call("ir.attachment", "get_fields", [mail.attachment_ids]);
+                this.state.attachments[mail.id] = result;
+            }
+        }
+    }
+
+    async replyMail(mail) {
+        this.env.services.dialog.add(ComposeReplyDialog, { mail });
+    }
+
+    async forwardMail(mail) {
+        this.env.services.dialog.add(ComposeForwardDialog, { mail });
+    }
+
+    async markAsDone(mail) {
+        await this.mailUtils.markAsDone(mail.id);
+        window.location.reload();
+    }
+
+    async snoozeMail(mail) {
+        await this.mailUtils.snoozeMail(mail.id);
+        window.location.reload();
+    }
+
+    async markAsUnread(mail) {
+        await this.mailUtils.markAsUnread(mail.id);
+        window.location.reload();
+    }
+
+    async onClickAttachment(attachmentId) {
+        this.action.doAction({
+            type: "ir.actions.act_url",
+            url: `/web/content/${attachmentId}?download=true`
+        });
+    }
+}
+MessageView.template = 'MessageView';
+
+-----------
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="MessageView" owl="1">
+        <div class="message" t-ref="root-mail">
+            <t t-foreach="state.thread" t-as="mail" t-key="mail.id">
+                <div class="mail-thread-item" style="border:1px solid #ccc; padding:1rem; margin-bottom:1rem; border-radius:5px;">
+                    <h5 t-out="mail.subject" style="margin:0;"/>
+                    <div>
+                        <strong>From:</strong> <span t-out="mail.email_from"/>
+                    </div>
+                    <div>
+                        <strong>To:</strong> <span t-out="mail.email_to"/>
+                    </div>
+                    <div class="mt-2" t-out="markup(mail.body_html)"/>
+                    <div class="mt-2">
+                        <t t-if="state.attachments[mail.id]">
+                            <div class="attachments">
+                                <t t-foreach="state.attachments[mail.id]" t-as="attachment" t-key="attachment.attachment">
+                                    <div class="attachment-item d-flex align-items-center">
+                                        <span t-out="attachment.name"/>
+                                        <button class="btn btn-sm ms-2" t-on-click="() => onClickAttachment(attachment.attachment)">Download</button>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                    <div class="mt-2 d-flex gap-2">
+                        <button class="btn btn-primary btn-sm" t-on-click="() => replyMail(mail)">Reply</button>
+                        <button class="btn btn-secondary btn-sm" t-on-click="() => forwardMail(mail)">Forward</button>
+                        <button class="btn btn-success btn-sm" t-on-click="() => markAsDone(mail)">Mark as Done</button>
+                        <button class="btn btn-warning btn-sm" t-on-click="() => snoozeMail(mail)">Snooze</button>
+                        <button class="btn btn-outline-secondary btn-sm" t-on-click="() => markAsUnread(mail)">Mark as Unread</button>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>
+--------
+<t t-if="state.thread && state.thread.length">
+    <t t-foreach="state.thread" t-as="mail" t-key="mail.id">
+        <!-- Mail content -->
+    </t>
+</t>
+<t t-else="">
+    <div>No thread messages to display.</div>
+</t>
+---------
+<!-- Document Selection -->
+<div class="mb-2">
+    <label class="form-label">Select Document</label>
+    <select class="form-select" t-model="state.documentModel"
+            t-on-change="() => this.loadDocumentRecords(state.documentModel)">
+        <option value="">-- Select a Document Type --</option>
+        <t t-foreach="state.availableDocuments" t-as="doc" t-key="doc.model">
+            <option t-att-value="doc.model" t-out="doc.name"/>
+        </t>
+    </select>
+    <t t-if="state.loadingDocuments">
+        <div class="text-muted small">Loading document types...</div>
+    </t>
+</div>
+-----
+//    async onDocumentModelChange(model) {
+//        this.state.documentModel = model;
+//        await this.loadDocumentRecords(model);
+//
+//        if (model) {
+//            this.state.templateLoading = true;
+//            try {
+//                this.state.templates = await this.orm.call( 'mail.mail',  'get_document_templates',[model]);
+//            } catch (error) {
+//                console.error("Error loading templates:", error);
+//                this.state.templates = [];
+//            } finally {
+//                this.state.templateLoading = false;
+//            }
+//        } else {
+//            this.state.templates = [];
+//            this.state.selectedTemplate = false;
+//        }
+//    }
+
+//    async onTemplateChange(templateId) {
+//        if (templateId) {
+//            this.state.templateLoading = true;
+//            try {
+//                const templateContent = await this.orm.call('mail.mail','load_template', [templateId]);
+//                if (templateContent) {
+//                    this.state.subject = templateContent.subject || this.state.subject;
+//                    this.state.content = templateContent.body_html || this.state.content;
+//                }
+//            } catch (error) {
+//                console.error("Error loading template content:", error);
+//            } finally {
+//                this.state.templateLoading = false;
+//            }
+//        }
+//    }
+
+----
+<!-- Content Template Selection -->
+<div class="mb-2" t-if="state.documentModel">
+    <label class="form-label">Select Template</label>
+    <select class="form-select" t-model="state.selectedTemplate"
+            t-on-change="() => this.onTemplateChange(state.selectedTemplate)"
+            t-att-disabled="state.templateLoading || !state.documentModel">
+        <option value="">-- Select a Template --</option>
+        <t t-foreach="state.templates" t-as="template" t-key="template.id">
+            <option t-att-value="template.id" t-out="template.name"/>
+        </t>
+    </select>
+    <t t-if="state.templateLoading">
+        <div class="text-muted small">Loading templates...</div>
+    </t>
+</div>
+----------
+@api.model
+def get_document_templates(self, model_name):
+    """Get available templates for a specific model"""
+    return self.env['mail.template'].search([
+        ('model_id.model', '=', model_name)
+    ]).read(['id', 'name'])
+
+@api.model
+def load_template(self, template_id):
+    """Load template content"""
+    template = self.env['mail.template'].browse(template_id)
+    if template.exists():
+        return {
+            'subject': template.subject,
+            'body_html': template.body_html,
+        }
+    return {}
+
+
+attachments = self.env['ir.attachment'].search([
+            ('res_model', '=', 'mail.message'),
+            ('res_id', '=', mail_id)
+        ])
+
+        # Prepare the list of attachments as (0, 0, values) tuples to copy them
+        attachment_values = []
+        for attachment in attachments:
+            attachment_values.append((0, 0, {
+                'name': attachment.name,
+                'datas': attachment.datas,
+                'datas_fname': attachment.datas_fname,
+                'mimetype': attachment.mimetype,
+                'res_model': 'mail.message',
+            }))
+
+
+main.css
+.message-default-unread {
+	background-color: var(--fill-grey);
+}
+
+.message-default .unread {
+	color: var(--black);
+	font-weight: 600;
+}
+
+.message-default .read {
+	color: var(--light-grey);
+	font-weight: 400;
+}

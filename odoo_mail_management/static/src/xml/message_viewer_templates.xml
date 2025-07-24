@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--<templates id="tmp" xml:space="preserve">-->
+<!--        &lt;!&ndash; MessageView template for displaying a single mail message &ndash;&gt;-->
+<!--    <t t-name="MessageView" owl="1">-->
+<!--        <div class="message" t-ref="root-mail">-->
+<!--            <h4 t-out="props.mail.subject" style="margin-right: auto;"/>-->
+<!--            <br/>-->
+<!--            <div>-->
+<!--                <strong>From:</strong>-->
+<!--                <span t-out="props.mail.email_from"/>-->
+<!--            </div>-->
+<!--            <div>-->
+<!--                <strong>To:</strong>-->
+<!--                <span t-out="props.mail.email_to"/>-->
+<!--            </div>-->
+<!--            <br/>-->
+<!--            <div>-->
+<!--                <t t-out="html_content"/>-->
+<!--            </div>-->
+<!--            <div style="display: flex; gap: 1rem; margin-top: 1rem;">-->
+<!--                <button class="btn reply_btn" t-on-click="replyMail">Reply</button>-->
+<!--                <button class="btn forward_btn" t-on-click="forwardMail">Forward</button>-->
+<!--                <button class="btn thread_btn" t-on-click="loadThread">Get Threads</button>-->
+<!--                <button class="btn done_btn" t-on-click="markAsDone">Mark as Done</button>-->
+<!--                <button class="btn snooze_btn" t-on-click="snoozeMail">Snooze</button>-->
+<!--                <button class="btn unread_btn" t-if="props.mail.is_read" t-on-click="markAsUnread">Mark as Unread</button>-->
+<!--            </div>-->
+<!--            <div style="display: flex; gap: 1rem; flex-wrap: wrap; ">-->
+<!--                <t t-foreach="this.state.attachments" t-as="data" t-key="data_index">-->
+<!--                    <div t-if="data.mimetype == 'image/jpeg' ||  data.mimetype == 'image/png' ||  data.mimetype == 'image/gif' ||  data.mimetype == 'image/svg+xml' ||  data.mimetype == 'image/webp'">-->
+<!--                        <div class="row">-->
+<!--                            <div class="img-container" style="">-->
+<!--                                <div class="hover-card"  t-on-click="() => this.onClickImage(data.attachment)">-->
+<!--                                   <i class="fa fa-download"/>-->
+<!--                                </div>-->
+<!--                                <img class="img-fluid" style="width: 300px;height: 100px" t-att-src="'data:image/png;base64,'+data.datas"-->
+<!--                                     alt=""/>-->
+<!--                                </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div t-if="data.mimetype == 'application/pdf'">-->
+<!--                        <div class="row bg-secondary">-->
+<!--                            <div class="d-flex flex-row">-->
+<!--                                <div>-->
+<!--                                    <img class="p-2" style="width: 45px; height:45px"-->
+<!--                                         src="/odoo_mail_management/static/src/img/pdf.png"-->
+<!--                                         alt="PDF Preview"/>-->
+<!--                                </div>-->
+<!--                                <div>-->
+<!--                                    <p class="mt-3" t-out="data.name"/>-->
+<!--                                </div>-->
+<!--                                <div style="width: 50px"/>-->
+<!--                                <div>-->
+<!--                                    <button type="download" class="btn mt-3"-->
+<!--                                            t-on-click="() => this.onClickImage(data.attachment)">-->
+<!--                                                <i class="text-black fa fa-download" aria-hidden="true"/>-->
+<!--                                    </button>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </t>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </t>-->
+<!--</templates>-->
+
+<!--&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+<!--<templates xml:space="preserve">-->
+<!--    <t t-name="MessageView" owl="1">-->
+<!--        <div class="message" t-ref="root-mail">-->
+<!--            <t t-foreach="state.thread" t-as="mail" t-key="mail.id">-->
+<!--                <div class="mail-thread-item" style="border:1px solid #ccc; padding:1rem; margin-bottom:1rem; border-radius:5px;">-->
+<!--                    <h5 t-out="mail.subject" style="margin:0;"/>-->
+<!--                    <div>-->
+<!--                        <strong>From:</strong> <span t-out="mail.email_from"/>-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                        <strong>To:</strong> <span t-out="mail.email_to"/>-->
+<!--                    </div>-->
+<!--                    <div class="mt-2" t-out="markup(mail.body_html)"/>-->
+<!--                    <div class="mt-2">-->
+<!--                        <t t-if="state.attachments[mail.id]">-->
+<!--                            <div class="attachments">-->
+<!--                                <t t-foreach="state.attachments[mail.id]" t-as="attachment" t-key="attachment.attachment">-->
+<!--                                    <div class="attachment-item d-flex align-items-center">-->
+<!--                                        <span t-out="attachment.name"/>-->
+<!--                                        <button class="btn btn-sm ms-2" t-on-click="() => onClickAttachment(attachment.attachment)">Download</button>-->
+<!--                                    </div>-->
+<!--                                </t>-->
+<!--                            </div>-->
+<!--                        </t>-->
+<!--                    </div>-->
+<!--                    <div class="mt-2 d-flex gap-2">-->
+<!--                        <button class="btn btn-primary btn-sm" t-on-click="replyMail.bind(this, mail)">Reply</button>-->
+<!--                        <button class="btn btn-secondary btn-sm" t-on-click="forwardMail.bind(this, mail)">Forward</button>-->
+<!--                        <button class="btn btn-success btn-sm" t-on-click="markAsDone.bind(this, mail)">Mark as Done</button>-->
+<!--                        <button class="btn btn-warning btn-sm" t-on-click="snoozeMail.bind(this, mail)">Snooze</button>-->
+<!--                        <button class="btn btn-outline-secondary btn-sm" t-on-click="markAsUnread.bind(this, mail)">Mark as Unread</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </t>-->
+<!--        </div>-->
+<!--    </t>-->
+<!--</templates>-->
+
+<!--&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+<templates xml:space="preserve">
+    <t t-name="MessageView" owl="1">
+        <div class="message" t-ref="root-mail">
+            <t t-foreach="state.thread" t-as="mail" t-key="mail.id">
+                <div class="mail-thread-item" style="border:1px solid #e0e0e0; padding:16px; margin-bottom:16px; border-radius:8px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 t-out="mail.subject" style="margin:0; font-size:16px; font-weight:500;"/>
+                        <div class="text-muted" style="font-size:13px;">
+                            <t t-out="formatDate(mail.date)"/>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-2" style="font-size:14px;">
+                        <strong style="min-width:40px;">From:</strong>
+                        <span t-out="mail.email_from" style="color:#202124;"/>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3" style="font-size:14px;">
+                        <strong style="min-width:40px;">To:</strong>
+                        <span t-out="mail.email_to" style="color:#202124;"/>
+                    </div>
+                    <t t-if="mail.email_cc">
+                        <div class="d-flex align-items-center mb-3" style="font-size:14px;">
+                            <strong style="min-width:40px;">Cc:</strong>
+                            <span t-out="mail.email_cc" style="color:#202124;"/>
+                        </div>
+                    </t>
+
+                    <div class="mail-body mb-3" t-out="markup(mail.body_html)" style="font-size:14px; line-height:1.5; color:#202124;"/>
+                    <t t-if="state.attachments[mail.id]">
+                        <div class="attachments mb-3">
+                            <t t-foreach="state.attachments[mail.id]" t-as="attachment" t-key="attachment.attachment">
+                                <div class="attachment-item d-flex align-items-center mb-1" style="font-size:13px;">
+                                    <i class="fa fa-paperclip me-2" style="color:#5f6368;"/>
+                                    <span t-out="attachment.name" style="color:#1a73e8;"/>
+                                    <button class="btn btn-link p-0 ms-2" t-on-click="() => this.onClickAttachment(attachment.attachment)" style="color:#1a73e8; font-size:13px; text-decoration:none;">
+                                        Download
+                                    </button>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+
+                    <div class="d-flex align-items-center justify-content-between border-top pt-3">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm" t-on-click="() => replyMail(mail, env)" style="border-radius:4px; padding:6px 12px; font-size:13px;">
+                                Reply
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" t-on-click="() => forwardMail(mail, env)" style="border-radius:4px; padding:6px 12px; font-size:13px;">
+                                Forward
+                            </button>
+                        </div>
+<!--                        <div class="d-flex align-items-center gap-2">-->
+<!--                             Starred button-->
+<!--                            <button class="btn btn-sm p-1" href="#" t-on-click="toggleStar" style="color:#5f6368;">-->
+<!--                                <i t-attf-class="fa {{ mail.is_starred ? 'fa-star' : 'fa-star-o' }}" style="color:{{ mail.is_starred ? '#FBBC04' : 'inherit' }};"></i>-->
+<!--                            </button>-->
+
+<!--                             Reply All button-->
+<!--                            <button class="btn btn-sm p-1" href="#" t-on-click="replyAllMail" style="color:#5f6368;">-->
+<!--                                <i class="fa fa-reply-all"></i>-->
+<!--                            </button>-->
+<!--                        </div>-->
+
+                        <div class="d-flex align-items-center">
+<!--                            <div class="dropdown">-->
+<!--                                <button class="btn btn-sm p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="color:#5f6368;">-->
+<!--                                    <i class="fa fa-ellipsis-v"></i>-->
+<!--                                </button>-->
+<!--                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton" style="font-size:13px; min-width:200px;">-->
+<!--                                    <li>-->
+<!--                                        <a class="dropdown-item" href="#" t-on-click="markAsDone">-->
+<!--                                            <i class="fa fa-check me-2"></i> Mark as Done-->
+<!--                                        </a>-->
+<!--                                    </li>-->
+<!--                                    <li>-->
+<!--                                        <a class="dropdown-item" href="#" t-on-click="snoozeMail">-->
+<!--                                            <i class="fa fa-clock me-2"></i> Snooze-->
+<!--                                        </a>-->
+<!--                                    </li>-->
+<!--                                    <li>-->
+<!--                                        <a class="dropdown-item" href="#" t-on-click="markAsUnread">-->
+<!--                                            <i class="fa fa-envelope me-2"></i> Mark as Unread-->
+<!--                                        </a>-->
+<!--                                    </li>-->
+<!--                                    <li><hr class="dropdown-divider"/></li>-->
+<!--                                    <li>-->
+<!--                                        <a class="dropdown-item" href="#">-->
+<!--                                            <i class="fa fa-filter me-2"></i> Filter messages like this-->
+<!--                                        </a>-->
+<!--                                    </li>-->
+<!--                                    <li>-->
+<!--                                        <a class="dropdown-item" href="#">-->
+<!--                                            <i class="fa fa-print me-2"></i> Print-->
+<!--                                        </a>-->
+<!--                                    </li>-->
+<!--                                    <li>-->
+<!--                                        <a class="dropdown-item" href="#">-->
+<!--                                            <i class="fa fa-trash me-2"></i> Delete this message-->
+<!--                                        </a>-->
+<!--                                    </li>-->
+<!--                                    <li>-->
+<!--                                        <a class="dropdown-item" href="#" t-on-click="snoozeMail">-->
+<!--                                            <i class="fa fa-archive me-2"></i> Archived-->
+<!--                                        </a>-->
+<!--                                    </li>-->
+<!--                                    <li><hr class="dropdown-divider"/></li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

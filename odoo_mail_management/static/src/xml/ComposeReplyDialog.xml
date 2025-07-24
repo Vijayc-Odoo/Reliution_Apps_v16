@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ComposeReplyDialog" owl="1">
+        <div class="compose-reply-container" style="position:fixed; bottom:0; right:10px; width:400px; background:white; border:1px solid #ccc; border-radius:8px; z-index:1000; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+            <div class="header d-flex justify-content-between align-items-center p-2 border-bottom">
+                <span><strong>Reply</strong></span>
+                <div>
+                    <button class="btn btn-sm" t-on-click="closePopup">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="body p-2">
+                <div class="mb-2">
+                    <label>To:</label>
+                    <input type="email" class="form-control" t-model="state.recipient"/>
+                </div>
+                <div class="mb-2">
+                    <label>Cc:</label>
+                    <input type="text" class="form-control" t-model="state.cc" t-ref="ccInput" placeholder="Cc recipients (separate with commas)"/>
+                </div>
+                <div class="mb-2">
+                    <label>Subject:</label>
+                    <input type="text" class="form-control" t-model="state.subject"/>
+                </div>
+                <div class="mb-2">
+                    <label>Message:</label>
+                    <textarea class="form-control" rows="6" t-model="state.content"></textarea>
+                </div>
+                <t t-foreach="state.attachedFiles" t-as="attachment" t-key="attachment_index">
+                    <div class="custom-input"
+                         style="background-color: #f1f1f1; border-radius: 6px; padding: 4px 8px; font-size: 12px; display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 6px; color: #333;">
+                         <t t-out="attachment.name"/>
+                        <button type="button" class="btn close-button" id="attachments"
+                                style="background: transparent; border: none; font-size: 14px; cursor: pointer; color: #c00; margin-left: 10px;"
+                                t-on-click="() => this.closeInput(attachment_index)">
+                            ✖
+                        </button>
+                    </div>
+                </t>
+<!--                <div class="mb-2">-->
+<!--                    <input type="file" t-ref="fileInput" t-on-change="addAttachment"/>-->
+<!--                </div>-->
+            </div>
+            <div class="footer d-flex justify-content-end p-2 border-top">
+                <button class="btn btn-primary" t-on-click="sendReply">Send</button>
+
+                <div class="image-upload" t-on-click="attachmentAction" style="cursor: pointer;">
+                    <label>
+                        <img src="/odoo_mail_management/static/src/img/attach_file.svg"
+                             style="width: 20px; height: 20px; filter: grayscale(100%); transition: filter 0.2s ease;"
+                             onmouseover="this.style.filter='grayscale(0%)'"
+                             onmouseout="this.style.filter='grayscale(100%)'"/>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

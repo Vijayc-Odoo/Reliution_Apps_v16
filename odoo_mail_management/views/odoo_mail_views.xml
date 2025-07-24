@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--This XML file defines an action and a menu item for integrating the
+        'Odoo Mail' functionality into the Odoo system. It associates the
+        'action_odoo_mail' action with the 'Odoo Mail' menu item. -->
+    <record id="action_odoo_mail" model="ir.actions.client">
+        <field name="name">Odoo Mail</field>
+        <field name="tag">odoo_mail</field>
+        <field name="target">current</field>
+    </record>
+    <menuitem id="mail_menu_root"
+              name="Odoo Mail"
+              action="action_odoo_mail"
+              web_icon="odoo_mail_management,static/description/icon.png"/>
+
+    <menuitem id="dashboard_menu"
+              name="Dashboard"
+              parent="mail_menu_root"
+              action="action_odoo_mail"
+              groups="base.group_no_one"/>
+
+    <!-- Configuration Submenu -->
+    <menuitem id="menu_mail_configuration"
+              name="Mail Configuration"
+              parent="mail_menu_root"/>
+
+    <!-- Outgoing Mail Servers -->
+    <menuitem id="menu_custom_outgoing_servers"
+              name="Outgoing Mail Servers"
+              parent="menu_mail_configuration"
+              action="base.action_ir_mail_server_list"
+              groups="base.group_no_one"/>
+
+    <!-- Incoming Mail Servers -->
+    <menuitem id="menu_custom_incoming_servers"
+              name="Incoming Mail Servers"
+              parent="odoo_mail_management.menu_mail_configuration"
+              action="mail.action_email_server_tree"
+              groups="base.group_no_one"/>
+</odoo>

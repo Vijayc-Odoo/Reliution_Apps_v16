@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="fetch_incoming_mail_tree_view" model="ir.ui.view">
+        <field name="name">fetch.incoming.mail.tree</field>
+        <field name="model">fetch.incoming.mail</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="subject"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="fetch_incoming_mail_form_view" model="ir.ui.view">
+        <field name="name">fetch.incoming.mail.form</field>
+        <field name="model">fetch.incoming.mail</field>
+        <field name="arch" type="xml">
+            <form string="Incoming mails">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="subject"/>
+                        </group>
+                        <group>
+                            <field name="email" widget="email"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="fetch_incoming_mail_action" model="ir.actions.act_window">
+        <field name="name">Fetch Incoming Mail</field>
+        <field name="res_model">fetch.incoming.mail</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem name="Incoming Fetched Mails"
+        id="menu_incoming_fetch_mails"
+        parent="base.menu_email"
+        action="fetch_incoming_mail_action"
+        sequence="23"/>
+</odoo>

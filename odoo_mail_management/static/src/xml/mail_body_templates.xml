@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+        <!-- MailBody template for displaying individual mail items in the inbox -->
+    <t t-name="MailBody" owl="1">
+<!--        <div class="inbox-message-item  message-default-unread"-->
+<!--             data-id="' + name.id + '" t-ref="root">-->
+        <div t-ref="root" class="inbox-message-item  message-default-unread"
+             t-att-class="{ 'inbox-message-item': true, 'message-default-unread': !props.mail.is_read, 'message-default-read': props.mail.is_read }"
+             data-id="' + name.id + '">
+           <div class="checkbox" style="margin-right: -12px;">
+               <button class="btn">
+                   <input type="checkbox" id="checkbox"
+                          data-id="' + name.id + '"
+                          class="checkbox checkbox_func mail_check_box"
+                          t-on-click="onClickSelect">
+                   </input>
+               </button>
+           </div>
+            <div>
+        <button class="btn star" data-id="' + name.id + '" style="margin: 0;"
+                t-on-click="starMail">
+            <img t-if="!props.mail.is_starred "
+                 src="/odoo_mail_management/static/src/img/star_border_black_24dp.svg"
+                 alt="Not starred" data-id="' + name.id + '"
+                 class="btn-icon-sm btn-icon-alt btn-icon-hover message-btn-icon"
+                 id="not_starred"/>
+            <img t-else=""
+                 src="/odoo_mail_management/static/src/img/yellow_star.svg"
+                 alt="Not starred"
+                 class="btn-icon-sm btn-icon-alt btn-icon-hover message-btn-icon"
+                 id="starred"/>
+        </button>
+        </div>
+            <!--            <div class="message-default" data-id="' + name.id + '"-->
+            <!--                 t-on-click="openMail">-->
+            <!--            <div class="message-sender message-content">-->
+            <!--                <t t-if="props.mail.email_msg_to">-->
+            <!--                    <span t-out="props.mail.email_msg_to"/>-->
+            <!--                </t>-->
+            <!--                <t t-else="">-->
+
+            <!--                <span t-out="props.mail.email_from"/>-->
+            <!--                </t>-->
+            <!--            </div>-->
+            <!--            <div class="message-subject message-content" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-->
+            <!--                <span t-out="props.mail.subject"/>-->
+            <!--                - -->
+            <!--                <span t-out="props.mail.preview"/>-->
+            <!--            </div>-->
+            <!--                &lt;!&ndash;                <div>-</div>&ndash;&gt;-->
+            <!--                &lt;!&ndash;                <div class="message-body message-content">&ndash;&gt;-->
+            <!--                &lt;!&ndash;                    <span t-out="props.mail.preview"/>&ndash;&gt;-->
+            <!--                &lt;!&ndash;                </div>&ndash;&gt;-->
+            <!--                &lt;!&ndash;                <div>&ndash;&gt;-->
+            <!--                &lt;!&ndash;                    <span out="props.mail.body"/>&ndash;&gt;-->
+            <!--                &lt;!&ndash;                </div>&ndash;&gt;-->
+            <!--&lt;!&ndash;                <div class="gap message-content"> </div>&ndash;&gt;-->
+            <!--                <div class="message-date center-text" style="margin-left: 10px; white-space: nowrap;">-->
+            <!--                    <span t-out="props.mail.date"/>-->
+            <!--               </div>-->
+            <!--    </div>-->
+<!--<div class="message-default" style="display: flex; align-items: center; width: 100%; border-bottom: 1px solid #f1f1f1;"-->
+<!--     data-id="' + name.id + '"-->
+<!--     t-on-click="openMail">-->
+
+
+<!--    <div class="message-sender" style="width: 200px; min-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-->
+<!--        <t t-if="props.mail.email_msg_to">-->
+<!--            <span t-out="props.mail.email_msg_to"/>-->
+<!--        </t>-->
+<!--        <t t-else="">-->
+<!--            <span t-out="props.mail.email_from"/>-->
+<!--        </t>-->
+<!--    </div>-->
+
+<!--    <div class="message-subject" style="flex: 1; min-width: 0; display: flex; overflow: hidden; margin: 0 8px;">-->
+<!--        <span style="white-space: nowrap;">-->
+<!--            <span t-out="props.mail.subject"/>-->
+<!--        </span>-->
+<!--        <span style="margin: 0 4px;">-</span>-->
+<!--        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-->
+<!--            <span t-out="props.mail.preview"/>-->
+<!--        </span>-->
+<!--    </div>-->
+
+<!--    <div class="message-date" style="white-space: nowrap; font-size: 0.8rem; margin-left: auto; padding-left: 12px;">-->
+<!--        <span t-out="props.mail.date"/>-->
+<!--    </div>-->
+<!--</div>-->
+            <div class="message-default" style="display: flex; align-items: center; width: 100%; border-bottom: 1px solid #f1f1f1;" data-id="' + name.id + '" t-on-click="openMail">
+            <div class="message-sender" style="width: 200px; min-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <t t-if="props.mail.email_msg_to">
+                    <span t-debug="props.mail.email_msg_to"/>
+                    <span t-out="props.mail.email_msg_to"/>
+                </t>
+                <t t-else="">
+                    <span t-out="props.mail.email_from"/>
+                </t>
+            </div>
+
+            <div class="message-subject" style="flex: 1; min-width: 0; display: flex; overflow: hidden; margin: 0 8px;">
+                <span style="white-space: nowrap;">
+                    <span t-out="props.mail.subject"/>
+                </span>
+                <span style="margin: 0 4px;">-</span>
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <span t-out="props.mail.preview"/>
+                </span>
+            </div>
+
+            <div class="message-date" style="white-space: nowrap; font-size: 0.8rem; margin-left: auto; padding-left: 12px;">
+                <span t-out="props.mail.date"/>
+            </div>
+        </div>
+
+            <div class="message-group-hidden">
+        <div class="inbox-message-item-options">
+            <button class="btn">
+                <img t-if="props.mailType !== 'archive'"
+                     src="/odoo_mail_management/static/src/img/archive_black_24dp.svg"
+                     alt="Archive" data-id="' + name.id + '"
+                     class="btn-icon-sm btn-icon-alt btn-icon-hover"
+                     id="archive" t-on-click="archiveMail"/>
+                <img t-elif="props.mailType == 'archive'"
+                     src="/odoo_mail_management/static/src/img/unarchive_FILL1_wght400_GRAD0_opsz48.svg"
+                     alt="Archive" data-id="' + name.id + '"
+                     class="btn-icon-sm btn-icon-alt btn-icon-hover"
+                     id="archive" t-on-click="unArchive"/>
+            </button>
+            <button class="btn">
+                <img src="/odoo_mail_management/static/src/img/delete_black_24dp.svg"
+                     alt="Delete" data-id="' + name.id + '"
+                     class="btn-icon-sm btn-icon-alt btn-icon-hover"
+                     id="delete" t-on-click="deleteMail"/>
+            </button>
+            <button class="btn">
+                <img t-if="props.mailType == 'outbox'"
+                     src="/odoo_mail_management/static/src/img/refresh_black_24dp.svg"
+                     alt="Retry"
+                     class="btn-icon-sm btn-icon-alt btn-icon-hover"
+                     id="retry"
+                     t-on-click="resendMail"/>
+            </button>
+<!--            <button class="btn done_btn" t-if="!props.mail.is_done"-->
+<!--                    t-on-click="() => this.toggleDone(props.mail)">✅</button>-->
+
+<!--            <button class="btn undone_btn" t-elif="props.mail.is_done"-->
+<!--                    t-on-click="() => this.toggleDone(props.mail)">❌</button>-->
+
+            <!--            <button class="btn snooze_btn" t-on-click="() => this.snoozeMail(mail)">Snooze</button>-->
+            <button class="btn read_btn" t-if="!props.mail.is_read"
+                    t-on-click="() => this.markAsRead(props.mail)">📩</button>
+            <button class="btn unread_btn" t-if="props.mail.is_read"
+                    t-on-click="() => this.markAsUnread(props.mail)">✉</button>
+        </div>
+    </div>
+        </div>
+    </t>
+</templates>
