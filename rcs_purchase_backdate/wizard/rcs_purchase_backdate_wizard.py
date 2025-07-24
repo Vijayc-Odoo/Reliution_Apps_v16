@@ -20,6 +20,11 @@ class BackdateWizard(models.TransientModel):
         related="company_id.rcs_notes_mandatory_for_purchase_order", string="Is Notes mandatory")
     is_boolean = fields.Boolean()
 
+    backdate_for_stock_move=fields.Boolean("Recept BackDate")
+    backdate_for_bill=fields.Boolean("Bill BackDate")
+
+
+
     @api.onchange('date_planned')
     def onchange_date_planned(self):
         if self.date_planned:
@@ -54,14 +59,14 @@ class BackdateWizard(models.TransientModel):
                     'rcs_notes': self.rcs_notes if self.rcs_notes else ''
                 })
 
-            if self.company_id.bill_backdate:
+            if self.backdate_for_bill:
                 for bill in purchase_order.invoice_ids:
                     bill.name = False
                     bill.invoice_date = self.date_planned
                     bill.date = self.date_planned
                     bill.rcs_notes_for_purchase = self.rcs_notes if self.rcs_notes else ''
 
-            if self.company_id.stock_move_backdate:
+            if self.backdate_for_stock_move:
                 for picking in purchase_order.picking_ids:
                     picking.scheduled_date = self.date_planned
                     picking.date_done = self.date_planned

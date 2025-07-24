@@ -13,6 +13,8 @@
                             <field name="date_planned" />
                             <field name="rcs_notes" invisible="not is_rcs_notes" required="is_rcs_notes_mandatory and is_boolean" />
                             <field name="is_rcs_notes" invisible="1" />
+                            <field name="backdate_for_stock_move"/>
+                            <field name="backdate_for_bill"/>
                             <field name="is_rcs_notes_mandatory" invisible="1" />
                             <field name="is_boolean" invisible="1" />
                         </group>
