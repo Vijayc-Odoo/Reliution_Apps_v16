@@ -640,7 +640,7 @@ class MailMessage(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('message_type') == 'comment':
+            if vals.get('message_type') in ['comment','email']:
                 vals['is_odoo_mail_message'] = True
         return super(MailMessage, self).create(vals_list)
 

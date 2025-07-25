@@ -13,7 +13,8 @@ export class ComposeReplyDialog extends Component {
 
         debugger;
         this.state = useState({
-            recipient: this.props.mail.email_from,
+//            recipient: this.props.mail.email_from,
+            recipient: this.props.mail.email_to,
             subject: `Re: ${this.props.mail.subject}`,
             content: "",
             attachedFiles: [],

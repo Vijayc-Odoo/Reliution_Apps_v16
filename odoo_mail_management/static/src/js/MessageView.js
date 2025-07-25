@@ -28,6 +28,7 @@ export class MessageView extends  Component {
         this.formatDate = this.formatDate.bind(this);
         this.goBack = this.goBack.bind(this);
         onMounted(this.fetchThread);
+
     }
 
     formatDate(date) {
@@ -37,6 +38,8 @@ export class MessageView extends  Component {
 
     async fetchThread() {
          const thread = await this.orm.call('mail.mail', 'get_mail_thread', [this.props.mail.id]);
+         debugger;
+         thread.reverse()
         this.state.thread = thread;
         for (const mail of thread) {
             if (mail.attachment_ids && mail.attachment_ids.length) {
@@ -44,6 +47,7 @@ export class MessageView extends  Component {
                 this.state.attachments[mail.id] = result;
             }
         }
+        debugger;
     }
 
     onClickImage(value){
@@ -106,7 +110,6 @@ export class MessageView extends  Component {
             console.error("No back handler available");
         }
     }
-
 }
 MessageView.template = 'MessageView';
 MessageView.props = {

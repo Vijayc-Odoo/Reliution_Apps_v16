@@ -40,7 +40,8 @@ class odooMail extends  Component {
             onGoBack: this.resetView.bind(this)
         };
         onMounted(() => {
-            this.allMailView()
+//            this.allMailView()
+            this.inboxMailView()
         })
         onWillStart(async ()=> {
             this.mailState.loadLogo = await this.orm.call('mail.icon','load_logo',[])
@@ -49,11 +50,10 @@ class odooMail extends  Component {
         })
     }
 
-     /**
-     * Method to get the count of different mail categories.
-     */
+//    Method to get the count of different mail categories.
     async getCount(){
         this.mailState.getCount = await this.orm.call('mail.mail','get_mail_count',[])
+        debugger;
     }
     /**
      * Method to compose a new mail.
@@ -66,10 +66,10 @@ class odooMail extends  Component {
         }
      })
     }
-    /**
-     * Method triggered on click of the "Select All" checkbox.
-     * @param {Object} ev - Event object.
-     */
+
+//     Method triggered on click of the "Select All" checkbox.
+//     @param {Object} ev - Event object.
+
     onClickSelectAll(ev) {
         const checked = ev.target.checked;
         const visibleMails = this.mailState.loadMail.map(mail => mail.id);
@@ -265,8 +265,10 @@ class odooMail extends  Component {
         }
     }
     refreshCurrentView() {
+    debugger;
         if (this.mailState.mailType === 'all') {
             this.allMailView(); // Refresh All Mail view
+
         } else if (this.mailState.mailType === 'sent') {
             this.sentMail(); // Refresh Sent Mail view
         } else if (this.mailState.mailType === 'starred'){
@@ -353,12 +355,13 @@ class odooMail extends  Component {
         this.resetView()
         const currentUserId = await this.orm.call('res.users', 'get_current_user_id', []);
         const currentUser = await this.orm.call('res.users', 'read', [[currentUserId], ['email']]);
+        debugger;
         const currentUserEmail = currentUser[0].email;
         const domain = [
             ['create_uid', '=', currentUserId],
             ['is_odoo_mail_message', '=', true],
             ['is_trashed', '=', false],
-//            ['message_type', 'in', ['comment','email','email_outgoing']],
+            ['message_type', 'in', ['comment','email','email_outgoing']],
             ['email_from', 'ilike', currentUserEmail]
         ];
         const total = await this.orm.searchCount('mail.message', domain);
@@ -403,7 +406,7 @@ class odooMail extends  Component {
                const domain = [
                 ['is_odoo_mail_message', '=', true],
                 ['is_trashed', '=', false],
-                ['message_type', 'in', ['comment','email','email_outgoing']],
+                ['message_type', 'in', ['comment','email','email_outgoing','email']],
                 ['is_starred', '=', true]
         ];
         const total = await this.orm.searchCount('mail.message', domain);
@@ -612,7 +615,7 @@ async sentMail(){
        const domain = [
             ['is_odoo_mail_message', '=', true],
             ['is_trashed', '=', false],
-            ['message_type', 'in', ['comment','email_outgoing']]
+            ['message_type', 'in', ['comment','email_outgoing','email']]
         ];
         const total = await this.orm.searchCount('mail.message', domain);
         this.mailState.totalRecords = total;
