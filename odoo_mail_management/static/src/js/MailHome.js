@@ -128,6 +128,7 @@ class odooMail extends  Component {
      * @param {Object} mail - Mail object.
      */
     openMail(mail) {
+        debugger;
         this.mailState.formData = mail
         this.mailState.mode = "form"
     }
@@ -308,6 +309,7 @@ class odooMail extends  Component {
     }
 
     async inboxMailView () {
+    debugger;
         const root = this.root.el;
         root.querySelector('.inbox')?.classList.add('active');
         root.querySelector('.all_mail')?.classList.remove('active');
@@ -323,6 +325,7 @@ class odooMail extends  Component {
         const total =  await this.orm.call('mail.message', 'get_inbox_mails', []);
         this.mailState.totalRecords = total.length;
         const paginatedRecords = await this.orm.call('mail.message', 'get_inbox_mails', []);
+        debugger;
         const records = paginatedRecords.slice(
             this.mailState.offset,
             this.mailState.offset + this.mailState.limit
@@ -596,6 +599,7 @@ class odooMail extends  Component {
      * Method to view sent mails.
      */
 async sentMail(){
+        debugger;
        const root = this.root.el
        root.querySelector('.sent')?.classList.add('active');
        root.querySelector('.archieved-mail')?.classList.remove('active');
@@ -617,7 +621,8 @@ async sentMail(){
        const domain = [
             ['is_odoo_mail_message', '=', true],
             ['is_trashed', '=', false],
-            ['message_type', 'in', ['comment','email_outgoing','email']]
+            ['message_type', 'in', ['comment','email_outgoing']]
+//            ['message_type', 'in', ['comment','email_outgoing','email']]
         ];
         const total = await this.orm.searchCount('mail.message', domain);
         this.mailState.totalRecords = total;
@@ -628,6 +633,8 @@ async sentMail(){
               offset: this.mailState.offset,
               order: "create_date desc" }
         );
+        const a=await this.orm.call('mail.message', 'search_read',[domain, []],{ limit: this.mailState.limit,offset: this.mailState.offset,order: "create_date desc" });
+        debugger;
         this.mailState.loadMail = records;
         this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;
         this.addPaginationControls();

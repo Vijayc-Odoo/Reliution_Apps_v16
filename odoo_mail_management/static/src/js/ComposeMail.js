@@ -555,7 +555,11 @@ export class ComposeMail extends Component {
      */
     Close() {
     debugger;
-        this.props.close()
+        const result=confirm("Are you sure you want to delete this email?","confirmation dialog");
+        if (result){
+            this.props.close()
+        }
+
     }
     /**
      * Method to minimize or restore the mail composition window.

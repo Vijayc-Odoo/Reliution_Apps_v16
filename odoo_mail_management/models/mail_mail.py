@@ -148,7 +148,7 @@ class MailMail(models.Model):
     #     for mail in mails:
     #         mail.is_trashed = True
     #         mail.active = True
-            # mail.sudo().unlink()
+    # mail.sudo().unlink()
 
     # @api.model
     # def get_trash_mail(self):
@@ -408,6 +408,7 @@ class MailMail(models.Model):
         root_msg = parent_mail
         while root_msg.parent_id:
             root_msg = root_msg.parent_id
+
         def _walk(msg):
             res = [msg]
             for child in msg.child_ids:
@@ -418,15 +419,16 @@ class MailMail(models.Model):
         all_msgs.sort(key=lambda m: m.date or m.create_date)
 
         # ── 3.  Build a unified thread list  ─────────────────────────────────────────
-        allowed_types = {'email', 'comment', 'email_outgoing'}  
+        allowed_types = {'email', 'comment', 'email_outgoing'}
         thread = []
         for msg in all_msgs:
-            if msg.message_type in allowed_types: 
+            if msg.message_type in allowed_types:
                 thread.append({
                     'id': f"msg-{msg.id}",  # ensure unique key for JS
                     'subject': msg.subject,
                     'email_from': msg.email_from,
-                    'email_to': msg.email_msg_to if msg.email_msg_to else ', '.join([partner.email_formatted for partner in msg.partner_ids]),
+                    'email_to': msg.email_msg_to if msg.email_msg_to else ', '.join(
+                        [partner.email_formatted for partner in msg.partner_ids]),
                     # 'email_to': ','.join(msg.email_to.split(',')) if msg.email_to else '',
                     'email_cc': msg.email_msg_cc,
                     'body_html': msg.body,
@@ -517,7 +519,8 @@ class MailMail(models.Model):
         return reply_mail.read()
 
     @api.model
-    def forward_mail(self, mail_id, forward_recipient, forward_content, attachment_ids=None, new_attachment_ids=None, cc=None):
+    def forward_mail(self, mail_id, forward_recipient, forward_content, attachment_ids=None, new_attachment_ids=None,
+                     cc=None):
         """Compose a forward of a mail."""
         parent_id = None
         if isinstance(mail_id, str) and mail_id.startswith('msg-'):
@@ -625,6 +628,7 @@ class MailMail(models.Model):
         forward_mail.send()
         return forward_mail.read()
 
+
 class MailMessage(models.Model):
     _inherit = 'mail.message'
 
@@ -632,15 +636,15 @@ class MailMessage(models.Model):
     email_msg_to = fields.Char('To', help='Message recipients (emails_message)')
     email_msg_cc = fields.Char('Cc')
     is_read = fields.Boolean(string="Is Read", default=False)
-    is_starred = fields.Boolean(string="Starred Mail", default=False, help="Flag indicating whether the mail is starred.")
+    is_starred = fields.Boolean(string="Starred Mail", default=False,
+                                help="Flag indicating whether the mail is starred.")
     is_trashed = fields.Boolean(string="Is Trashed", default=False)
     active = fields.Boolean(default=True, help="Flag indicating whether the mail is active.")
-
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('message_type') in ['comment','email']:
+            if vals.get('message_type') in ['comment', 'email']:
                 vals['is_odoo_mail_message'] = True
         return super(MailMessage, self).create(vals_list)
 
@@ -676,7 +680,7 @@ class MailMessage(models.Model):
 
         domain = [
             ('parent_id', '=', False),
-            ('child_ids', '!=', False),
+            # ('child_ids', '!=', False),
             ('is_trashed', '=', False),
             ('is_odoo_mail_message', '=', True),
             '|',
@@ -687,20 +691,23 @@ class MailMessage(models.Model):
         ]
 
         parent_messages = self.sudo().search(domain)
+        # parent_messages = self.sudo().search([('is_odoo_mail_message', '=', True),('parent_id','=',False)])
 
+        result = parent_messages.filtered(
+            lambda msg:not msg.message_type == 'email_outgoing' and not msg.parent_id or any(
+                child.message_type == 'email'
+                for child in msg.child_ids
+            )
+        )
         # result = parent_messages.filtered(
         #     lambda msg: any(
         #         child.message_type == 'email'
         #         for child in msg.child_ids
         #     )
         # )
-        result = parent_messages.filtered(
-            lambda msg: any(
-                child.message_type == 'email'
-                for child in msg.child_ids
-            )
-        )
+        # result = parent_messages.filtered(lambda m: m.message_type == 'email')
 
+        # return parent_messages
         return result.read()
 
         # inbox_mails = self.sudo().search([
@@ -729,7 +736,6 @@ class MailMessage(models.Model):
             mail.is_trashed = True
             mail.active = True
 
-
     @api.model
     def get_trash_mail(self):
         """Method to get trashed mails."""
@@ -741,7 +747,8 @@ class MailMessage(models.Model):
         for record in mails:
             mail_dict[str(record)] = {
                 "id": record.id,
-                "sender": record.email_msg_to or  ", ".join(record.partner_ids.mapped('name')) if record.partner_ids else False,
+                "sender": record.email_msg_to or ", ".join(
+                    record.partner_ids.mapped('name')) if record.partner_ids else False,
                 "subject": record.subject,
                 "date": fields.Date.to_date(record.create_date),
             }
@@ -769,7 +776,7 @@ class MailMessage(models.Model):
     def archive_mail(self, *args):
         """Method to archive mail."""
         """Call thay che js mathi and """
-        self.sudo().search([('id', '=', *args),('create_uid', '=', self.env.user.id)]).write({"active": False})
+        self.sudo().search([('id', '=', *args), ('create_uid', '=', self.env.user.id)]).write({"active": False})
 
     @api.model
     def get_archived_mail(self):
@@ -787,7 +794,7 @@ class MailMessage(models.Model):
             elif record.partner_ids:
                 mail_dict[str(record)] = ({
                     "id": record.id,
-                    "sender":  ", ".join(record.partner_ids.mapped('name')) if record.partner_ids else False,
+                    "sender": ", ".join(record.partner_ids.mapped('name')) if record.partner_ids else False,
                     "subject": record.subject,
                     "date": fields.Date.to_date(record.create_date), })
         return mails.read()
@@ -833,7 +840,6 @@ class ResUsers(models.Model):
         return self.env.user.id
 
 
-
 class MailThread(models.AbstractModel):
     _inherit = 'mail.thread'
 
@@ -841,4 +847,3 @@ class MailThread(models.AbstractModel):
 
     def _message_compute_parent_id(self, parent_id):
         return super()._message_compute_parent_id(parent_id)
-
