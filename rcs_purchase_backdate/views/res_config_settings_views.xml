@@ -9,18 +9,18 @@
                 <block title="Purchase Backdate Settings" name="purchase_backdate">
                     <div class="row mt16 o_settings_container">
 
-                        <!--                         Backdate Toggle -->
+<!--                         Backdate Toggle -->
                         <div class="col-12 o_setting_box" style="width:100%">
                             <div class="o_setting_left_pane">
                                 <field name="purchase_order_backdate"/>
                             </div>
                             <div class="o_setting_right_pane">
                                 <label for="purchase_order_backdate"/>
+                                <div class="text-muted">
+                                    Allow setting a custom order date instead of using today's default date.
+                                </div>
                             </div>
                         </div>
-                        <!--                        <setting name="purchase_order_backdate" string="Enable Purchase Order Backdate">-->
-                        <!--                            <field name="purchase_order_backdate"/>-->
-                        <!--                        </setting>-->
 
                         <!-- Conditional Settings Row -->
                         <div class="row" invisible="purchase_order_backdate == False">
@@ -34,6 +34,9 @@
                                     </div>
                                     <div class="o_setting_right_pane">
                                         <label for='bill_backdate' class='mr-3'/>
+                                        <div class="text-muted">
+                                            	Automatically set the bill date same as the purchase order date.
+                                        </div>
                                     </div>
                                 </div>
 
@@ -44,6 +47,9 @@
                                     </div>
                                     <div class="o_setting_right_pane">
                                         <label for='stock_move_backdate' class='mr-3'/>
+                                        <div class="text-muted">
+                                            Automatically set the receipt date same as the purchase order date.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -53,20 +59,26 @@
                                 <!-- Notes for PO -->
                                 <div class="o_setting_box">
                                     <div class="o_setting_left_pane">
-                                        <field name='rcs_notes_for_purchase_order' class="oe_inline ms-2"/>
+                                        <field name='notes_for_purchase_order' class="oe_inline ms-2"/>
                                     </div>
                                     <div class="o_setting_right_pane">
-                                        <label for='rcs_notes_for_purchase_order' class='mr-3'/>
+                                        <label for='notes_for_purchase_order' class='mr-3'/>
+                                        <div class="text-muted">
+                                            Enable adding a reason when using a custom purchase date.
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Notes Mandatory -->
-                                <div class="o_setting_box" invisible="rcs_notes_for_purchase_order == False">
+                                <div class="o_setting_box" invisible="notes_for_purchase_order == False">
                                     <div class="o_setting_left_pane">
-                                        <field name='rcs_notes_mandatory_for_purchase_order' class="oe_inline ms-2"/>
+                                        <field name='notes_mandatory_for_purchase_order' class="oe_inline ms-2"/>
                                     </div>
                                     <div class="o_setting_right_pane">
-                                        <label for='rcs_notes_mandatory_for_purchase_order' class='mr-3'/>
+                                        <label for='notes_mandatory_for_purchase_order' class='mr-3'/>
+                                        <div class="text-muted">
+                                            Make notes mandatory when the custom date is changed on a purchase order.
+                                        </div>
                                     </div>
                                 </div>
                             </div>

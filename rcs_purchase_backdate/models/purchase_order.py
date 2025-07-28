@@ -4,14 +4,14 @@ from odoo import fields, models, api
 from datetime import date
 
 
-class RcsPurchaseOrder(models.Model):
+class PurchaseOrderInherit(models.Model):
     _inherit = 'purchase.order'
 
-    rcs_notes = fields.Text(string="Notes")
-    is_rcs_notes = fields.Boolean(
-        related="company_id.rcs_notes_for_purchase_order", string="Is Notes")
-    is_rcs_notes_mandatory = fields.Boolean(
-        related="company_id.rcs_notes_mandatory_for_purchase_order", string="Is Notes mandatory")
+    purchase_notes = fields.Text(string="Notes")
+    is_purchase_notes = fields.Boolean(
+        related="company_id.notes_for_purchase_order", string="Is Notes")
+    is_purchase_notes_mandatory = fields.Boolean(
+        related="company_id.notes_mandatory_for_purchase_order", string="Is Notes mandatory")
     is_boolean = fields.Boolean()
 
     @api.onchange('date_order')
@@ -56,12 +56,12 @@ class RcsPurchaseOrder(models.Model):
             'invoice_line_ids': [],
             'company_id': self.company_id.id,
             'invoice_date': self.date_approve if self.company_id.bill_backdate else date.today(),
-            'rcs_notes_for_purchase': self.rcs_notes if self.rcs_notes else False
+            'notes_for_purchase': self.purchase_notes if self.purchase_notes else False
         }
         return invoice_vals
 
 
-class RcsPurchaseOrderLine(models.Model):
+class PurchaseOrderLineInherit(models.Model):
     _inherit = 'purchase.order.line'
 
     def _prepare_stock_move_vals(self, picking, price_unit, product_uom_qty, product_uom):

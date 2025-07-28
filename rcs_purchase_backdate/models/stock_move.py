@@ -3,13 +3,13 @@
 from odoo import fields, models
 
 
-class RcsStockMove(models.Model):
+class StockMoveInherit(models.Model):
     _inherit = 'stock.move'
 
-    rcs_notes_for_purchase = fields.Text(
-        string="Notes for Purchase", related="picking_id.rcs_notes_for_purchase")
-    is_rcs_notes_for_purchase = fields.Boolean(
-        related="company_id.rcs_notes_for_purchase_order", string="Is Notes for Purchase")
+    notes_for_purchase = fields.Text(
+        string="Notes for Purchase", related="picking_id.notes_for_purchase")
+    is_notes_for_purchase = fields.Boolean(
+        related="company_id.notes_for_purchase_order", string="Is Notes for Purchase")
 
     def write(self, vals):
         for rec in self:

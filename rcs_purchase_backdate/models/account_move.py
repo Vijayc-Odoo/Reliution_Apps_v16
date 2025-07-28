@@ -3,9 +3,9 @@
 from odoo import fields, models
 
 
-class RcsAccountMove(models.Model):
+class AccountMoveInherit(models.Model):
     _inherit = 'account.move'
 
-    rcs_notes_for_purchase = fields.Text(string="Notes for Purchase")
-    is_rcs_notes_for_purchase = fields.Boolean(
-        related="company_id.rcs_notes_for_purchase_order", string="Is Notes for Purchase")
+    notes_for_purchase = fields.Text(string="Notes for Purchase")
+    is_notes_for_purchase = fields.Boolean(
+        related="company_id.notes_for_purchase_order", string="Is Notes for Purchase")

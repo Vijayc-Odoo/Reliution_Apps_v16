@@ -7,9 +7,9 @@
         <field name="inherit_id" ref="purchase.purchase_order_form" />
         <field name="arch" type="xml">
             <field name="currency_id" position="after">
-                <field name="rcs_notes" invisible="not is_rcs_notes" required="is_rcs_notes_mandatory and is_boolean" placeholder="Purchase Order Notes"/>
-                <field name="is_rcs_notes" invisible="1" />
-                <field name="is_rcs_notes_mandatory" invisible="1" />
+                <field name="purchase_notes" invisible="not is_purchase_notes" required="is_purchase_notes_mandatory and is_boolean" placeholder="Purchase Order Notes"/>
+                <field name="is_purchase_notes" invisible="1" />
+                <field name="is_purchase_notes_mandatory" invisible="1" />
                 <field name="is_boolean" invisible="1" />
             </field>
         </field>

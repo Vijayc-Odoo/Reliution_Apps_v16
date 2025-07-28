@@ -13,11 +13,11 @@ class BackdateWizard(models.TransientModel):
         string="Receipt Date", required=True, default=datetime.now())
     company_id = fields.Many2one(
         'res.company', default=lambda self: self.env.company)
-    rcs_notes = fields.Text(string="Notes")
-    is_rcs_notes = fields.Boolean(
-        related="company_id.rcs_notes_for_purchase_order", string="Is Notes")
-    is_rcs_notes_mandatory = fields.Boolean(
-        related="company_id.rcs_notes_mandatory_for_purchase_order", string="Is Notes mandatory")
+    purchase_notes = fields.Text(string="Notes")
+    is_purchase_notes = fields.Boolean(
+        related="company_id.notes_for_purchase_order", string="Is Notes")
+    is_purchase_notes_mandatory = fields.Boolean(
+        related="company_id.notes_mandatory_for_purchase_order", string="Is Notes mandatory")
     is_boolean = fields.Boolean()
 
     backdate_for_stock_move=fields.Boolean("Receipt BackDate")
@@ -56,7 +56,7 @@ class BackdateWizard(models.TransientModel):
                 purchase_order.write({
                     'date_planned': self.date_planned,
                     'date_approve': self.date_planned,
-                    'rcs_notes': self.rcs_notes if self.rcs_notes else ''
+                    'purchase_notes': self.purchase_notes if self.purchase_notes else ''
                 })
 
             if self.backdate_for_bill:
@@ -64,13 +64,13 @@ class BackdateWizard(models.TransientModel):
                     bill.name = False
                     bill.invoice_date = self.date_planned
                     bill.date = self.date_planned
-                    bill.rcs_notes_for_purchase = self.rcs_notes if self.rcs_notes else ''
+                    bill.notes_for_purchase = self.purchase_notes if self.purchase_notes else ''
 
             if self.backdate_for_stock_move:
                 for picking in purchase_order.picking_ids:
                     picking.scheduled_date = self.date_planned
                     picking.date_done = self.date_planned
-                    picking.rcs_notes_for_purchase = self.rcs_notes if self.rcs_notes else ''
+                    picking.notes_for_purchase = self.purchase_notes if self.purchase_notes else ''
 
                     stock_moves = self.env['stock.move'].search(
                         [('picking_id', '=', picking.id)])
@@ -90,7 +90,7 @@ class BackdateWizard(models.TransientModel):
 
                     for move in stock_moves:
                         move.date = self.date_planned
-                        move.rcs_notes_for_purchase = self.rcs_notes if self.rcs_notes else ''
+                        move.notes_for_purchase = self.purchase_notes if self.purchase_notes else ''
 
                     for move in product_moves:
                         move.date = self.date_planned

@@ -6,8 +6,8 @@
         <field name="inherit_id" ref="account.view_move_form" />
         <field name="arch" type="xml">
             <field name="payment_reference" position="after">
-                <field name="rcs_notes_for_purchase" invisible="not is_rcs_notes_for_purchase or not rcs_notes_for_purchase" />
-                <field name="is_rcs_notes_for_purchase" invisible="1" />
+                <field name="notes_for_purchase" invisible="not is_notes_for_purchase or not notes_for_purchase" />
+                <field name="is_notes_for_purchase" invisible="1" />
             </field>
         </field>
     </record>
