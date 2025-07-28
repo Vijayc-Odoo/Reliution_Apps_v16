@@ -12,6 +12,22 @@ export class ComposeForwardDialog extends Component {
         this.action = useService("action");
         this.notification = useService("notification");
 
+        if(document.querySelector('.compose-mail-container')){
+            document.querySelectorAll('.compose-mail-container').forEach(el => {
+                el.remove();
+            });
+        }
+        if(document.querySelector('.compose-reply-container')){
+            document.querySelectorAll('.compose-reply-container').forEach(el => {
+                el.remove();
+            });
+        }
+        if(document.querySelector('.compose-forward-container')){
+            document.querySelectorAll('.compose-forward-container').forEach(el => {
+                el.remove();
+            });
+        }
+
         this.state = useState({
             recipient: "",
             subject: `Fwd: ${this.props.mail.subject}`,

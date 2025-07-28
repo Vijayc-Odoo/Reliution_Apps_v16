@@ -11,7 +11,21 @@ export class ComposeReplyDialog extends Component {
         this.dialog = useService("dialog");
         this.action = useService("action");
 
-        debugger;
+        if(document.querySelector('.compose-mail-container')){
+            document.querySelectorAll('.compose-mail-container').forEach(el => {
+                el.remove();
+            });
+        }
+        if(document.querySelector('.compose-reply-container')){
+            document.querySelectorAll('.compose-reply-container').forEach(el => {
+                el.remove();
+            });
+        }
+        if(document.querySelector('.compose-forward-container')){
+            document.querySelectorAll('.compose-forward-container').forEach(el => {
+                el.remove();
+            });
+        }
         this.state = useState({
 //            recipient: this.props.mail.email_from,
             recipient: this.props.mail.email_to,

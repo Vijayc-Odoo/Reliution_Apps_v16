@@ -12,12 +12,30 @@ import {ImportDialog} from "./AttachmentMail";
 export class ComposeMail extends Component {
     setup() {
         debugger;
+        debugger;
         this.orm = useService('orm')
         this.root = useRef('root');
         this.action = useService('action')
         this.dialog = useService('dialog')
         this.dropdownRef = useRef("dropdown");
         this.searchInputRef = useRef("searchInput");
+
+
+        if(document.querySelector('.compose-mail-container')){
+            document.querySelectorAll('.compose-mail-container').forEach(el => {
+                el.remove();
+            });
+        }
+        if(document.querySelector('.compose-reply-container')){
+            document.querySelectorAll('.compose-reply-container').forEach(el => {
+                el.remove();
+            });
+        }
+        if(document.querySelector('.compose-forward-container')){
+            document.querySelectorAll('.compose-forward-container').forEach(el => {
+                el.remove();
+            });
+        }
 
         this.state = useState({
             subject: "",
@@ -393,7 +411,7 @@ export class ComposeMail extends Component {
     }
 
     /* Method to send the composed mail. */
-        async sentMail() {
+    async sentMail() {
 
         this.state.errors = {
             recipients: "",

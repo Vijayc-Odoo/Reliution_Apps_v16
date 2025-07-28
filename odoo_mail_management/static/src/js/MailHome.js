@@ -15,6 +15,8 @@ import { session } from "@web/session";
  */
 class odooMail extends  Component {
     setup() {
+    debugger;
+    debugger;
         this.mailState = useState({
             loadLogo: "",
             loadMail: [],

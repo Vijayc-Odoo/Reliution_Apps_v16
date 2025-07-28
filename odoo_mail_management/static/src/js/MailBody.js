@@ -9,6 +9,7 @@ import { useMailUtils } from './MailUtils.js';
  */
 export class MailBody extends  Component {
     setup() {
+    debugger;
         this.ref = useRef('root');
         this.orm = useService('orm');
         this.mailUtils = useMailUtils();
