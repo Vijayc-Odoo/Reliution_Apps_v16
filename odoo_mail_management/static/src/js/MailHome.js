@@ -119,9 +119,28 @@ class odooMail extends  Component {
        /**
      * Method to reset the mail view.
      */
-    resetView(){
+    resetView(a=false){
+        debugger;
         this.mailState.formData = {}
         this.mailState.mode = "list"
+        console.log("This is a Reset View Method")
+        if(a == true){
+            this.refreshPage()
+        }
+//        if (this.mailState.mailType === 'all') {
+//            this.allMailView(); // Refresh All Mail view
+//        } else if (this.mailState.mailType === 'sent') {
+//            this.sentMail(); // Refresh Sent Mail view
+//        }else if (this.mailState.mailType === 'inbox') {
+//            this.inboxMailView(); // Refresh Inbox Mail view
+//        } else if (this.mailState.mailType === 'starred'){
+//            this.starredMail() // Refresh Starred Mail view
+//        } else if(this.mailState.mailType === 'outbox'){
+//            this.outboxMailView() // Refresh Outbox Mail view
+//        } else if(this.mailState.mailType === 'archive'){
+//            this.archivedMail() // Refresh Archive Mail view
+//        }
+//        this.refreshPage()
     }
     /**
      * Method to open a specific mail.
@@ -131,6 +150,7 @@ class odooMail extends  Component {
         debugger;
         this.mailState.formData = mail
         this.mailState.mode = "form"
+
     }
      /**
      * Method to star or unstar a mail.
@@ -149,6 +169,7 @@ class odooMail extends  Component {
      * @param {Boolean} check - Checked or not.
      */
     onSelectMail(mailId, check) {
+    debugger;
         if (check) {
             if (!this.selectedMails.includes(mailId)) {
                 this.selectedMails.push(mailId);
@@ -221,7 +242,22 @@ class odooMail extends  Component {
      * @param {Object} event - Event object.
      */
     refreshPage(event){
-      window.location.reload()
+        debugger;
+        if (this.mailState.mailType === 'all') {
+            this.allMailView(); // Refresh All Mail view
+        } else if (this.mailState.mailType === 'sent') {
+            this.sentMail(); // Refresh Sent Mail view
+        }else if (this.mailState.mailType === 'inbox') {
+            this.inboxMailView(); // Refresh Inbox Mail view
+        } else if (this.mailState.mailType === 'starred'){
+            this.starredMail() // Refresh Starred Mail view
+        } else if(this.mailState.mailType === 'outbox'){
+            this.outboxMailView() // Refresh Outbox Mail view
+        } else if(this.mailState.mailType === 'archive'){
+            this.archivedMail() // Refresh Archive Mail view
+        }
+        console.log(this.mailState.mailType)
+//      window.location.reload()
     }
      /**
      * Method to delete selected mails.
@@ -271,9 +307,10 @@ class odooMail extends  Component {
     debugger;
         if (this.mailState.mailType === 'all') {
             this.allMailView(); // Refresh All Mail view
-
         } else if (this.mailState.mailType === 'sent') {
             this.sentMail(); // Refresh Sent Mail view
+        }else if (this.mailState.mailType === 'inbox') {
+            this.inboxMailView(); // Refresh Inbox Mail view
         } else if (this.mailState.mailType === 'starred'){
             this.starredMail() // Refresh Starred Mail view
         } else if(this.mailState.mailType === 'outbox'){
@@ -378,6 +415,7 @@ class odooMail extends  Component {
               offset: this.mailState.offset,
               order: "create_date desc" }
         );
+        debugger;
         this.mailState.loadMail = records;
         this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;
         this.addPaginationControls();
@@ -421,7 +459,7 @@ class odooMail extends  Component {
             [domain, []],
             { limit: this.mailState.limit,
               offset: this.mailState.offset,
-              order: "create_date desc" }
+              order: "create_date" }
         );
         this.mailState.loadMail = records;
         this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;

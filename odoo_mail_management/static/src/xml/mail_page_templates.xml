@@ -198,7 +198,7 @@
                         <!-- Back button -->
                         <button class="btn back-button"
                                 t-if="mailState.mode == 'form'"
-                                t-on-click="resetView">
+                                t-on-click="() => this.resetView(true)">
                             <img src="/odoo_mail_management/static/src/img/arrow_left_alt.svg"
                                  alt="Back"
                                  class="btn-icon btn-icon-sm btn-icon-alt btn-icon-hover"/>

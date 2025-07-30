@@ -2,19 +2,28 @@
 import { Component, useRef, useState ,markup, onWillStart } from '@odoo/owl'
 import { useService } from "@web/core/utils/hooks";
 import { useMailUtils } from './MailUtils.js';
+import { formatDateTime } from "@web/core/l10n/dates";
+//import { DateTime } from 'luxon';
+
 
 /**
  * MailBody component for displaying mail details.
  * @extends Component
  */
 export class MailBody extends  Component {
-    setup() {
+    async setup() {
     debugger;
         this.ref = useRef('root');
         this.orm = useService('orm');
         this.mailUtils = useMailUtils();
-        this.state = useState({ starred: false });
 
+        this.state = useState({ starred: false });
+        this.state.latest_mail=[];
+        this.state.date='';
+//        this.state.latest_mail=await this.orm.call('mail.message', 'get_inbox_mails', [this.props.mail.child_ids,true])
+//        debugger;
+//        this.state.date=formatDateTime(this.state.latest_mail[0]?.date || this.props.mail.date)
+//        this.state.date=formatDateTime(DateTime.fromISO(this.state.latest_mail[0]?.date || this.props.mail.date))
         this.handleSelectAll = (event) => {
             if (this.ref.el) {
                 const checkbox = this.ref.el.querySelector(".mail_check_box");
@@ -79,20 +88,19 @@ export class MailBody extends  Component {
      * @param {Object} event - Event object.
      */
      async starMail(event) {
-            const mailId = this.props.mail.id;
-    const currentStarred = this.props.mail.is_starred;
+     debugger;
+        const mailId = this.props.mail.id;
+        const currentStarred = this.props.mail.is_starred;
 
-    // Toggle star value
-    const newStarred = !currentStarred;
-
-    // RPC call to backend
-    if (newStarred) {
+        // Toggle star value
+        const newStarred = !currentStarred;
+        // RPC call to backend
+        if (newStarred) {
             await this.orm.call('mail.message', 'star_mail', [mailId]);
-    } else {
-        await this.orm.call('mail.message', 'unstar_mail', [mailId]);
-    }
-           this.props.mail.is_starred = newStarred;
-
+        } else {
+            await this.orm.call('mail.message', 'unstar_mail', [mailId]);
+        }
+        this.props.mail.is_starred = newStarred;
     }
     /**
      * Method to open the mail.

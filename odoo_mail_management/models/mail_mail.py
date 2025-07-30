@@ -2,6 +2,8 @@
 import base64
 from odoo import api, fields, models, tools
 from odoo.exceptions import ValidationError
+from datetime import datetime
+
 from bs4 import BeautifulSoup
 
 
@@ -424,6 +426,7 @@ class MailMail(models.Model):
         for msg in all_msgs:
             if msg.message_type in allowed_types:
                 thread.append({
+                    'message_type':msg.message_type,
                     'id': f"msg-{msg.id}",  # ensure unique key for JS
                     'subject': msg.subject,
                     'email_from': msg.email_from,
@@ -639,14 +642,29 @@ class MailMessage(models.Model):
     is_starred = fields.Boolean(string="Starred Mail", default=False,
                                 help="Flag indicating whether the mail is starred.")
     is_trashed = fields.Boolean(string="Is Trashed", default=False)
-    active = fields.Boolean(default=True, help="Flag indicating whether the mail is active.")
+    active = fields.Boolean(default=False,help="Flag indicating whether the mail is active.")
 
     @api.model_create_multi
     def create(self, vals_list):
+        is_email_or_comment=False
         for vals in vals_list:
             if vals.get('message_type') in ['comment', 'email']:
                 vals['is_odoo_mail_message'] = True
-        return super(MailMessage, self).create(vals_list)
+                vals['active'] = True
+                is_email_or_comment=True
+            else:
+                vals['active'] = True
+        result= super(MailMessage, self).create(vals_list)
+
+        # This is used to highlight the main mail so that the user can easily identify a new mail.
+        if is_email_or_comment and result.parent_id:
+            parent = result.parent_id
+            while parent.parent_id:
+                parent = parent.parent_id
+            self.mark_as_unread(parent.id)
+            return result
+        else:
+            return result
 
     @api.model
     def mark_as_read(self, mail_ids):
@@ -664,7 +682,7 @@ class MailMessage(models.Model):
     def star_mail(self, *args):
         """Method to make a mail starred."""
         self.search([('id', '=', *args),
-                     ('create_uid', '=', self.env.user.id)]).write({"is_starred": True})
+                     ('create_uid', '=', self.env.user.id)]).sudo().write({"is_starred": True})
 
     @api.model
     def unstar_mail(self, *args):
@@ -672,9 +690,18 @@ class MailMessage(models.Model):
         self.sudo().search([('id', '=', *args),
                             ('create_uid', '=', self.env.user.id)]).write({"is_starred": False})
 
+    # This function is used to retrieve the ID of the most recent mail
+    def get_last_child_message(self,msg):
+        if msg.child_ids:
+            # Find the latest child (by date or ID)
+            last_child = max(msg.child_ids, key=lambda m: m.date or m.create_date)
+            # Recurse into its children
+            return self.get_last_child_message(last_child)
+        return msg
+
     @api.model
     def get_inbox_mails(self):
-        """Return only top-level, not-done, not-trashed mails addressed to the current user."""
+        """Return only top-level, nomzit-done, not-trashed mails addressed to the current user."""
         user_email = self.env.user.email
         now = fields.Datetime.now()
 
@@ -699,30 +726,20 @@ class MailMessage(models.Model):
                 for child in msg.child_ids
             )
         )
-        # result = parent_messages.filtered(
-        #     lambda msg: any(
-        #         child.message_type == 'email'
-        #         for child in msg.child_ids
-        #     )
-        # )
-        # result = parent_messages.filtered(lambda m: m.message_type == 'email')
+        data=result.read()
+        # This is used to show replies (child messages) within the mail body content
+        for index, res in enumerate(result):
+            if res.child_ids:
+                last_mail_message = self.get_last_child_message(res)
+                if last_mail_message.preview:
+                    data[index]['Last_Message'] = last_mail_message.preview
+                    data[index]['Last_Message_Date'] = last_mail_message.date
+            else:
+                data[index]['Last_Message_Date'] = res.date
 
-        # return parent_messages
-        return result.read()
-
-        # inbox_mails = self.sudo().search([
-        #     '|',
-        #     '|',
-        #     ('email_from', 'ilike', user_email),
-        #     ('email_msg_to', 'ilike', user_email),
-        #     ('partner_ids.email', 'ilike', user_email),
-        #     ('is_trashed', '=', False),
-        #     # ('is_done', '=', False),
-        #     ('child_ids', '!=', False),
-        #     # ('message_type', '=', 'email'),
-        #     ('is_odoo_mail_message', '=', True),
-        # ], order='create_date desc')
-        # return inbox_mails.read()
+        # Show latest mail in teh top
+        sorted_data = sorted(data, key=lambda x: x['Last_Message_Date'], reverse=True)
+        return sorted_data
 
     @api.model
     def delete_mail(self, ids):

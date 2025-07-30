@@ -104,12 +104,17 @@
                 </span>
                 <span style="margin: 0 4px;">-</span>
                 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    <span t-out="props.mail.preview"/>
+<!--                    <span t-out="props.mail.preview"/>-->
+                    <span t-out="props.mail.Last_Message || props.mail.preview"/>
                 </span>
             </div>
 
             <div class="message-date" style="white-space: nowrap; font-size: 0.8rem; margin-left: auto; padding-left: 12px;">
+                <span t-out="props.mail.Last_Message_Date || props.mail.date"/>
+                <span>---</span>
                 <span t-out="props.mail.date"/>
+<!--                <span t-out="state.date"/>-->
+<!--                <span t-out="(state.latest_mail[0]?.date) || props.mail.date"/>-->
             </div>
         </div>
 

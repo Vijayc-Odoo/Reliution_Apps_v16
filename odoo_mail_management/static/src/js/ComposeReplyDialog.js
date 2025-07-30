@@ -7,6 +7,7 @@ import {ImportDialog} from "./AttachmentMail";
 
 export class ComposeReplyDialog extends Component {
     setup() {
+    debugger;
         this.orm = useService("orm");
         this.dialog = useService("dialog");
         this.action = useService("action");
@@ -27,8 +28,9 @@ export class ComposeReplyDialog extends Component {
             });
         }
         this.state = useState({
-//            recipient: this.props.mail.email_from,
-            recipient: this.props.mail.email_to,
+
+            recipient: this.props.mail.email_from,
+//            recipient: this.props.mail.email_to,
             subject: `Re: ${this.props.mail.subject}`,
             content: "",
             attachedFiles: [],
@@ -36,7 +38,13 @@ export class ComposeReplyDialog extends Component {
 //            cc: this.props.mail.email_cc || "",
             cc: "",
         });
-
+        if(this.props.mail.message_type == 'email_outgoing'){
+            this.state.recipient= this.props.mail.email_to
+        }
+        else{
+            this.state.recipient= this.props.mail.email_from
+        }
+        debugger;
         this.fileInputRef = useRef('fileInput');
         this.recipientInputRef = useRef('recipientInput');
         this.ccInputRef = useRef('ccInput');

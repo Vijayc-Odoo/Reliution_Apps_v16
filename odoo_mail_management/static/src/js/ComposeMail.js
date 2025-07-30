@@ -75,7 +75,7 @@ export class ComposeMail extends Component {
 //        };
 
         this.handleKeyDown = (ev) => {
-            if (ev.key === 'Enter' && this.state.currentSearchTerm.trim()) {
+            if (ev.key === 'Enter' && this.state.currentSearchTerm.trim() && this.state.currentSearchTerm.includes("@")) {
                 ev.preventDefault();
                 this.selectPartner(this.state.currentSearchTerm);
             }

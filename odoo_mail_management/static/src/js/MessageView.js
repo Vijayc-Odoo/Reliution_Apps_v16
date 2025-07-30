@@ -11,6 +11,7 @@ import { useMailUtils } from './MailUtils.js';
  */
 export class MessageView extends  Component {
     setup(){
+
         this.root = useRef("root-mail")
         this.action = useService("action");
         this.orm = useService("orm");
@@ -38,9 +39,10 @@ export class MessageView extends  Component {
 
     async fetchThread() {
          const thread = await this.orm.call('mail.mail', 'get_mail_thread', [this.props.mail.id]);
-         debugger;
+
          thread.reverse()
         this.state.thread = thread;
+        debugger;
         for (const mail of thread) {
             if (mail.attachment_ids && mail.attachment_ids.length) {
                 const result = await this.orm.call("ir.attachment", "get_fields", [mail.attachment_ids]);
@@ -76,6 +78,7 @@ export class MessageView extends  Component {
     }
 
     async replyMail(mail, env) {
+        debugger;
         env.services.dialog.add(ComposeReplyDialog, {mail: mail});
     }
 
