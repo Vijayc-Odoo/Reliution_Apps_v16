@@ -31,7 +31,7 @@ export class ComposeReplyDialog extends Component {
 
             recipient: this.props.mail.email_from,
 //            recipient: this.props.mail.email_to,
-            subject: `Re: ${this.props.mail.subject}`,
+            subject: `${this.props.mail.subject}`,
             content: "",
             attachedFiles: [],
             images: [],
@@ -62,8 +62,8 @@ export class ComposeReplyDialog extends Component {
     }
 
     async sendReply() {
-        debugger;
         const { recipient, subject, content, images, cc} = this.state;
+        debugger;
         if (!content) {
             alert("Please enter a message");
             return;
@@ -85,7 +85,6 @@ export class ComposeReplyDialog extends Component {
          cc: cc,
          });
         this.props.close();
-        window.location.reload();
     }
 
     async attachmentAction() {

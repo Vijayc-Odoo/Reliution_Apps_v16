@@ -11,7 +11,7 @@ import { useMailUtils } from './MailUtils.js';
  */
 export class MessageView extends  Component {
     setup(){
-
+        debugger;
         this.root = useRef("root-mail")
         this.action = useService("action");
         this.orm = useService("orm");

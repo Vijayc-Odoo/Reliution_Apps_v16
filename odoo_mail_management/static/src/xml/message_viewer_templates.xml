@@ -111,7 +111,7 @@
             <t t-foreach="state.thread" t-as="mail" t-key="mail.id">
                 <div class="mail-thread-item" style="border:1px solid #e0e0e0; padding:16px; margin-bottom:16px; border-radius:8px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 t-out="mail.subject" style="margin:0; font-size:16px; font-weight:500;"/>
+                        <h5 t-out="props.mail.subject" style="margin:0; font-size:16px; font-weight:500;"/>
                         <div class="text-muted" style="font-size:13px;">
                             <t t-out="formatDate(mail.date)"/>
                         </div>

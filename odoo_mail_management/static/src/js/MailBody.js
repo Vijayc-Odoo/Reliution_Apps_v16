@@ -54,7 +54,6 @@ export class MailBody extends  Component {
      async archiveMail(event){
       var mail = this.props.mail.id
       await this.orm.call('mail.message','archive_mail',[mail])
-      window.location.reload();
     }
     /**
      * Method to unarchive the mail.
@@ -79,8 +78,15 @@ export class MailBody extends  Component {
      */
 
     async deleteMail(event){
+        debugger;
        var mail = this.props.mail.id
-       await this.orm.call('mail.message','delete_checked_mail',[mail])
+       if(this.props.mailType === 'trash'){
+        await this.orm.call('mail.message','delete_forever_mail',[mail])
+       }
+       else{
+        await this.orm.call('mail.message','delete_checked_mail',[mail])
+       }
+
        window.location.reload();
     }
     /**
