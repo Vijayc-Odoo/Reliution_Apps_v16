@@ -26,16 +26,16 @@ class MailMail(models.Model):
     document_model_id = fields.Many2one('ir.model', string="Document Model")
     document_record_id = fields.Integer(string="Document Record ID")
     mail_template_id = fields.Many2one('mail.template', string="Template")
-    active = fields.Boolean(help="Flag indicating whether the mail is active.")
+    is_active = fields.Boolean(default=True,help="Flag indicating whether the mail is active.")
     is_thread_root = fields.Boolean(compute='_compute_is_thread_root', store=True, string="Thread Root")
     mail_message_id = fields.Many2one('mail.message', string="Related Message", ondelete='set null')
     is_odoo_mail = fields.Boolean('Odoo Mail')
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            vals['active'] = True
-        return super(MailMail, self).create(vals_list)
+    # @api.model_create_multi
+    # def create(self, vals_list):
+    #     for vals in vals_list:
+    #         vals['is_active'] = True
+    #     return super(MailMail, self).create(vals_list)
 
     @api.model
     def load_template(self, template_id, doc):
@@ -106,7 +106,7 @@ class MailMail(models.Model):
         stared_count = self.sudo().search_count(
             [('is_starred', '=', True), ('create_uid', '=', self.env.user.id), ('is_trashed', '=', False)])
         archived_count = self.sudo().search_count(
-            [('active', '=', False), ('create_uid', '=', self.env.user.id), ('is_trashed', '=', False)])
+            [('is_active', '=', False), ('create_uid', '=', self.env.user.id), ('is_trashed', '=', False)])
         trash_count = self.sudo().search_count(
             [('is_trashed', '=', True), ('create_uid', '=', self.env.user.id)])
         inbox_count = self.sudo().search_count(
@@ -180,7 +180,7 @@ class MailMail(models.Model):
         """Method to open a mail and show its content."""
         detail = self.sudo().search(
             [('id', '=', *args), ('create_uid', '=', self.env.user.id), '|',
-             ('active', '=', False), ('id', '=', *args),
+             ('is_active', '=', False), ('id', '=', *args),
              ('create_uid', '=', self.env.user.id)]).body_html
         return detail
 
@@ -648,7 +648,7 @@ class MailMessage(models.Model):
     is_starred = fields.Boolean(string="Starred Mail", default=False,
                                 help="Flag indicating whether the mail is starred.")
     is_trashed = fields.Boolean(string="Is Trashed", default=False)
-    active = fields.Boolean(help="Flag indicating whether the mail is active.")
+    is_active = fields.Boolean(default=True,help="Flag indicating whether the mail is active.")
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -656,11 +656,8 @@ class MailMessage(models.Model):
         for vals in vals_list:
             if vals.get('message_type') in ['comment', 'email']:
                 vals['is_odoo_mail_message'] = True
-                vals['active'] = True
                 vals['is_read'] = False
                 is_email_or_comment=True
-            else:
-                vals['active'] = True
         result= super(MailMessage, self).create(vals_list)
 
         # This is used to highlight the main mail so that the user can easily identify a new mail.
@@ -798,11 +795,11 @@ class MailMessage(models.Model):
         """Move mails to Trash instead of deleting."""
         mails = self.sudo().search(
             [('id', 'in', ids), ('create_uid', '=', self.env.user.id), '|',
-             ('active', '=', False), ('id', 'in', ids),
+             ('is_active', '=', False), ('id', 'in', ids),
              ('create_uid', '=', self.env.user.id)])
         for mail in mails:
             mail.is_trashed = True
-            mail.active = True
+            mail.is_active = True
 
     @api.model
     def get_trash_mail(self):
@@ -842,7 +839,7 @@ class MailMessage(models.Model):
     def delete_forever_mail(self, *args):
         """Method to delete forever mails."""
         self.search(
-            [('id', '=', *args), '|', ('id', '=', *args), ('active', '=', False)]).sudo().unlink()
+            [('id', '=', *args), '|', ('id', '=', *args), ('is_active', '=', False)]).sudo().unlink()
 
     # @api.model
     # def delete_checked_mail(self, *args):
@@ -855,14 +852,14 @@ class MailMessage(models.Model):
         """Method to archive mail."""
         """Call thay che js mathi and """
         # self.sudo().search([('id', '=', *args), ('create_uid', '=', self.env.user.id)]).write({"active": False})
-        self.sudo().search([('id', '=', *args)]).write({"active": False})
+        self.sudo().search([('id', '=', *args)]).write({"is_active": False})
 
     @api.model
     def get_archived_mail(self):
         """Method to get archived mails"""
         mail_dict = {}
         # mails = self.sudo().search([('active', '=', False), ('is_trashed', '=', False),('create_uid', '=', self.env.user.id)])
-        mails = self.sudo().search([('active', '=', False), ('is_trashed', '=', False)])
+        mails = self.sudo().search([('is_active', '=', False), ('is_trashed', '=', False)])
         for record in mails:
             if record.email_msg_to:
                 mail_dict[str(record)] = ({
@@ -895,7 +892,7 @@ class MailMessage(models.Model):
     def unarchive_mail(self, *args):
         """Method to make mail unarchived."""
         # self.sudo().search([('active', '=', False), ('id', '=', *args),('create_uid', '=', self.env.user.id)]).write({'active': True})
-        self.sudo().search([('active', '=', False), ('id', '=', *args)]).write({'active': True})
+        self.sudo().search([('is_active', '=', False), ('id', '=', *args)]).write({'is_active': True})
 
     # @api.model
     # def delete_checked_mail(self, *args):
@@ -907,18 +904,18 @@ class MailMessage(models.Model):
     @api.model
     def delete_checked_mail(self,*args):
         """Method to delete checked mails."""
-        mails = self.sudo().search([('id', '=', *args), '|', ('id', '=', *args),('active', '=', False)])
+        mails = self.sudo().search([('id', '=', *args), '|', ('id', '=', *args),('is_active', '=', False)])
 
         for mail in mails:
             mail.is_trashed = True
-            mail.active = True
+            mail.is_active = True
 
     @api.model
     def archive_checked_mail(self, *args):
         """Method to archive checked mails."""
         self.sudo().search([('id', 'in', *args),
                             ('create_uid', '=', self.env.user.id)]). \
-            write({"active": False})
+            write({"is_active": False})
 
 
 class ResUsers(models.Model):
