@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="token_form_achosa" model="ir.ui.view">
+            <field name='name'>payment.token.form achosa</field>
+            <field name='model'>payment.token</field>
+            <field name="inherit_id" ref="payment.payment_token_form"/>
+            <field name="arch" type="xml">
+                <xpath expr='//field[@name="active"]' position='after'>
+                    <field name="remove_home_warranty"/>
+                    <field name="remove_batch"/>
+                    <field name="remove_status"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="token_tree_achosa" model="ir.ui.view">
+            <field name='name'>payment.token.tree achosa</field>
+            <field name='model'>payment.token</field>
+            <field name="inherit_id" ref="payment.payment_token_list"/>
+            <field name="arch" type="xml">
+                <xpath expr='//field[@name="name"]' position='after'>
+                    <field name="remove_batch"/>
+                    <field name="remove_status"/>
+                </xpath>
+            </field>
+        </record>
+</odoo>

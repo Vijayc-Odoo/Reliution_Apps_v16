@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="home_warranty_product_pricelist_form_inherit" model="ir.ui.view">
+        <field name="name">Home Warranty Product Pricelist Inherit Form</field>
+        <field name="model">product.pricelist</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="arch" type="xml">
+            <group name="pricelist_settings" position="after">
+                <group>
+                    <field name="state_ids" widget="many2many_tags" domain="[['enable_home_warranty', '=', True]]"/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

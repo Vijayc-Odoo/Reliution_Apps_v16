@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <template id="portal_subscription_page_hw" name="Subscription - Home Warranty" inherit_id="sale_subscription.subscription">
+        <xpath expr="//div[@t-field='account.partner_id']" position="before">
+            <div id="shipping_address" class="col-md-6" style="float:right">
+                <div>
+                    <strong>Covered Address</strong>
+                </div>
+                <div t-if="account.home_warranty">
+                    <address class="mb0" itemscope="itemscope" itemtype="http://schema.org/Organization">
+                        <div>
+                            <strong>Ref:</strong>
+                            <span itemprop="name">
+                                <t t-esc="account.home_warranty.name"/>
+                            </span>
+                        </div>
+                        <div itemprop="address" itemscope="itemscope" itemtype="http://schema.org/PostalAddress">
+                            <div>
+                                <span itemprop="streetAddress">
+                                    <t t-esc="account.home_warranty.property_street"/><br/>
+                                    <t t-esc="account.home_warranty.property_city"/>,
+                                    <t t-esc="account.home_warranty.property_state_code"/>
+                                    <t t-esc="account.home_warranty.property_zip"/><br/>
+                                    United States
+                                </span>
+                            </div>
+                        </div>
+                    </address>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

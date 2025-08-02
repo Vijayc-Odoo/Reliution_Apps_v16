@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record model="ir.model.access" id="portal_home_warranty">
+	    <field eval="True" name="active"/>
+	    <field ref="base.group_portal" name="group_id"/>
+	    <field ref="achosa.model_home_warranty" name="model_id"/>
+	    <field name="name">Portal Home Warranty</field>
+	    <field eval="True" name="perm_create"/>
+	    <field eval="True" name="perm_read"/>
+	    <field eval="False" name="perm_unlink"/>
+	    <field eval="True" name="perm_write"/>
+   </record>
+
+    <record model="ir.ui.view" id="view_account_asset_sale_tree_inh">
+        <field name="name">account.asset.sale.tree</field>
+        <field name="model">account.asset</field>
+        <field name="inherit_id"
+			ref="account_asset.view_account_asset_sale_tree" />
+        <field name="arch" type="xml">
+                <field name="name" position="after">
+                	<field name="invoice_id"/>
+                	<field name="model_id" string="Category"/>
+                </field>
+                <field name="first_depreciation_date" position="before">
+                	<field name="acquisition_date" string="Date"/>
+                </field>
+                <field name="book_value" position="replace">
+                	<field name="partner_id"/>
+                	<field name="city"/>
+                	<field name="state_id"/>
+                	<field name="original_value" string="Gross Value" widget="monetary"/>
+                </field>
+                <field name="value_residual" position="replace">
+                	 <field name="value_residual" string="Residual Value" widget="monetary"/>
+                </field>
+                
+        </field>
+    </record>
+    
+    <record id="view_account_revenue_model_search_inh" model="ir.ui.view">
+        <field name="name">account.asset.model.search</field>
+        <field name="model">account.asset</field>
+        <field name="inherit_id"
+			ref="account_asset.view_account_asset_search" />
+        <field name="arch" type="xml">
+                <field name="name" position="after">
+                	<field name="invoice_id"/>
+                	<field name="partner_id"/>
+                </field>
+               <filter name="model" position="before">
+               		<filter string="Invoice" name="invoice_id" domain="[]" context="{'group_by':'invoice_id'}"/>
+               		<filter string="Customer" name="partner_id" domain="[]" context="{'group_by':'partner_id'}"/>
+               </filter>
+        </field>
+    </record>
+    
+    <!-- <record model="ir.ui.view" id="view_account_asset_revenue_form_inh">
+        <field name="name">account.asset.revenue.form</field>
+        <field name="model">account.asset</field>
+        <field name="inherit_id" ref="account_asset.view_account_asset_revenue_form"/>
+        <field name="arch" type="xml">
+            <field name="account_depreciation_expense_id" position="after">
+                <field name="invoice_id"/>
+               	<field name="partner_id"/>
+               	<field name="city"/>
+                <field name="state_id"/>
+            </field>
+        </field>
+        </record> -->
+    
+</odoo>

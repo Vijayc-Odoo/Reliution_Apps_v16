@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+<t t-name="FieldAddOns">
+        <div>
+        <div t-foreach="widget.m2mValues" t-as="m2m_value" style="float:left;width:50%">
+            <t t-set="id_for_label" t-value="'o_many2many_checkbox_' + _.uniqueId()"/>
+            <t t-set="id_for_price" t-value="JSON.stringify(m2m_value[0]) + '_Price'"/>
+            <table style="margin:0px">
+                    <tr>
+                        <td class="o_td_label" style="min-width: 200px;">
+                            <label t-att-for="id_for_label" class="o_form_label"><t t-esc="m2m_value[1]"/></label>
+                        </td>
+                        <td style="width: 50px;">
+                            <input type="checkbox" t-att-id="id_for_label"
+                                   t-att-data-record-id="JSON.stringify(m2m_value[0])"/>
+                            <span/>
+                        </td>
+                        <td style="width: 75px;">
+                            <div t-att-id="id_for_price" class="price">$</div>
+                        </td>
+                    </tr>
+            </table>
+        </div>
+            <div style="clear:both"></div>
+            <script>set_Prices();</script>
+    </div>
+</t>
+</templates>

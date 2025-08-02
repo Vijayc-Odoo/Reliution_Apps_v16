@@ -1,0 +1,88 @@
+"id","name","state","type","binding_type","model_id/id","nextcall","user_id/id","ir_actions_server_id/id","usage","code"
+"__export__.ir_cron_20_3ce183be","HW: link invoice","code","ir.actions.server","action","account_payment.model_account_invoice","2019-07-15 17:26:44","__export__.res_users_8_fab3e8ec","__export__.ir_act_server_715_aa009301","ir_cron","
+# Available variables:
+#  - env: Odoo Environment on which the action is triggered
+#  - model: Odoo Model of the record on which the action is triggered; is a void recordset
+#  - record: record on which the action is triggered; may be void
+#  - records: recordset of all records on which the action is triggered in multi-mode; may be void
+#  - time, datetime, dateutil, timezone: useful Python libraries
+#  - log: log(message, level='info'): logging function to record debug information in ir.logging table
+#  - Warning: Warning Exception to use with raise
+# To return an action, assign: action = {...}
+
+records = env['account.invoice'].search([['home_warranty','=',False]])
+
+for rec in records:
+  rec._update_hw()
+
+records = env['account.invoice'].search_read([['home_warranty','=',False]],['number','home_warranty'])
+
+msg = str(records).replace('},','},\n')
+
+log(msg,level='info')
+"
+"achosa.submit_seller","HW: Submit Seller","code","ir.actions.server","action","achosa.home_warranty","2019-07-15 17:26:44","__export__.res_users_8_fab3e8ec","__export__.ir_act_server_715_aa009301","ir_cron","
+# Available variables:
+#  - env: Odoo Environment on which the action is triggered
+#  - model: Odoo Model of the record on which the action is triggered; is a void recordset
+#  - record: record on which the action is triggered; may be void
+#  - records: recordset of all records on which the action is triggered in multi-mode; may be void
+#  - time, datetime, dateutil, timezone: useful Python libraries
+#  - log: log(message, level='info'): logging function to record debug information in ir.logging table
+#  - Warning: Warning Exception to use with raise
+# To return an action, assign: action = {...}
+
+msg = ''
+
+records = env['home.warranty'].search([['state','=','Seller'],['seller_invoice_status','=','draft']])
+
+for rec in records:
+  r = rec.confirm_seller()
+  if r == True:
+    msg += rec.name + '\n'
+  else:
+    msg += rec.name + str(r) + '\n'
+
+if msg != '':
+    log(msg,level='info')
+"
+"achosa.calc_coverage","SUB: Compute Coverage","code","ir.actions.server","action","sale.subscription","2019-07-15 17:26:44","__export__.res_users_8_fab3e8ec","__export__.ir_act_server_715_aa009301","ir_cron","
+# Available variables:
+#  - env: Odoo Environment on which the action is triggered
+#  - model: Odoo Model of the record on which the action is triggered; is a void recordset
+#  - record: record on which the action is triggered; may be void
+#  - records: recordset of all records on which the action is triggered in multi-mode; may be void
+#  - time, datetime, dateutil, timezone: useful Python libraries
+#  - log: log(message, level='info'): logging function to record debug information in ir.logging table
+#  - Warning: Warning Exception to use with raise
+# To return an action, assign: action = {...}
+
+message = ''
+
+products = env['product.product'].search([('can_be_expensed', '=', True)])
+
+for p in products:
+  p._compute_get_terms()
+
+subs = env['sale.subscription'].search([('state', 'in', ['open', 'pending']), ('home_warranty', '!=', False)])
+
+records = subs.mapped('recurring_invoice_line_ids')
+
+c = 0
+
+for r in records:
+  if not r.covered_items and r.product_id.warranty_terms_id:
+    msg = r['analytic_account_id'].name.ljust(30) + ' ' + r['analytic_account_id'].partner_id.name.rjust(40)
+    msg += ' ' + str(r['analytic_account_id']['date_start']).rjust(30) + '\n'
+    msg += r['name'] + '\n'
+    for t in r.product_id.warranty_terms_id:
+      msg += '\t' + str(t.name) + '\n'
+    msg += r.calc_coverage()
+    message += msg + '-------------------------------\n'
+    c += 1
+
+message += '-------------------------------\nCount: '+ str(c).rjust(10)
+
+if c > 0:
+  log(message, level='info')
+"

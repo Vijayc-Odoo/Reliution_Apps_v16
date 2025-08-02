@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="achosa_sale_subscription_view_form_inh" model="ir.ui.view">
+        <field name="name">achosa.sale.subscription.view.form.inh</field>
+        <field name="model">sale.subscription</field>
+        <field name="inherit_id" ref="sale_subscription.sale_subscription_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/header/button[4]" position="after">
+                <field name="in_cancelled" invisible="1"/>
+                <button string="Cancel Renewal"
+                        name="%(sale_subscription.sale_subscription_close_reason_wizard_action)d"
+                        type="action"
+                        attrs="{'invisible': ['|', ('in_cancelled', '=', True),
+                ('stage_category', '=', False),
+                ('stage_id','!=',%(sale_subscription.sale_subscription_stage_draft)d)]}"
+                        context="{'cancel':1}"
+                        help="This button sets the end date to one day before the next payment is due. Use for paid orders."/>
+            </xpath>
+            <xpath expr="//header/button[7]" position="replace">
+                <button string="Close Now"
+                        name="%(sale_subscription.sale_subscription_close_reason_wizard_action)d"
+                        type="action"
+                        attrs="{'invisible': [('stage_category', '=', False)]}"
+                        help="This button sets the end date to today, use for seller’s orders and transfers."/>
+            </xpath>
+            <!--            <xpath expr="//form/header/button[4]" position="attributes">-->
+            <!--                <attribute name="attrs">{'invisible':-->
+            <!--                    [('stage_id','!=',%(sale_subscription.sale_subscription_stage_draft)d), ('stage_category', '=',-->
+            <!--                    False)]}-->
+            <!--                </attribute>-->
+            <!--            </xpath>-->
+            <button name="generate_recurring_invoice" position="replace">
+                <button string="Create Invoice"
+                        name="generate_recurring_invoice"
+                        type="object"
+                        attrs="{'invisible': ['|',('in_cancelled', '=', True), ('payment_mode', '!=', 'manual')]}"
+                        class="btn-primary"/>
+             </button>
+<!--             <xpath expr="//form/header" position="attributes">
+                <attribute name="attrs">{'invisible':[('in_cancelled', '=', True)]}
+                </attribute>
+            </xpath> -->
+
+            <!--            <button name="prepare_renewal_order" position="replace">-->
+            <!--                 <button string="Renewal Quotation" name="prepare_renewal_order" type="object" data-hotkey="w"-->
+            <!--                            attrs="{'invisible': ['|','|',-->
+            <!--                            ('archived_product_count','!=', 0),-->
+            <!--                            ('in_cancelled', '=', True),-->
+            <!--                            '&amp;',-->
+            <!--                            ('recurring_rule_boundary','=','unlimited'),-->
+            <!--                            '&amp;',-->
+            <!--                            ('stage_category','!=','closed'),-->
+            <!--                            ('to_renew', '=', False)]}"/>-->
+            <!--&lt;!&ndash;                <button string="Renewal Quotation"&ndash;&gt;-->
+            <!--&lt;!&ndash;                        name="prepare_renewal_order"&ndash;&gt;-->
+            <!--&lt;!&ndash;                        type="object"&ndash;&gt;-->
+            <!--&lt;!&ndash;                        attrs="{'invisible': ['|',('in_cancelled', '=', True), ('recurring_rule_boundary','=','unlimited'), ('to_renew', '=', False)]}"/>&ndash;&gt;-->
+            <!--            </button>-->
+        </field>
+    </record>
+
+    <record id="achosa_sale_subscription_stage_view_form_inh" model="ir.ui.view">
+        <field name="name">achosa.sale.subscription.stage.view.form.inh</field>
+        <field name="model">sale.subscription.stage</field>
+        <field name="inherit_id"
+               ref="sale_subscription.sale_subscription_stage_view_form"/>
+        <field name="arch" type="xml">
+            <field name="rating_template_id" position="after">
+                <field name="in_cancelled"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="sale_subscription_view_search" model="ir.ui.view">
+        <field name="name">sale.subscription.search</field>
+        <field name="model">sale.subscription</field>
+        <field name="inherit_id"
+               ref="sale_subscription.sale_subscription_view_search"/>
+        <field name="arch" type="xml">
+            <filter name="pending" position="after">
+                <filter name="cancelled"
+                        string="Cancelled"
+                        domain="[('in_cancelled','=',True)]"
+                        help="Cancelled subscriptions"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

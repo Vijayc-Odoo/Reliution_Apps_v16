@@ -1,0 +1,845 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <data>
+        <record model="mail.template" id="achosa.hw_paid">
+            <field name="name">Home Warranty Invoice Paid</field>
+            <field name="subject">Achosa Home Warranty LLC Order Confirmation</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="partner_to">{{object.partner_id.id}}</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="report_template" ref="account.account_invoices"/>
+            <field name="report_name">Invoice_{{(object.name or '').replace('/','_')}}_{{object.state == 'draft' and 'draft' or ''}}</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+                <t t-if="object.home_warranty and object.home_warranty.state == 'Buyer'" data-oe-t-group-active="true"
+                   data-oe-t-group="0" data-oe-t-selectable="true" data-oe-t-inline="true">
+                    Congratulations on your new home! We are sending you this e-mail to confirm that we have received
+                    payment for your home warranty. As we know moving is a hectic time and sometimes our paperwork gets
+                    lost in the closing documents, we are sending you a few items.
+                </t>
+                <t t-else="" data-oe-t-selectable="true" data-oe-t-group="0" data-oe-t-inline="true">
+                    We are sending you this e-mail to confirm that we have received payment for your home warranty.
+                    Further, we are sending you a few items for your information.
+                </t>
+                <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">
+                    First, we have included an invoice that shows your home warranty has been paid. Second, we have
+                    included a document that explains our service process. Finally, we have included the terms &amp;
+                    conditions for your home warranty.
+                </p>
+                <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">
+                    If you have any questions, you can reach us at (888) 509-2916 or at info@achosahw.com. Thank you and
+                    have a wonderful day!
+                </p>
+                <t t-if="object.first_invoice and not object.check_renewal_product() and not object.home_warranty.state == 'Buyer'"
+                   data-oe-t-group-active="true" data-oe-t-group="1" data-oe-t-selectable="true">
+                    <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">
+                        <b style="box-sizing:border-box;font-weight:bolder;">Note for New Customers</b>
+                    </p>
+                    <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">
+                        Please remember that your coverage will not begin until 30 days after today. Your next monthly
+                        payment will automatically process at that time. All recurring payments will automatically
+                        process monthly thereafter.
+                    </p>
+                </t>
+                <t t-elif="object.first_invoice and object.check_renewal_product()" data-oe-t-selectable="true"
+                   data-oe-t-group="1">
+                    <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">
+                        <b style="box-sizing:border-box;font-weight:bolder;">Note for Customers Just Renewing</b>
+                    </p>
+                    <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">
+                        Your renewal plan will begin immediately after your current plan expires. Your second monthly
+                        payment will automatically process one month after your renewal plan begins. All recurring
+                        payments will automatically process monthly thereafter.
+                    </p>
+                </t>
+                <p style="box-sizing:border-box;margin-bottom: 0px;">
+                    <a target="_blank" class="badge badge-pill badge-info" t-attf-href="{{object.warranty_terms_url}}"
+                       style="text-decoration:none;border-radius:120px;border-style:solid;padding:0.25em 0.6em 0.25em 0.6em;margin:1px 2px 1px 0px;box-sizing:border-box;border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;border-left-width:1px;border-left-color:#017e84;border-bottom-width:1px;border-bottom-color:#017e84;border-right-width:1px;border-right-color:#017e84;border-top-width:1px;border-top-color:#017e84;transition-delay:0s;transition-timing-function:ease;transition-duration:0s;transition-property:none;vertical-align:baseline;white-space:nowrap;text-align:center;line-height:1;font-weight:500;font-size:75%;display:inline-block;background-color:#17a2b8;color:#008f8c;">
+                        <t t-out="object.warranty_terms_file_name" data-oe-t-inline="true" oe-keep-contenteditable=""
+                           contenteditable="false"></t>
+                    </a>
+                </p>
+                <p style="box-sizing:border-box;margin-bottom: 0px;">
+                    <a target="_blank" class="badge badge-pill badge-info" t-attf-href="{{object.service_map_url}}"
+                       style="text-decoration:none;border-radius:120px;border-style:solid;padding:0.25em 0.6em 0.25em 0.6em;margin:1px 2px 1px 0px;box-sizing:border-box;border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;border-left-width:1px;border-left-color:#017e84;border-bottom-width:1px;border-bottom-color:#017e84;border-right-width:1px;border-right-color:#017e84;border-top-width:1px;border-top-color:#017e84;transition-delay:0s;transition-timing-function:ease;transition-duration:0s;transition-property:none;vertical-align:baseline;white-space:nowrap;text-align:center;line-height:1;font-weight:500;font-size:75%;display:inline-block;background-color:#17a2b8;color:#008f8c;">
+                        <t t-out="object.service_map_file_name" data-oe-t-inline="true" oe-keep-contenteditable=""
+                           contenteditable="false"></t>
+                    </a>
+                </p>
+                <p style="box-sizing:border-box;margin-bottom: 0px;">
+                    <a target="_blank" class="badge badge-pill badge-info" t-attf-href="{{object.share_url}}"
+                       style="text-decoration:none;border-radius:120px;border-style:solid;padding:0.25em 0.6em 0.25em 0.6em;margin:1px 2px 1px 0px;box-sizing:border-box;border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;border-left-width:1px;border-left-color:#017e84;border-bottom-width:1px;border-bottom-color:#017e84;border-right-width:1px;border-right-color:#017e84;border-top-width:1px;border-top-color:#017e84;transition-delay:0s;transition-timing-function:ease;transition-duration:0s;transition-property:none;vertical-align:baseline;white-space:nowrap;text-align:center;line-height:1;font-weight:500;font-size:75%;display:inline-block;background-color:#17a2b8;color:#008f8c;">
+                        <t t-out="object.name.replace('/','-')" data-oe-t-inline="true" oe-keep-contenteditable=""
+                           contenteditable="false"></t>.pdf
+                    </a>
+                </p>
+                <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;color:#888888;">
+                    <t t-if="object.user_id and object.user_id.signature" data-oe-t-group-active="true"
+                       data-oe-t-group="2" data-oe-t-inline="true">
+                        <t t-out="object.user_id.signature" data-oe-t-inline="true" oe-keep-contenteditable=""
+                           contenteditable="false"></t>
+                    </t>
+                </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.seller_basic_Realtor">
+            <field name="name">Seller’s Order – Seller’s Basic Plan - Realtor</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Confirmation</field>
+            <field name="email_from">sales@achosahw.com</field>
+            <!--            <field name="partner_to">-->
+            <!--                {{ object.realtor_contact.id }}-->
+            <!--            </field>-->
+            <field name="email_to">{{object.realtor_email}}</field>
+            <field name="email_cc">info@achosahw.com, {{object.realtor_coordinator}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="report_template" ref="achosa.hw_report_so"/>
+            <field name="report_name">Sale_Order.pdf</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">Thank you for your order of our <t t-out="object.covered_seller_product_id.name"/> plan for
+                your client.
+            </p>
+            <t t-if="object.seller_email">
+                <p style=" 0px 9px 0px;">We have sent an order confirmation with terms &amp; conditions to
+                    <t t-out="object.seller_name"/>
+                </p>
+            </t>
+            <t t-else="">
+                <p style=" 0px 9px 0px;">As we don’t have your client’s e-mail, we have attached the order
+                    confirmation
+                    with terms &amp; conditions to this e-mail. Please forward to your client at your earliest
+                    convenience.
+                </p>
+            </t>
+            <p style=" 0px 9px 0px;">We appreciate the opportunity you are giving us to serve your client and wish you
+                the best in getting this house sold. When you have a buyer for this house, you can add buyer’s coverage
+                by logging into your account on <a href="http://www.achosahw.com"
+                                                   style="text-decoration-thickness:auto;">www.achosahw.com
+                </a> or contacting us at (888) 509-2916. Have a wonderful day!
+                <br/>
+            </p>
+
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature">
+                    <t t-out="object.realtor_salesperson.signature or ''"/>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.seller_Invoice">
+            <field name="name">Seller’s Order – Invoice</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Confirmation</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="email_cc">info@achosahw.com</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="report_template" ref="achosa.hw_report_so"/>
+            <field name="report_name">Sale_Order.pdf</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">Thank you for your order of our
+                <t t-out="object.covered_seller_product_id.name" contenteditable="false" data-oe-t-inline="true">
+                </t>
+                plan.
+            </p>
+            <p style=" 0px 9px 0px;">We appreciate the opportunity you are giving us to serve your client and wish
+                you the best in getting this house sold. When you have a buyer for this house, you can add buyer’s
+                coverage by logging into your account on <a href="www.achosahw.com">www.achosahw.com</a> or
+                contacting us at (888) 509-2916. Have a wonderful day!
+            </p>
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="0"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.seller_basic_Seller">
+            <field name="name">Seller’s Order – Seller’s Basic Plan – Seller</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Confirmation</field>
+            <field name="email_from">sales@achosahw.com</field>
+            <field name="email_to">{{object.seller_email}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style="margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif; 0px 9px 0px;">
+                <span style="font-style:initial;font-variant-ligatures: initial; font-variant-caps: initial; font-weight: initial; text-align: inherit;">
+                    Congratulations, your complimentary</span> <t t-out="object.covered_seller_product_id.name"
+                                                                       contenteditable="false"
+                                                                       data-oe-t-inline="true"></t> Home Warranty
+                coverage is now in place. Your terms &amp; conditions for the plan are attached. We appreciate the
+                opportunity to serve you and wish you the best in getting your house sold. If you need to contact us
+                while your plan is in effect, you can reach us at (888) 509-2916 or <a href="mailto:info@achosahw.com"
+                                                                                       style="background-color:transparent;color:rgb(0, 135, 132);text-decoration-thickness:auto;">
+                info@achosahw.com</a>. Our website is <a href="http://www.achosahw.com"
+                                                         style="background-color:transparent;color:rgb(0, 135, 132);text-decoration-thickness:auto;">
+                www.achosahw.com</a>. Have a wonderful day!
+                <br/>
+            </p>
+
+            <p style="margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="0"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.seller_Ess_Main_Realtor">
+            <field name="name">Seller’s Order – Seller’s Essentials Plan (Maintenance) - Realtor</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Confirmation</field>
+            <field name="email_from">info@achosahw.com</field>
+            <!--            <field name="partner_to">-->
+            <!--                {{object.realtor_contact}}-->
+            <!--            </field>-->
+            <field name="email_to">{{object.realtor_email}}</field>
+            <field name="email_cc">info@achosahw.com, {{object.realtor_coordinator}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="report_template" ref="achosa.hw_report_so"/>
+            <field name="report_name">Sale_Order.pdf</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">Thank you for your order of our Seller’s Essentials plan for your client.</p>
+            <t t-if="object.seller_email" data-oe-t-group="0" data-oe-t-selectable="true" data-oe-t-group-active="true">
+                <p style=" 0px 9px 0px;">We have sent an order confirmation with terms &amp; conditions to <t
+                        t-out="object.seller_name" contenteditable="false" data-oe-t-inline="true"></t>.
+                </p>
+            </t>
+            <t t-else="" data-oe-t-selectable="true" data-oe-t-group="0">
+                <p style=" 0px 9px 0px;">As we don’t have your client’s e-mail, we have attached the order
+                    confirmation with terms &amp; conditions to this e-mail. Please forward to your client at your
+                    earliest convenience.
+                </p>
+            </t>
+            <p style=" 0px 9px 0px;">As you have selected the version of our plan that requires proof of an HVAC
+                maintenance, please ensure that your client e-mails the maintenance record to us at <a
+                        href="mailto:info@achosahw.com" style="text-decoration-thickness:initial;">info@achosahw.com
+                </a> at your earliest convenience. The HVAC maintenance must have been completed no more than 30 days
+                prior to or after today. We cannot cover any HVAC related claims prior to the receipt of the proof of
+                HVAC maintenance. Further, the maintenance must have been completed prior to the claim.
+            </p>
+            <p style=" 0px 9px 0px;">We appreciate the opportunity you are giving us to serve your client and wish you
+                the best in getting this house sold. When you have a buyer for this house, you can add buyer’s coverage
+                by logging into your account on <a href="http://www.achosahw.com"
+                                                   style="text-decoration-thickness:initial;">www.achosahw.com
+                </a> or contacting us at (888) 509-2916. Have a wonderful day!
+            </p>
+            <div>
+                <br/>
+            </div>
+
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="1"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.seller_Ess_Main_Seller">
+            <field name="name">Seller’s Order – Seller’s Essentials Plan (Maintenance) – Seller</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Confirmation</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="email_to">{{object.seller_email}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">Thank you for your order of our Seller’s Essentials plan. Your terms &amp;
+                conditions for the plan are attached.
+            </p>
+            <p style=" 0px 9px 0px;">As you have selected the version of our plan that requires proof of an HVAC
+                maintenance,please e-mail the maintenance record to us at <a href="mailto:info@achosahw.com">
+                    info@achosahw.com
+                </a> at your earliest convenience. The HVAC maintenance must have been completed no more than 30
+                days prior to or after today. We cannot cover any HVAC related claims prior to the receipt of the
+                proof of HVAC maintenance. Further, the maintenance must have been completed prior to the claim. We
+                appreciate the opportunity to serve you and wish you the best in getting your house sold. If you
+                need to contact us while your plan is in effect, you can reach us at (888) 509-2916 or <a
+                        href="mailto:info@achosahw.com">info@achosahw.com</a>. Our website is <a
+                        href="www.achosahw.com">www.achosahw.com</a>. Have a wonderful day!
+            </p>
+
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="0"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.seller_Ess_NoMa_Realtor">
+            <field name="name">Seller’s Order – Seller’s Essentials Plan (No Ma) - Realtor</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Confirmation</field>
+            <field name="email_from">info@achosahw.com</field>
+            <!--            <field name="partner_to">-->
+            <!--                {{ object.realtor_contact }}-->
+            <!--            </field>-->
+            <field name="email_to">{{object.realtor_email}}</field>
+            <field name="email_cc">info@achosahw.com, {{object.realtor_coordinator}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="report_template" ref="achosa.hw_report_so"/>
+            <field name="report_name">Sale_Order.pdf</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">Thank you for your order of our Seller’s Essentials plan for your client.</p>
+            <t t-if="object.seller_email" data-oe-t-group="0" data-oe-t-selectable="true" data-oe-t-group-active="true">
+                <p style=" 0px 9px 0px;">We have sent an order confirmation with terms &amp; conditions to <t
+                        t-out="object.seller_name" contenteditable="false" data-oe-t-inline="true"></t>; however, we did
+                    not send the invoice to avoid payment confusion.
+                </p>
+            </t>
+            <t t-else="" data-oe-t-selectable="true" data-oe-t-group="0">
+                <p style=" 0px 9px 0px;">As we don’t have your client’s e-mail, we have attached the order
+                    confirmation with terms &amp; conditions to this e-mail. Please forward to your client at your
+                    earliest convenience.
+                </p>
+            </t>
+            <p style=" 0px 9px 0px;">Please remember to inform your client that no payment is due at this time. The cost
+                of the plan will either be added to your client’s first trade call fee (deductible) for a claim or
+                collected at closing upon the successful sale of your client’s house if no claim is made. If it is the
+                latter, we will resend you this invoice prior to closing.
+            </p>
+            <p style=" 0px 9px 0px;">We appreciate the opportunity you are giving us to serve your client and wish you
+                the best in getting this home sold. When you have a buyer for this house, you can add buyer’s coverage
+                by logging into your account on <a href="http://www.achosahw.com"
+                                                   style="text-decoration-thickness:initial;">www.achosahw.com
+                </a> or contacting us at (888) 509-2916. Have a wonderful day!
+            </p>
+
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="1"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.seller_Ess_NoMa_Seller">
+            <field name="name">Seller’s Order – Seller’s Essentials Plan (No Ma) – Seller</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Confirmation</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="email_to">{{object.seller_email}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">Thank you for your order of our Seller’s Essentials plan. Please consider this
+                e-mail as confirmation that your plan is now in effect. We have attached the terms &amp; conditions for
+                the plan for your review.
+            </p>
+            <p style=" 0px 9px 0px;">Please note that you do not have to pay for the plan at this time. The cost of the
+                plan will either be added to your first trade call fee (deductible) for a claim or collected at closing
+                upon the successful sale of your house if no claim is made.
+            </p>
+            <p style=" 0px 9px 0px;">You also have the alternative of submitting proof of an HVAC maintenance within 30
+                days prior to this e-mail to <a href="mailto:info@achosahw.com">info@achosahw.com</a> to avoid the price
+                this plan. We appreciate the opportunity to serve you and wish you the best in getting your house sold.
+            </p>
+            <p style=" 0px 9px 0px;">If you need to contact us while your plan is in effect, you can reach us at (888)
+                509-2916 or <a href="mailto:info@achosahw.com">info@achosahw.com</a>. Our website is <a
+                        href="http://www.achosahw.com">www.achosahw.com</a>. Have a wonderful day!
+            </p>
+
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="0"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.buyer_all_buyer">
+            <field name="name">Buyers Order - Buyer</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Confirmation</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="email_to">{{object.buyer_email}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">Congratulations on finding your new home and thank you for your order of our
+
+                <t t-if="object.covered_buyers_coverage" data-oe-t-group="0" data-oe-t-selectable="true"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.covered_buyer_product_id.name" contenteditable="false" data-oe-t-inline="true"></t>
+                    plan.
+                </t>
+                <t t-elif="object.covered_owners_coverage" data-oe-t-selectable="true" data-oe-t-group="0"
+                   data-oe-t-inline="true">
+                    <t t-out="object.covered_buyer_product_id.name" contenteditable="false" data-oe-t-inline="true"></t>
+                    plan.
+                </t>
+                <t t-elif="object.covered_sellers_coverage" data-oe-t-selectable="true" data-oe-t-group="0"
+                   data-oe-t-inline="true">
+                    <t t-out="object.covered_buyer_product_id.name" contenteditable="false" data-oe-t-inline="true"></t>
+                    plan.
+                </t>
+                <t t-else="" data-oe-t-selectable="true" data-oe-t-group="0" data-oe-t-inline="true">
+                    <t t-out="object.covered_buyer_product_id.name" contenteditable="false" data-oe-t-inline="true"></t>
+                    plan.
+                </t>
+
+                We have attached the terms &amp; conditions for the plan(s) for your review. Your plan will take effect
+                after you close on the purchase of the home.
+            </p>
+            <p style=" 0px 9px 0px;">
+                If you have any questions, you can reach us at
+                <a href="mailto:sales@achosahw.com" style="text-decoration-thickness:auto;">sales@achosahw.com</a>
+                or (888) 509-2916. Also, you can find out more about us and our plans at <a
+                    href="http://www.achosahw.com/" style="text-decoration-thickness:auto;">www.achosahw.com</a>.
+                Have a wonderful day!
+            </p>
+
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="1"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.buyer_all_buyer_invoice">
+            <field name="name">Buyers Order - Buyer With Invoice</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Confirmation</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="email_to">{{object.buyer_email}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="report_template" ref="achosa.hw_report_so"/>
+            <field name="report_name">Sale_Order.pdf</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">
+                Congratulations on finding your new home and thank you for your order of our <t
+                    t-out="object.covered_buyer_product_id.name" contenteditable="false" data-oe-t-inline="true"></t> plan(s).
+                We have attached the terms &amp; conditions for the plan(s) for your review.
+                Your plan(s) will take effect after you close on the purchase of the home.
+            </p>
+            <p style=" 0px 9px 0px;">
+                If you have any questions, you can reach us at
+                <a href="mailto:sales@achosahw.com">sales@achosahw.com</a>
+                or (888) 509-2916. Also, you can find out more about us and our plans at <a
+                    href="http://www.achosahw.com/">www.achosahw.com</a>.
+                Have a wonderful day!
+            </p>
+
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="0"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.buyer_all_closing">
+            <field name="name">Buyers Order - Closing</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Invoice</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="email_to">{{object.closing_email}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="report_template" ref="achosa.hw_report_so"/>
+            <field name="report_name">Sale_Order.pdf</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style="margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif; 0px 9px 0px;">
+                We have attached the invoice and terms &amp; conditions for the home warranty ordered by <t
+                    t-out="object.realtor_name" contenteditable="false" data-oe-t-inline="true"></t> for <t
+                    t-out="object.property_street" contenteditable="false" data-oe-t-inline="true"></t>. Please include
+                both in the closing packet.
+            </p>
+            <p style="margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif; 0px 9px 0px;">
+                You will find the address for payment on the invoice. If you have any questions, you can reach us by
+                e-mail at <a href="mailto:sales@achosahw.com"
+                             style="text-decoration:none;background-color:transparent;color:rgb(0, 135, 132);">
+                sales@achosahw.com
+            </a> or telephone (888) 509-2916. Have a wonderful day!
+                <br/>
+            </p>
+
+            <p style="margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="0"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.buyer_all_realtor">
+            <field name="name">Buyers Order - Realtor</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Invoice</field>
+            <field name="email_from">info@achosahw.com</field>
+            <!--            <field name="partner_to">-->
+            <!--                {{ object.realtor_contact.id if object.realtor_contact.id else False }}-->
+            <!--                &lt;!&ndash;                {{ object.realtor_contact.id }}&ndash;&gt;-->
+            <!--            </field>-->
+            <field name="email_to">{{object.realtor_email}}</field>
+            <field name="email_cc">{{object.realtor_coordinator}},{{object.realtor_salesperson and object.realtor_salesperson.login}}</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="report_template" ref="achosa.hw_report_so"/>
+            <field name="report_name">Sale_Order.pdf</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">Thank you for your order of our
+
+                <t t-if="object.covered_buyers_coverage" data-oe-t-group="0" data-oe-t-selectable="true"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.covered_buyer_product_id.name" contenteditable="false" data-oe-t-inline="true"></t>
+                    plan
+                </t>
+                <t t-elif="object.covered_owners_coverage" data-oe-t-selectable="true" data-oe-t-group="0"
+                   data-oe-t-inline="true">
+                    <t t-out="object.covered_buyer_product_id.name" contenteditable="false" data-oe-t-inline="true"></t>
+                    plan
+                </t>
+                <t t-elif="object.covered_sellers_coverage" data-oe-t-selectable="true" data-oe-t-group="0"
+                   data-oe-t-inline="true">
+                    <t t-out="object.covered_buyer_product_id.name" contenteditable="false" data-oe-t-inline="true"></t>
+                    plan
+                </t>
+                <t t-else="" data-oe-t-selectable="true" data-oe-t-group="0" data-oe-t-inline="true">
+                    <t t-out="object.covered_buyer_product_id.name" contenteditable="false" data-oe-t-inline="true"></t>
+                    plan
+                </t>
+
+                for your client. We have attached the invoice and terms &amp; conditions to this e-mail.
+            </p>
+            <t t-if="object.buyer_email" data-oe-t-group="1" data-oe-t-selectable="true" data-oe-t-group-active="true">
+                <p style=" 0px 9px 0px;">Also, we have sent an order confirmation with terms &amp; conditions to <t
+                        t-out="object.buyer_name" contenteditable="false" data-oe-t-inline="true"></t>. Please note that
+                    we did not send your client the invoice to avoid confusion regarding payment.
+                </p>
+            </t>
+            <t t-else="" data-oe-t-selectable="true" data-oe-t-group="1">
+                <p style=" 0px 9px 0px;">As we did not have the e-mail for your client, we could not forward them the
+                    order confirmation. Please forward them the terms &amp; conditions at your earliest convenience.
+                </p>
+            </t>
+            <p style=" 0px 9px 0px;"></p>
+            <t t-if="object.closing_email" data-oe-t-group="2" data-oe-t-selectable="true"
+               data-oe-t-group-active="true">
+                <p style=" 0px 9px 0px;">Further, we forwarded the invoice and terms &amp; conditions directly to the
+                    closing agent.
+                </p>
+            </t>
+            <t t-else="" data-oe-t-selectable="true" data-oe-t-group="2">
+                <p style=" 0px 9px 0px;">As we did not have the closing agent’s e-mail, we could not forward this
+                    information to him or her. Please forward the invoice and terms &amp; conditions to the closing
+                    agent at your earliest convenience, and request that they include both in the closing packet.
+                </p>
+            </t>
+            <p style=" 0px 9px 0px;">If you have any questions or need any changes to this order, you can contact your
+                sales representative, or reach us by e-mail at <a href="mailto:sales@achosahw.com"
+                                                                  style="text-decoration-thickness:auto;">
+                    sales@achosahw.com
+                </a> or telephone (888) 509-2916. Have a wonderful day!
+            </p>
+
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="3"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.buyer_all_invoice">
+            <field name="name">Buyers Invoice</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC Invoice</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="email_cc">info@achosahw.com</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="report_template" ref="achosa.hw_report_so"/>
+            <field name="report_name">Sale_Order.pdf</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+            <p style=" 0px 9px 0px;">
+                Thank you for your order of our <t t-out="object.covered_buyer_product_id.name" contenteditable="false"
+                                                   data-oe-t-inline="true"></t> plan(s).
+                <br/>
+                We have attached the invoice and terms &amp; conditions to this e-mail.
+                If you have any questions or need any changes to this order, you can contact your sales representative,
+                or reach us by e-mail at <a href="mailto:sales@achosahw.com">sales@achosahw.com</a> or telephone (888)
+                509-2916. Have a wonderful day!
+            </p>
+
+            <p style="color:#888888;">
+                <t t-if="object.realtor_salesperson and object.realtor_salesperson.signature" data-oe-t-group="0"
+                   data-oe-t-group-active="true" data-oe-t-inline="true">
+                    <t t-out="object.realtor_salesperson.signature" contenteditable="false" data-oe-t-inline="true"></t>
+                </t>
+            </p>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.hw_updated">
+            <field name="name">Home Warranty Updated</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC - Updated</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="partner_to"/>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+                <p>Home Warranty
+                    <a t-attf-href="https://achosahw.odoo.com/web?debug#id={{object.id}}&amp;view_type=form&amp;model=home.warranty&amp;menu_id=504&amp;action=709">
+                        <t t-out="object.name"/>
+                    </a>
+                    updated by
+                    <b>
+                        <t t-esc="ctx['author']"/>
+                    </b>
+                </p>
+                <t t-if="ctx.get('tracking')">
+                    <t t-foreach="tracking in ctx['tracking']" t-as="track">
+                        <p>
+                            <b>
+                                <t t-esc="track['col_desc']"/>
+                            </b>
+                            <br/>
+                            Old Value:
+                            <t t-esc="track['initial_value']"/>
+                            <br/>
+                            New Value:
+                            <t t-esc="track['new_value']"/>
+                        </p>
+                    </t>
+                </t>
+            </field>
+        </record>
+        <record model="mail.template" id="achosa.hw_created">
+            <field name="name">Home Warranty Created</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC - Created</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+        </record>
+        <record model="mail.template" id="achosa.hw_usps_address">
+            <field name="name">Home Warranty USPS address check</field>
+            <field name="subject">{{object.property_street}} - Achosa Home Warranty, LLC - USPS address check</field>
+            <field name="email_from">info@achosahw.com</field>
+            <field name="reply_to">info@achosahw.com</field>
+            <field name="model_id" ref="achosa.model_home_warranty"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+                <p>Home Warranty
+                    <a t-attf-href="https://achosahw.com/web?debug#id={{object.id}}&amp;view_type=form&amp;model=home.warranty&amp;menu_id=504&amp;action=709">
+                        <t t-out="object.name or ''"/>
+                        <t t-out="ctx['author']"/>
+                    </a>
+                </p>
+                <t t-if="ctx.get('rxml') and ctx.get('rxml').get('Address') != None">
+                    <t t-if="ctx.get('rxml').get('Address').get('Address1') != None">
+                        <h3>Address found:</h3>
+                        <table>
+                            <tr>
+                                <th>Street:</th>
+                                <td>
+                                    <t t-out="ctx.get('rxml').get('Address').get('Address1')"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Street2:</th>
+                                <td>
+                                    <t t-out="ctx.get('rxml').get('Address').get('Address2')"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>City:</th>
+                                <td>
+                                    <t t-out="ctx.get('rxml').get('Address').get('City')"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>State:</th>
+                                <td>
+                                    <t t-out="ctx.get('rxml').get('Address').get('State')"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Zip:</th>
+                                <td>
+                                    <t t-out="ctx.get('rxml').get('Address').get('Zip5')"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </t>
+                </t>
+                <t t-if="ctx.get('rxml').get('Address').get('Error') != None">
+                    <h3>Error:</h3>
+                    <p>
+                        <t t-out="ctx.get('rxml').get('Address').get('Error').get('Description')"/>
+                    </p>
+                </t>
+                <t t-if="ctx.get('text')">
+                    <p>Raw:
+                        <t t-out="ctx['text']"/>
+                    </p>
+                </t>
+            </field>
+        </record>
+        <!-- TODO:fix user assigned email
+            <template id="message_user_assigned" inherit_id="mail.message_user_assigned">
+            <xpath expr="//p[3]" position="after">
+            <t t-if="'home_warranty' in object">
+                <div t-if="object.home_warranty.name">
+                    <strong>Home Warranty:</strong>
+                    <p t-field="object.home_warranty.name" />
+                </div>
+                <div t-if="object.home_warranty.realtor_contact">
+                    <strong>Realtor:</strong>
+                    <p t-field="object.home_warranty.realtor_contact.name"/>
+                </div>
+                <div t-if="object.home_warranty.property_street">
+                    <strong>Address:</strong>
+                    <p>
+                        <span t-field="object.home_warranty.property_street"/><br/>
+                        <span t-field="object.home_warranty.property_city"/>,
+                        <span t-field="object.home_warranty.property_state"/>
+                        <span t-field="object.home_warranty.property_zip"/>
+                    </p>
+                </div>
+            </t>
+            </xpath>
+        </template>-->
+        <!--Email template -->
+        <record id="email_template_edi_sale" model="mail.template">
+            <field name="name">Sales Order - Send by Email</field>
+            <field name="email_from">{{(object.user_id.email and '"%s" &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')}}</field>
+            <field name="subject">Thank You from Achosa!</field>
+            <field name="partner_to">{{object.partner_id.id}}</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="report_template" ref="sale.action_report_saleorder"/>
+            <field name="report_name">{{(object.name or '').replace('/','_')}}{{object.state == 'draft' and '_draft' or ''}}</field>
+            <field name="lang">{{object.partner_id.lang}}</field>
+            <field name="body_html" type="html">
+                <p>Dear
+                    <t t-out="object.partner_id.name"/>
+                    <t t-set="access_action" t-value="object.with_context(force_website=True).get_access_action()"/>
+                    <t t-set="is_online" t-value="access_action and access_action['type'] == 'ir.actions.act_url'"/>
+                    <t t-set="doc_name" t-value="'quotation' if object.state in ('draft', 'sent') else 'order'"/>
+                    <t t-set="pay_sign_name" t-value="object.get_base_url() + object.get_portal_url()"/>
+                    <t t-set="access_name" t-value="is_online and object.state in ('draft', 'sent')
+                    and pay_sign_name in ('pay','sign') and 'View online' or 'View %s' % doc_name"/>
+                    <t t-set="access_url"
+                       t-value="is_online and object.get_base_url() + object.get_portal_url() or ''"/>
+                    <t t-if="object.partner_id.parent_id">
+                        <t t-out="object.partner_id.parent_id.name or ''"/>
+                    </t>
+                </p>
+                <p>
+                    First and foremost, we want to thank you for your home warranty with Achosa. Without your loyalty
+                    and support, we would not be able to continuously provide the industry’s best level of customer
+                    service. Put simply, you make what we do possible.
+                    <br/>Can you believe that there is only two months left on your home warranty? Since you protected
+                    your home, we have saved our customers hundreds of thousands of dollars in home repair bills while
+                    seeing more and more customers choose Achosa.
+                    <br/>If, like most of our customers, you are happy with our service, consider renewing now by
+                    clicking the button below. In order to make your Achosa experience as easy as possible, our renewal
+                    offer is payable monthly or annually via credit card. We appreciate your business!
+                </p>
+                <t t-if="is_online and not ctx.get('proforma')">
+                    <br/>
+                    <br/>
+                    <center>
+                        <a t-att-href="access_url"
+                           style="background-color: #1abc9c; padding: 20px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 16px;"
+                           class="o_default_snippet_text">
+                            <t t-out="access_name"/>
+                        </a>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <span style="color:#888888">(or view attached PDF)</span>
+                    </center>
+                    <br/>
+                </t>
+                <p>Kind regards,</p>
+                <p style="color:#888888;">
+                    <t t-if="object.user_id and object.user_id.signature">
+                        <t t-out="object.user_id.signature or ''"/>
+                    </t>
+                </p>
+            </field>
+        </record>
+        <!--Email template -->
+        <record id="email_template_edi_renewal" model="mail.template">
+            <field name="name">Sales Order - Renewal Email</field>
+            <field name="email_from">{{(object.user_id.email and '"%s" &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')}}</field>
+            <field name="subject">Thank You from Achosa!</field>
+            <field name="partner_to">{{object.partner_id.id}}</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="report_template" ref="sale.action_report_saleorder"/>
+            <field name="report_name">{{(object.name or '').replace('/','_')}}{{object.state == 'draft' and '_draft' or ''}}</field>
+            <field name="lang">{{object.partner_id.lang}}</field>
+            <field name="body_html" type="html">
+                <t t-set="access_action" t-value="object.with_context(force_website=True).get_access_action()"/>
+                <t t-set="is_online" t-value="access_action and access_action['type'] == 'ir.actions.act_url'"/>
+                <t t-set="doc_name" t-value="'quotation' if object.state in ('draft', 'sent') else 'order'"/>
+                <t t-set="pay_sign_name" t-value="object.get_base_url() + object.get_portal_url()"/>
+                <t t-set="access_name" t-value="is_online and object.state in ('draft', 'sent')
+                    and pay_sign_name in ('pay','sign') and 'View online' or 'View %s' % doc_name"/>
+                <t t-set="access_url"
+                   t-value="is_online and object.get_base_url() + object.get_portal_url() or ''"/>
+                <t t-if="object.partner_id.parent_id">
+                    <p>Dear
+                        <t t-out="object.partner_id.name"/>
+                        <t t-out="object.partner_id.parent_id.name or ''"/>,
+                    </p>
+                </t>
+                <t t-else="">
+                    <p>Dear
+                        <t t-out="object.partner_id.name"/>,
+                    </p>
+                </t>
+                <br/>
+                <p>
+                    First and foremost, we want to thank you for your home warranty with Achosa. Without your loyalty
+                    and support, we would not be able to continuously provide the industry’s best level of customer
+                    service. Put simply, you make what we do possible.
+                    <br/>
+                    <br/>Can you believe that there is only two months left on your home warranty? Since you protected
+                    your home, we have saved our customers millions of dollars in home repair bills while seeing more
+                    and more customers choose Achosa.
+                    <br/>
+                    <br/>If, like most of our customers, you are happy with our service, consider renewing now by
+                    clicking the button below. In order to make your Achosa experience as easy as possible, our renewal
+                    offer is payable monthly or annually via credit card. We appreciate your business!
+                </p>
+                <t t-if="is_online and not ctx.get('proforma')">
+                    <br/>
+                    <br/>
+                    <center>
+                        <a t-att-href="access_url"
+                           style="background-color:#1abc9c;padding: 20px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 16px;"
+                           class="o_default_snippet_text">
+                            <t t-out="access_name"/>
+                        </a>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <span style="color:#888888">(or view attached PDF)</span>
+                    </center>
+                    <br/>
+                </t>
+                <p>Kind regards,</p>
+                <p style="color:#888888;">
+                    <t t-if="object.user_id and object.user_id.signature">
+                        <t t-out="object.user_id.signature or ''"/>
+                    </t>
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_update_property_data,achosa.update.property.data,model_update_property_data,,1,1,1,1
+access_home_warranty_email,achosa.home.warranty.email,model_home_warranty_email,,1,1,1,1
+access_home_warranty_receive_check,achosa.home.warranty.receive.check,model_home_warranty_receive_check,,1,1,1,1
+access_home_warranty_coupon_apply_code,achosa.home.warranty.coupon.apply.code,model_home_warranty_coupon_apply_code,,1,1,1,1

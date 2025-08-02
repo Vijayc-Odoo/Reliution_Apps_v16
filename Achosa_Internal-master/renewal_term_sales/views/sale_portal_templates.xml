@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="sale_order_portal_content_inherit_view_achosa" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//section[@id='details']" position="before">
+            <t t-set="renewal_term_buttons_visible" t-value="sale_order.get_renewal_term_buttons_status()"/>
+            <t t-set="order_renewal_term" t-value="sale_order.get_order_renewal_term()"/>
+            <div class="float-right" t-if="renewal_term_buttons_visible">
+                <a t-att-href="sale_order.get_portal_url(query_string='&amp;renewal_term=Monthly')"
+                   t-attf-class="float-right {{ 'btn btn-sm btn-primary' if order_renewal_term == 'Monthly' else 'btn btn-sm btn-secondary' }}"
+                   aria-label="Monthly Payment"
+                   t-if="sale_order.state in ('draft', 'sent')"
+                   title="Monthly Payment">
+                    Monthly Payment
+                </a>
+                <a t-att-href="sale_order.get_portal_url(query_string='&amp;renewal_term=Yearly')"
+                   aria-label="Monthly Payment"
+                   t-attf-class="float-right mr-2 {{ 'btn btn-sm btn-primary' if order_renewal_term == 'Yearly' else 'btn btn-sm btn-secondary' }}"
+                   t-if="sale_order.state in ('draft', 'sent')"
+                   title="Monthly Payment">
+                    Yearly Payment
+                </a>
+            </div>
+            <div t-if="renewal_error_message" class="float-right" style="clear:right; color: red">
+                <t t-esc="renewal_error_message"/>
+            </div>
+            <t t-if="renewal_term_buttons_visible and order_renewal_term == 'Yearly'">
+                <h3>Yearly Payment</h3>
+            </t>
+            <t t-elif="renewal_term_buttons_visible and order_renewal_term == 'Monthly'">
+                <h3>Monthly Payment</h3>
+            </t>
+            <t t-else="">
+                <h3>Pricing</h3>
+            </t>
+        </xpath>
+        <xpath expr="//section[@id='details']//h3[@id='details']" position="attributes">
+            <!-- Hide the H3 Tag which has contain the Value *Pricing*, Original View Name: Sales Order Portal Content -->
+            <attribute name="t-att-style">"display:none;"</attribute>
+        </xpath>
+    </template>
+</odoo>

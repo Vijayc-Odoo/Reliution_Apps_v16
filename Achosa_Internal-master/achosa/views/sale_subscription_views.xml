@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="sale_subscription_view_form_home_warranty" model="ir.ui.view">
+        <field name="name">sale.subscription.form.view.inherit</field>
+        <field name="model">sale.subscription</field>
+        <field name="inherit_id" ref="sale_subscription.sale_subscription_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="replace">
+                <field name="partner_id" context="{'show_address': 1}" options="{'always_reload': True}" required="1"/>
+            </xpath>
+            <group name="sales" position="replace">
+                <group name="sales" string="Sales">
+                    <field name="home_warranty" context="{'show_address': 1}" options="{'always_reload': True}"/>
+                    <field name="code" attrs="{'required': [('id', '!=', False)]}"/>
+                    <field name="to_renew"/>
+                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                    <field attrs="{'readonly': True }" name="submitter" help="Created By"
+                           modifiers="{'readonly': True }"/>
+                </group>
+            </group>
+            <xpath expr="/form/sheet/group[@name='main']/group" position="inside">
+                <field name="sub_expiry_code" string="Expiration Code"/>
+            </xpath>
+            <xpath expr="//group[@name='main']/group[2]" position="inside">
+                <field name="user_id" domain="[('share', '=', False)]"/>
+                <field name="team_id" kanban_view_ref="%(sales_team.crm_team_view_kanban)s"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </xpath>
+            <xpath expr="//field[@name='recurring_invoice_line_ids']/tree[1]" position="after">
+                <form string="Subscription Lines">
+                    <group>
+                        <group>
+                            <field name="product_id"
+                                   domain="[('recurring_invoice', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
+                                   context="{'default_recurring_invoice': True}"/>
+                            <field name="name"/>
+                            <label for="quantity"/>
+                            <field name="product_uom_category_id" invisible="1"/>
+                            <div class="o_row">
+                                <field name="quantity"/>
+                                <field name="uom_id"/>
+                            </div>
+                            <field name="price_unit"/>
+                            <field name="discount" groups="product.group_discount_per_so_line"/>
+                        </group>
+                    </group>
+                </form>
+                <form>
+                    <sheet string="Subscription Line" name="studio_sheet_4d6771">
+                        <group col="4" name="studio_group_4ce60f">
+                            <field name="product_id"
+                                   domain="[('recurring_invoice', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
+                                   context="{'default_recurring_invoice': True}"/>
+                            <field name="analytic_account_id" on_change="1" can_create="true" can_write="true"
+                                   modifiers="{}"/>
+                            <newline/>
+                            <field name="name" colspan="4" modifiers="{&quot;required&quot;: true}"/>
+                            <newline/>
+                            <label for="quantity"/>
+                            <field name="product_uom_category_id" invisible="1"/>
+                            <div class="o_row">
+                                <field name="quantity"/>
+                                <field name="uom_id"/>
+                            </div>
+                            <field name="price_unit"/>
+                            <field name="discount" groups="product.group_discount_per_so_line"/>
+                            <field name="price_subtotal" modifiers="{&quot;readonly&quot;: true}"/>
+                            <newline/>
+                            <field name="coverage_used"/>
+                            <field name="max_coverage"/>
+                            <newline/><!--
+                  <field colspan="4" name="covered_items">
+                    <tree decoration-muted="True" edit="false">
+                        <field name="product_id"/>
+                        <field name="name"/>
+                        <field name="used_amt"/>
+                        <field name="coverage"/>
+                    </tree>
+                  </field>-->
+                            <separator/>
+                        </group>
+                    </sheet>
+                </form>
+            </xpath>
+            <!--           <xpath expr="//notebook/page[last()]" position="after"> -->
+            <!--             <page string="Anniversary Info" name="anniversary_info"> -->
+            <!--                 <group> -->
+            <!--                     <group> -->
+            <!--                         <field name="anniversary_number"/> -->
+            <!--                         <field name="anniversary_date"/> -->
+            <!--                         <field name="next_anniversary_date"/> -->
+            <!--                     </group> -->
+            <!--                 </group> -->
+            <!--             </page> -->
+            <!--           </xpath> -->
+        </field>
+    </record>
+    <template id="view_sale_sub_tree_sort" inherit_id="sale_subscription.sale_subscription_view_list">
+        <xpath expr="//field[@name='percentage_satisfaction']" position="replace"/>
+        <xpath expr="//field[@name='company_id']" position="replace"/>
+        <xpath expr="//field[@name='partner_id']" position="after">
+            <field name="property_street"/>
+            <field name="state"/>
+            <field name="date_start"/>
+            <field name="date"/>
+            <field name="realtor_contact"/>
+        </xpath>
+        <xpath expr="//field[@name='recurring_next_date']" position="after">
+            <xpath expr="//field[@name='user_id']" position="move"/>
+            <xpath expr="//field[@name='recurring_total']" position="move"/>
+        </xpath>
+        <xpath expr="//field[@name='stage_id']" position="after">
+            <field name="close_reason_id"/>
+        </xpath>
+        <xpath expr="//field[@name='code']" position="after">
+            <field name="create_date" optional="hide"/>
+        </xpath>
+        <xpath expr="//tree[1]" position="attributes">
+            <attribute name="default_order">create_date desc</attribute>
+        </xpath>
+    </template>
+</odoo>

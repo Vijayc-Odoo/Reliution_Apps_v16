@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="acquirer_form_paypal_custom" model="ir.ui.view">
+        <field name="name">acuirer.form.paypal.custom</field>
+        <field name="model">payment.acquirer</field>
+        <field name="inherit_id" ref="payment_paypal.acquirer_form_paypal" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='paypal_use_ipn']" position='after'>
+                <field name="paypal_api_enabled" />
+                <field name="paypal_api_username" string='Client ID' attrs="{'invisible': [('paypal_api_enabled', '=', False)]}" />
+                <field name="paypal_api_password" string='Secret Key' attrs="{'invisible': [('paypal_api_enabled', '=', False)]}" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

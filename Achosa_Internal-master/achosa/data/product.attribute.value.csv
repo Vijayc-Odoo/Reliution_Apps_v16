@@ -1,0 +1,40 @@
+id,attribute_id/id,name,states/id,term_product_type
+__export__.product_attribute_value_131_dfdfbbbc,product.variants_terms,Seller's Advantage,base.state_us_30,Seller Product
+__export__.product_attribute_value_132_42ca923a,product.variants_terms,Seller's Advantage Plus,base.state_us_30,Seller Product
+__export__.product_attribute_value_133_7e085f0e,product.variants_terms,Buyer's Advantage,base.state_us_30,Buyer Product
+__export__.product_attribute_value_134_1fc3f1f7,product.variants_terms,Buyer's Advantage Plus,base.state_us_30,Buyer Product
+__export__.product_attribute_value_135_e8ee2f05,product.variants_terms,Homeowner's Advantage,base.state_us_30,Homeowner Product
+__export__.product_attribute_value_136_c61e6e67,product.variants_terms,Homeowner's Advantage Plus,base.state_us_30,Homeowner Product
+__export__.product_attribute_value_41_323439cc,product.variants_terms,Seller's Basic,base.state_us_14,Seller Product
+__export__.product_attribute_value_42_cb2c5d57,product.variants_terms,Seller's Essentials,base.state_us_14,Seller Product
+__export__.product_attribute_value_40_99ae3101,product.variants_terms,Buyer's Essentials,base.state_us_14,Buyer Product
+__export__.product_attribute_value_43_e2106624,product.variants_terms,Buyer's 1st Choice,base.state_us_14,Buyer Product
+__export__.product_attribute_value_46_55153dbb,product.variants_terms,Homeowners Essentials,base.state_us_14,Homeowner Product
+__export__.product_attribute_value_47_39f1a707,product.variants_terms,Homeowners 1st Choice,base.state_us_14,Homeowner Product
+__export__.product_attribute_value_38_d324167d,product.variants_terms,Additional Pool or Spa,,AddOn
+__export__.product_attribute_value_44_8e769e54,product.variants_terms,Additional Refrigerator,,AddOn
+__export__.product_attribute_value_110_d3d65ea4,product.variants_terms,Attic & Exhaust Fans,,AddOn
+__export__.product_attribute_value_111_92064275,product.variants_terms,Central Air Conditioning,,AddOn
+__export__.product_attribute_value_112_c3f2523e,product.variants_terms,Central Heating System,,AddOn
+__export__.product_attribute_value_113_440fe642,product.variants_terms,Code Violations,,AddOn
+__export__.product_attribute_value_115_462cf4df,product.variants_terms,Electrical System,,AddOn
+__export__.product_attribute_value_32_8c86ce82,product.variants_terms,Jetted Bathtub,,AddOn
+__export__.product_attribute_value_114_112cb760,product.variants_terms,Dishwasher,,AddOn
+__export__.product_attribute_value_118_701b6e39,product.variants_terms,Kitchen Refrigerator,,AddOn
+__export__.product_attribute_value_124_aaa77691,product.variants_terms,Sump Pump,,AddOn
+__export__.product_attribute_value_119_2e445349,product.variants_terms,Microwave,,AddOn
+__export__.product_attribute_value_120_4dbaafb1,product.variants_terms,Oven/Range/Cooktop,,AddOn
+__export__.product_attribute_value_121_c1647f8d,product.variants_terms,Plumbing & Drains,,AddOn
+__export__.product_attribute_value_122_37aa53b5,product.variants_terms,Pool & Spa (Shared Equipment),,AddOn
+__export__.product_attribute_value_123_9a07efbd,product.variants_terms,Roof Leaks,,AddOn
+__export__.product_attribute_value_126_7bb29688,product.variants_terms,Water Heater,,AddOn
+__export__.product_attribute_value_127_56931ef1,product.variants_terms,Washer & Dryer,,AddOn
+__export__.product_attribute_value_48_cc2ce7cd,product.variants_terms,Mini-split System,,AddOn
+__export__.product_attribute_value_35_23d08e72,product.variants_terms,Pool and Spa (Shared Equipment),,AddOn
+__export__.product_attribute_value_116_7547e47b,product.variants_terms,Garage Door Opener,,AddOn
+__export__.product_attribute_value_33_baafa09f,product.variants_terms,Septic System,,AddOn
+__export__.product_attribute_value_117_ebf1c178,product.variants_terms,Garbage Disposal,,AddOn
+__export__.product_attribute_value_34_148b2a72,product.variants_terms,Stand Alone Freezer,,AddOn
+__export__.product_attribute_value_37_375c268d,product.variants_terms,Stand Alone Ice Maker,,AddOn
+__export__.product_attribute_value_39_98d65df8,product.variants_terms,Water Softener,,AddOn
+__export__.product_attribute_value_36_388e53f2,product.variants_terms,Water Well Pump,,AddOn

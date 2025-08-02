@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="sh_contact_address_google_place.AddressDropDown">
+        <div t-attf-class="sh_js_cls_addresses_dropdown dropdown-menu #{addresses.length ? 'show' : ''}">
+            <a class="dropdown-item sh_js_cls_address_dropdown_item"
+               t-foreach="addresses" t-as="address"
+               t-att-data-place-id="address['place_id']">
+                <i class="fa fa-map-marker fa-fw" role="img"/>
+                <t t-out="address['description']"/>
+            </a>
+            <img style="padding-right:10px; float:right;" src="/sh_contact_address_google_place/static/src/img/pw_by_google.png" alt="Powered by Google"/>
+        </div>
+    </t>
+
+</templates>

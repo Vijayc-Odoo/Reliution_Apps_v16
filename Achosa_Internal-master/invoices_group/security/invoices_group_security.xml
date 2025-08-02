@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_sale_create_invoices" model="res.groups">
+        <field name="name">User: Create Invoice</field>
+        <field name="category_id" ref="base.module_category_sales_sales"/>
+        <field name="comment">Only those users will have access to create invoices which are mentioned in the Users page.
+        </field>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

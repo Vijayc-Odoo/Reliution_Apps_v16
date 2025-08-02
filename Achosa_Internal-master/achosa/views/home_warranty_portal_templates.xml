@@ -1,0 +1,1203 @@
+<odoo>
+ 
+    <template id="replace_text_shop" name="Achosa - Replace Text in Shop"
+              inherit_id="website_sale.address" priority="30">
+        <xpath expr="//h2[contains(text(),'Your Address')]" position="replace">
+            <h2 class="o_page_header mt8">Billing Address
+                <small> or </small>
+                <a role="button" href="/web/login?redirect=/shop/checkout" class="btn btn-primary" style="margin-top: -11px">Log In</a>
+            </h2>
+        </xpath>
+        <xpath expr="//div[contains(@t-attf-class, 'div_state')]" position="replace">
+            <div t-attf-class="form-group #{error.get('state_id') and 'o_has_error' or ''} col-lg-6 div_state" t-att-style="(not country or not country.state_ids) and 'display: none'">
+                <select name="state_id" t-attf-class="form-control #{error.get('state_id') and 'is-invalid' or ''}" data-init="1">
+                    <option value="">State...</option>
+                    <t t-foreach="country and country.state_ids or []" t-as="s">
+                        <option t-att-value="s.id" t-att-selected="s.id == ('state_id' in checkout and country and checkout['state_id'] != '' and int(checkout['state_id']))">
+                            <t t-esc="s.name"/>
+                        </option>
+                    </t>
+                </select>
+            </div>
+        </xpath>
+    </template>
+    
+    <template id="remove_text_my_portal" name="Achosa - Remove Text My Portal"
+              inherit_id="portal.portal_searchbar" priority="30">
+        <xpath expr="//span[hasclass('navbar-brand')]" position="replace">
+        </xpath>
+    </template>
+    
+    <template id="portal_my_home_home_warranty" name="Portal My Home : home warranty entries"
+              inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_my_home')]/div[hasclass('oe_structure')]" position="replace">
+            <div class="oe_structure">
+                <br/>
+                <section class="jumbotron s_button bg-gray-lighter">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-9" style="font-size:0.75rem">
+                                <p class="mb0">
+                                    <strong>Welcome!</strong>
+                                    <br/>
+                                </p>
+                                <p class="mb0">Please make sure your contact information is up to date under</p>
+                                <p class="mb0">"YOUR DETAILS" before placing an order.</p>
+                            </div>
+                            <div class="col-md-3">
+                                <a style="width: 100%; font-size: 0.9375rem;padding: 10px 16px;color: #ffffff;background-color: ##2e6492;
+    border-color: #2e6492;border-radius: 0;" href="/home_warranty/New" class="pull-right mt8 btn btn-primary btn-lg"
+                                   target="_blank">Order Now
+                                    <i class="fa fa-chevron-right"/>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </xpath>
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">       
+            <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between" href="/my/home_warranties" title="Home Warranties"> 
+                Home Warranties
+                <span class="badge badge-secondary badge-pill" t-esc="home_warranty_count"/> 
+            </a>
+            
+        </xpath>
+    </template>
+
+    <template id="portal_home_warranty_products" name="Portal Home Warranty Products">
+
+        <div class="o_field_many2many o_field_widget o_field_x2many o_field_x2many_list o_readonly_modifier"
+             name="x_product">
+            <div class="table-responsive">
+                <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                    <thead>
+                        <tr>
+                            <th class="o_column_sortable">Name</th>
+                            <th class="o_column_sortable">Description</th>
+                            <th style="text-align: right;">Sale Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="ui-sortable">
+                        <t t-foreach="products" t-as="product">
+                            <tr class="o_data_row">
+                                <td class="o_data_cell o_required_modifier" t-esc="product.name"
+                                    t-attf-style="#{'font-style: italic;' if product.lst_price &lt; 0 else ''}" />
+                                <td class="o_data_cell o_list_text">
+                                    <t t-esc="product.description_sale"/>
+                                </td>
+                                <td class="o_data_cell o_list_number o_monetary_cell" style="text-align:right">
+                                    <span class="o_field_monetary o_field_number o_field_widget"
+                                        name="lst_price" t-esc="'%s0' % product.price"
+                                        t-attf-style="#{'font-style: italic;' if product.lst_price &lt; 0 else ''}"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr>
+                            <td colspan="3"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td class="o_list_number" title="Total" style="text-align:right">
+                                <span class="o_field_monetary o_field_number o_field_widget"
+                                      name="total" t-esc="'%s0' % total"/>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div style="clear:both"></div>
+
+        <script><t t-raw="prices"></t></script>
+
+    </template>
+
+    <template id="portal_home_warranty_messages" name="Portal Home Warranty Messages">
+
+        <div class="">
+            <div class="table-responsive">
+                <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                    <tbody>
+                        <t t-foreach="messages" t-as="msg">
+                            <tr>
+                                <th><div style="float:right" t-field="msg.author_id" />
+                                    <t t-esc="msg.date" t-options="{'widget': 'datetime'}"/>: <t t-esc="msg.subject" /></th>
+                            </tr>
+                            <tr class="o_data_row">
+                                <td class="o_data_cell" style="padding:15px;">
+                                    <t t-raw="msg.body" />
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="clear:both"></div>
+
+    </template>
+
+    <template id="portal_my_home_warranty" name="My home warranties">
+        <t t-call="portal.portal_layout">
+            <h3>home Warranties
+                <t t-call="portal.portal_searchbar"/>
+            </h3>
+            <t t-if="not home_warranties">
+                <p>There are currently no home_warranties and payments for your account.</p>
+            </t>
+            <div t-if="home_warranties" class="panel panel-default">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Home Warranty #</th>
+                                <th style="text-align: left;">Street</th>
+                                <th>Created</th>
+                                <th>Status</th>
+                                <th>Order Status</th>
+                            </tr>
+                        </thead>
+                        <t t-foreach="home_warranties" t-as="home_warranty">
+                            <tr>
+                                <td>
+                                    <a t-attf-href="/my/home_warranties/#{home_warranty.id}"
+                                       t-att-title="home_warranty.name">
+                                        <t t-esc="home_warranty.name"/>&amp;nbsp;
+                                        <t t-esc="home_warranty.property_type"/>
+                                    </a>
+                                </td>
+                                <td style="text-align: left;">
+                                    <span t-esc="home_warranty.property_street"/>
+                                </td>
+                                <td>
+                                    <span t-field="home_warranty.create_date" style="text-align: left;"/>
+                                </td>
+                                <td>
+                                    <t t-if="home_warranty.state == 'draft'">
+                                        <span class="label label-info">
+                                            <i class="fa fa-fw fa-clock-o"></i>
+                                            <span class="hidden-xs">Draft</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="home_warranty.state == 'Seller'">
+                                        <span class="label label-default">
+                                            <i class="fa fa-fw fa-check"></i>
+                                            <span class="hidden-xs">Seller Order Complete</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="home_warranty.state == 'Buyer'">
+                                        <span class="label label-default">
+                                            <i class="fa fa-fw fa-check"></i>
+                                            <span class="hidden-xs">Buyer Order Complete</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="home_warranty.state == 'Owner'">
+                                        <span class="label label-default">
+                                            <i class="fa fa-fw fa-check"></i>
+                                            <span class="hidden-xs">Owner Order Complete</span>
+                                        </span>
+                                    </t>
+                                </td>
+                                <td>
+                                    <t t-set="order" t-value="home_warranty.buyer_order" />
+                                    <a t-if="order and order._get_share_url() and order.state not in ['cancel','done']"
+                                         t-att-href="order._get_share_url()" style="background-color:#00a09d;color:#FFF;padding:4px 10px;"
+                                         alt="Pay Now" class="btn btn-xs btn-primary">
+                                          <i class="fa fa-arrow-circle-right" /><span class="hidden-xs">&amp;nbsp;Accept and Pay Now</span>
+                                    </a>
+                                    <t t-elif="order.state == 'done' or home_warranty.invoice_status == 'paid'">
+                                        <span class="label label-default">
+                                            <i class="fa fa-fw fa-check"></i>
+                                            <span class="hidden-xs">Invoice Paid</span>
+                                        </span>
+                                    </t>
+                                    <t t-elif="order.state == 'cancel' or home_warranty.invoice_status == 'cancel'">
+                                        <span class="label label-default">
+                                            <i class="fa fa-fw fa-check"></i>
+                                            <span class="hidden-xs">Invoice Cancelled</span>
+                                        </span>
+                                    </t>
+                                    <t t-else="home_warranty.invoice_status and home_warranty.invoice_status not in ['cancel','paid']">
+                                        <span class="label label-info">
+                                            <i class="fa fa-fw fa-clock-o"></i>
+                                            <span class="hidden-xs">Quotation</span>
+                                        </span>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </table>
+                </div>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="portal.pager"/>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_home_warranty_page" name="Home Warranty Order">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+        </script>
+        <script type="text/javascript" src="/achosa/static/src/js/portal_home_warranty_page.js"/>
+        <t t-call="portal.portal_layout">
+            <div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div style="float:right;font-size: 16px;margin:24px">
+                                <t t-if="home_warranty.state == 'draft'">
+                                    <span class="label label-info" style="padding-top:8px;">
+                                        <i class="fa fa-fw fa-clock-o"></i>
+                                        <span class="hidden-xs" id="status">Draft</span>
+                                    </span>
+                                </t>
+                                <t t-if="home_warranty.state == 'Seller'">
+                                    <span class="label label-default" style="padding-top:8px;">
+                                        <i class="fa fa-fw fa-info"></i>
+                                        <span class="hidden-xs" id="status">Seller Order Complete</span>
+                                    </span>
+                                </t>
+                                <t t-if="home_warranty.state == 'Buyer'">
+                                    <span class="label label-default" style="padding-top:8px;">
+                                        <i class="fa fa-fw fa-check"></i>
+                                        <span class="hidden-xs" id="status">Buyer Order Complete</span>
+                                    </span>
+                                </t>
+                                <t t-if="home_warranty.state == 'Owner'">
+                                    <span class="label label-default" style="padding-top:8px;">
+                                        <i class="fa fa-fw fa-check"></i>
+                                        <span class="hidden-xs" id="status">Owner Order Complete</span>
+                                    </span>
+                                </t>
+                                <t t-if="home_warranty.invoice_status == 'draft'">
+                                    <span class="label label-info" style="padding-top:8px;margin-left:4px">
+                                        <i class="fa fa-fw fa-clock-o"></i>
+                                        <span class="hidden-xs" id="status">Quotation</span>
+                                    </span>
+                                </t>
+                                <t t-if="home_warranty.invoice_status == 'sent'">
+                                    <span class="label label-default" style="padding-top:8px;margin-left:4px">
+                                        <i class="fa fa-fw fa-check"></i>
+                                        <span class="hidden-xs" id="status">Invoice Sent</span>
+                                    </span>
+                                </t>
+                                <t t-if="home_warranty.invoice_status == 'paid'">
+                                    <span class="label label-default" style="padding-top:8px;margin-left:4px">
+                                        <i class="fa fa-fw fa-check"></i>
+                                        <span class="hidden-xs" id="status">Invoice Paid</span>
+                                    </span>
+                                </t>
+                                <t t-if="home_warranty.invoice_status == 'cancel'">
+                                    <span class="label label-default" style="padding-top:8px;margin-left:4px">
+                                        <i class="fa fa-fw fa-check"></i>
+                                        <span class="hidden-xs" id="status">Invoice Cancelled</span>
+                                    </span>
+                                </t>
+                            </div>
+                            <div class="col-md-3" style="display:flex;justify-content:center">
+                                <h1>
+                                    <t t-call='portal.record_pager'/>
+                                    <span t-field="home_warranty.name"/>
+                                </h1>
+                            </div>
+                            <div style="font-size: 16px;margin:24px">
+                                <t t-set="order" t-value="home_warranty.buyer_order" />
+                                    <a t-if="order and order._get_share_url() and home_warranty.buyer_invoice_status not in ['cancel','paid'] and
+                                            (datetime.datetime.today() - home_warranty.create_date).days &gt; 0 "
+                                         t-att-href="order._get_share_url()" style="background-color:#00a09d;color:#FFF;font-size:16px"
+                                         alt="Pay Now" class="btn btn-xs btn-primary">
+                                          <i class="fa fa-arrow-circle-right" /><span class="hidden-xs">&amp;nbsp;Accept and Pay Now</span>
+                                    </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body" style="padding:0px;padding-bottom:30px;box-sizing: content-box;">
+                        <form method="post" style="padding:0px" t-attf-action="#{ action if action else ''}"
+                                  onsubmit="hide_submit_btn()"
+                              enctype="multipart/form-data" id="website_form" name="website_form">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" id="id" name="id" t-att-value="home_warranty.id"/>
+                            <input type="hidden" name="covered_sellers_coverage" t-att-value="home_warranty.covered_sellers_coverage"/>
+                            <input type="hidden" name="covered_buyers_coverage" t-att-value="home_warranty.covered_buyers_coverage"/>
+                            <input type="hidden" name="promo" t-att-value="home_warranty.promo"/>
+                            <t t-call="achosa.portal_home_warranty_fields"/>
+                                <t t-set="order" t-value="home_warranty.buyer_order" />
+                                <a t-if="order and order._get_share_url() and home_warranty.buyer_invoice_status not in ['cancel','paid'] and
+                                            (datetime.datetime.today() - home_warranty.create_date).days &gt; 0 "
+                                     t-att-href="order._get_share_url()" style="background-color:#00a09d;color:#FFF"
+                                     alt="Pay Now" class="btn btn-xs btn-primary">
+                                      <i class="fa fa-arrow-circle-right" /><span class="hidden-xs">&amp;nbsp;Accept and Pay Now</span>
+                                </a>
+                        </form>
+                    </div>
+                </div>
+                <t t-if="home_warranty.state in ['Seller','Buyer','Owner']">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-offset-3 col-md-6">
+                                    <h2 style="display:flex;justify-content:center">
+                                        TO EDIT ORDER INFORMATION – SEND MESSAGE
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="padding:0px;padding-bottom:30px;box-sizing: content-box;">
+                            <form action="/my/" method="post" id="msg_form"
+                                  class="s_website_form form-horizontal container-fluid mt32" enctype="multipart/form-data"
+                                  data-model_name="mail.mail" data-success_page="">
+                                <input type="hidden" name="home_warranty_id" t-att-value="home_warranty.id"/>
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <div class="form-group form-field">
+                                    <div class="col-md-3 col-sm-4 text-right-not-xs">
+                                        <label class="control-label" for="body">
+                                            Describe the edit(s) needed
+                                        </label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-8">
+                                        <textarea class="form-control o_website_form_input" name="body"/>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="display:flex;justify-content:center">
+                                    <div class="">
+                                        <span id="o_website_form_result"/><br/>
+                                        <span id="send" class="btn btn-primary btn-lg o_default_snippet_text">
+                                            Send
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-offset-3 col-md-6">
+                                    <h2 style="display:flex;justify-content:center;">
+                                        RESEND EMAIL / INVOICE
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="padding:0px;padding-bottom:30px;box-sizing: content-box;">
+                            <div class="form-group form-field">
+                                <div class="col-md-3 col-sm-4 text-right-not-xs">
+                                    <label class="control-label" for="template" style="font-weight:bold">
+                                        Re send email
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 col-md-7" style="display:flex;justify-content:center;">
+                                    <select id="template" class='form-control o_website_form_input'>
+                                        <t t-if="home_warranty.state == 'Seller'">
+                                            <option t-attf-value="seller_basic_Realtor">
+                                                Seller Invoice to me
+                                            </option>
+                                            <option t-attf-value="seller_basic_Seller">
+                                                Seller Terms to Seller
+                                            </option>
+                                        </t>
+                                        <t t-if="home_warranty.state == 'Buyer'">
+                                            <option value="buyer_all_realtor">Buyer Invoice to me</option>
+                                            <option value="buyer_all_buyer">Buyer Terms to buyer</option>
+                                            <option value="buyer_all_closing">Buyer Invoice to closing agent</option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <br />
+                                <div class="" style="display:flex;justify-content:center;">
+                                    <span id="o_website_email_result"/>
+                                    <br/>
+                                    <span id="send_invoice" class="btn btn-info btn-lg o_default_snippet_text">
+                                        Resend Email
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-offset-3 col-md-6">
+                                    <h2 style="display:flex;justify-content:center;">
+                                        Messages
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="padding:0px;padding-bottom:30px;box-sizing: content-box;">
+                            <div class="form-group">
+                                <div id="messages"></div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+                        <script type="text/javascript" src="/achosa/static/src/js/portal_home_warranty_page.js">
+                            chg_states();
+                            get_msg();
+                            $("#send").on('click',function (e) {send();});
+                            $("#send_invoice").on('click',function (e) {send_invoice();});
+                        </script>
+            <div class="oe_structure mb32"/>
+        </t>
+    </template>
+
+    <template id="portal_home_warranty_error" name="home_warranty error/warning display">
+        <div class="row mr16">
+            <div t-attf-class="'col-md-12 mr16 ml16 alert alert-dismissable' #{'alert-danger' if error else 'alert-warning'}">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+                <t t-if="error == 'generic'" name="generic">
+                    There was an error processing this page.
+                </t>
+            </div>
+        </div>
+    </template>
+
+    <template id="portal_home_warranty_success" name="home_warranty success display">
+        <t name="HomeWarrantySuccess" priority="29" t-name="achosa.home_warranty">
+            <t t-call="portal.portal_layout">
+                <div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div style="float:right;font-size: 16px;margin:24px">
+                                    <t t-if="home_warranty.state == 'draft'">
+                                        <span class="label label-info" style="padding-top:8px;">
+                                            <i class="fa fa-fw fa-clock-o"></i>
+                                            <span class="hidden-xs">Draft</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="home_warranty.state == 'Seller'">
+                                        <span class="label label-default" style="padding-top:8px;">
+                                            <i class="fa fa-fw fa-info"></i>
+                                            <span class="hidden-xs">Seller Order Complete</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="home_warranty.state == 'Buyer'">
+                                        <span class="label label-default" style="padding-top:8px;">
+                                            <i class="fa fa-fw fa-check"></i>
+                                            <span class="hidden-xs">Buyer Order Complete</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="home_warranty.state == 'Owner'">
+                                        <span class="label label-default" style="padding-top:8px;">
+                                            <i class="fa fa-fw fa-check"></i>
+                                            <span class="hidden-xs">Owner Order Complete</span>
+                                        </span>
+                                    </t>
+                                </div>
+                                <div class="col-md-6">
+                                    <h1>
+                                        <t t-call='portal.record_pager'/>
+                                        <span t-field="home_warranty.name"/>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="padding:15px;padding-bottom:30px;box-sizing: content-box;text-align: left;">
+                            <t t-raw="body"/>
+                            <br />
+                            <a t-att-href="'/my/home_warranties/' + str(home_warranty.id)" class="btn btn-primary btn-lg o_website_form_send o_default_snippet_text">Edit</a>
+                            <a href="/home_warranty/New" class="btn btn-primary btn-lg o_website_form_send o_default_snippet_text">New Order</a>
+                            <t t-set="order" t-value="home_warranty.buyer_order" />
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_home_warranty_valid_promo" name="home_warranty valid promo">
+        <t name="HomeWarrantyValidPromo" priority="29" t-name="achosa.home_warranty">
+            <t t-call="portal.portal_layout">
+                <div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div style="float:right;font-size: 16px;margin:24px">
+                                    <t t-if="home_warranty.state == 'draft'">
+                                        <span class="label label-info" style="padding-top:8px;">
+                                            <i class="fa fa-fw fa-clock-o"></i>
+                                            <span class="hidden-xs">Draft</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="home_warranty.state == 'Seller'">
+                                        <span class="label label-default" style="padding-top:8px;">
+                                            <i class="fa fa-fw fa-info"></i>
+                                            <span class="hidden-xs">Seller Order Complete</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="home_warranty.state == 'Buyer'">
+                                        <span class="label label-default" style="padding-top:8px;">
+                                            <i class="fa fa-fw fa-check"></i>
+                                            <span class="hidden-xs">Buyer Order Complete</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="home_warranty.state == 'Owner'">
+                                        <span class="label label-default" style="padding-top:8px;">
+                                            <i class="fa fa-fw fa-check"></i>
+                                            <span class="hidden-xs">Owner Order Complete</span>
+                                        </span>
+                                    </t>
+                                </div>
+                                <div class="col-md-6">
+                                    <h1>
+                                        <t t-call='portal.record_pager'/>
+                                        <span t-field="home_warranty.name"/>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="padding:15px;padding-bottom:30px;box-sizing: content-box;text-align: left;">
+                            <form method="post" style="padding:0px" t-attf-action="#{ action if action else ''}"
+                                  enctype="multipart/form-data" id="website_form" name="website_form">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" id="id" name="id" t-att-value="home_warranty.id"/>
+                                <input type="hidden" name="noupdate" value="1"/>
+                                <div t-if="success_message" class="alert alert-success">
+                                    <t t-foreach="success_message" t-as="msg">
+                                        <t t-esc="msg"/>
+                                        <br/>
+                                    </t>
+                                </div>
+                                <br/>
+
+                                <hr/>
+                                <div id="products">
+                                    <t t-call='achosa.portal_home_warranty_products'/>
+                                </div>
+                                    <div class="form-group">
+                                        <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                                            <button type="submit" id="submit_btn"
+                                                class="btn btn-epsilon btn-lg o_website_form_send o_default_snippet_text" attrs="{'invisible':['|',('home_warranty.state','=','Owner'),('home_warranty.state','=','Buyer')]}">
+                                            Submit Order
+                                            </button>
+                                            <span id="o_website_form_result"></span>
+                                            <a t-att-href="'/my/home_warranties/' + str(home_warranty.id)" class="btn btn-primary btn-lg o_website_form_send o_default_snippet_text">Edit</a>
+                                        </div>
+                                    </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+
+    <template id="portal_home_warranty_fields" name="home_warranty fields">
+        <style>
+            div.col-md-5{
+            box-sizing: content-box;
+            }
+            div.col-md-5 div{
+            box-sizing: content-box;
+            }
+            div.buyer-addons div.text-right{
+            margin-top: 0px;
+            }
+            div.col-md-5 label{
+            box-sizing: content-box;
+            }
+            .form-field .radio{
+            text-align: left;
+            }
+            #add-on {
+            column-count: 2;
+            }
+            div.row{
+            margin: 0;
+   	        padding: 0;
+            }
+        </style>
+
+        <div t-if="error_message" class="alert alert-danger">
+            <t t-foreach="error_message" t-as="err">
+                <t t-esc="err"/>
+                <br/>
+            </t>
+        </div>
+        <div t-if="success_message" class="alert alert-success">
+            <t t-foreach="success_message" t-as="msg">
+                <t t-esc="msg"/>
+                <br/>
+            </t>
+        </div>
+        
+        <br/>
+        <h2 style="padding-left:30px; color:#555555;text-align:center;text-transform:uppercase;font-size:1.125rem;margin-bottom: 0.625rem;font-weight: 500;line-height: 1.2">
+            Property Details
+        </h2>
+        <br/>
+
+        <div style="padding-left:30px;" class="row">
+            <div style="text-align: left;font-size: 0.75rem; color: #555555; font-weight: 700;padding-right: 15px; padding-left: 15px" class="col-lg-6">
+                <t t-call="achosa.input">
+                    <t t-set="fname" t-value="'property_street'"/>
+                    <t t-set="name" t-value="'Street'"/>
+                    <t t-set="value" t-value="home_warranty.property_street"/>
+                    <t t-set="required" t-value="1"/>
+                    <t t-set="readonly" t-value="home_warranty.state in ['Seller','Buyer','Owner']"/>
+                </t>
+
+                <t t-call="achosa.input">
+                <t t-set="fname" t-value="'property_street2'"/>
+                <t t-set="name" t-value="'Street2'"/>
+                <t t-set="value" t-value="home_warranty.property_street2"/>
+                <t t-set="required" t-value="0"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Seller','Buyer','Owner']"/>
+            </t>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'property_city'"/>
+                <t t-set="name" t-value="'City'"/>
+                <t t-set="value" t-value="home_warranty.property_city"/>
+                <t t-set="required" t-value="1"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Seller','Buyer','Owner']"/>
+            </t>
+            <div t-attf-class="form-group row #{'has-error' if error.get('home.warranty.property_state:') else ''} form-field o_website_form_required">
+                <div class="col-md-3 col-sm-4 text-left">
+                    <label for="property_state">State*</label>
+                </div>
+                <div class="col-md-7 col-sm-8">
+                    <select name="property_state" id="property_state" required="1" t-att-value="home_warranty.property_state" class="form-control o_website_form_input" onchange="chg_states();" t-att-disabled="home_warranty.state in ['Seller','Buyer','Owner']">
+                        <option value="">Please Select One</option>
+                        <t t-foreach="states" t-as="st">
+                                <option t-att-value="st.id" t-att-selected="home_warranty.property_state.id == st.id">
+                                    <t t-raw="st.code"/> - <t t-raw="st.name"/>
+                                </option>
+                        </t>
+                    </select>
+                </div>
+            </div>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'property_zip'"/>
+                <t t-set="name" t-value="'Zip'"/>
+                <t t-set="value" t-value="home_warranty.property_zip"/>
+                <t t-set="required" t-value="1"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Seller','Buyer','Owner']"/>
+            </t>
+        </div>
+            <div style="text-align:left;color:#555555;font-size: 0.75rem;line-height: 1.66666667;"
+                 class="col-lg-6">
+                <div class="form-group row form-field">
+                <div class="col-md-7 col-sm-8 text-left">
+                    <label class="control-label" style="font-weight:bold" for="covered_sellers_coverage">Seller To Buyer Coverage
+                    </label>
+                </div>
+                <div class="col-md-3 col-sm-4">
+                    <input type="checkbox" checked="unchecked" class="form-control o_website_form_input" name="covered_sellers_coverage" onclick="seller_buyer_click('S');" t-att-disabled="home_warranty.state in ['Seller','Buyer','Owner']" t-att-checked="home_warranty.covered_sellers_coverage"/>
+                </div>
+            </div>
+            <div class="form-group row form-field">
+                <div class="col-md-7 col-sm-8 text-left">
+                    <label class="control-label" for="covered_buyers_coverage">Buyer Only
+                        Coverage
+                    </label>
+                </div>
+                <div class="col-md-3 col-sm-4">
+                    <input type="checkbox" checked="unchecked" class="form-control o_website_form_input" id="covered_buyers_coverage" name="covered_buyers_coverage" onclick="seller_buyer_click('B');" t-att-disabled="home_warranty.state in ['Seller','Buyer','Owner']" t-att-checked="home_warranty.covered_buyers_coverage"/>
+                </div>
+            </div>
+            <div class="form-group row form-field o_website_form_required">
+                <div class="col-md-3 col-sm-4 text-left">
+                    <label class="control-label" for="property_type" style="padding-top: 2px;
+    padding-bottom: 0px">Property Type</label>
+                </div>
+                <div class="col-md-7 col-sm-8">
+                    <select name="property_type" required="1" t-att-value="home_warranty.property_type" class="form-control o_website_form_input" onchange="re_calc_rental();" id="property_type" t-att-disabled="home_warranty.state in ['Seller','Buyer','Owner']">
+                        <option value="Single Family Home" t-att-selected="home_warranty.property_type == 'Single Family Home'">Single Family Home
+                        </option>
+                        <option value="Townhome/Condo" t-att-selected="home_warranty.property_type == 'Townhome/Condo'">
+                            Townhome/Condo
+                        </option>
+                        <option value="Duplex" t-att-selected="home_warranty.property_type == 'Duplex'">Duplex</option>
+                        <option value="Triplex" t-att-selected="home_warranty.property_type == 'Triplex'">Triplex
+                        </option>
+                        <option value="Fourplex" t-att-selected="home_warranty.property_type == 'Fourplex'">Fourplex
+                        </option>
+<!--                         <option value="New" t-att-selected="home_warranty.property_type == 'New'">New Construction -->
+<!--                         </option> -->
+                    </select>
+                </div>
+            </div>
+            <div t-attf-class="form-group row #{'has-error' if error.get('home.warranty.realtor_contact:') else ''} form-field o_website_form_required">
+                <div class="col-md-3 col-sm-4 text-left">
+                    <label style="padding-top: 3px;" class="control-label" for="property_state">Realtor</label>
+                </div>
+                <div class="col-md-7 col-sm-8">
+                    <select name="realtor_contact" required="1" t-att-value="home_warranty.realtor_contact" class="form-control o_website_form_input" t-att-disabled="home_warranty.state in ['Seller','Buyer','Owner']">
+                        <option value="">Please Select One</option>
+                        <t t-foreach="realtors" t-as="r">
+                                <option t-att-value="r.id" t-att-selected="home_warranty.realtor_contact.id == r.id">
+                                    <t t-raw="r.name"/> - (<t t-raw="r.email"/>)
+                                </option>
+                        </t>
+                    </select>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <hr class="seller"/>
+        <h2 class="seller" style="padding-left:30px;">Seller</h2>
+        <br/>
+        
+      <div style="padding-left:30px;font-size:0.75rem" class="row seller">
+
+        <div style="text-align:left" class="col-lg-6">
+            <div class="form-group row form-field">
+                <div class="col-md-3 col-sm-4 text-left">
+                    <label for="covered_seller_product_id">Product
+                    </label>
+                </div>
+                <div class="col-md-7 col-sm-8">
+                    <div id="div_covered_seller_product_id" class="covered_seller_product_id">
+                        Please Select a State
+                        <input type="hidden" id="covered_seller_product_id" name="covered_seller_product_id" t-att-value="home_warranty.covered_seller_product_id.id"/>
+                    </div>
+                </div>
+            </div>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'coverage_start_date'"/>
+                <t t-set="ftype" t-value="'date'"/>
+                <t t-set="name" t-value="'Start Date'"/>
+                <t t-set="value" t-value="home_warranty.coverage_start_date or datetime.datetime.now().strftime('%Y-%m-%d')"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Seller','Buyer','Owner']"/>
+            </t>
+        </div>
+        <div style="text-align:left" class="col-lg-6">
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'seller_name'"/>
+                <t t-set="name" t-value="'Name'"/>
+                <t t-set="value" t-value="home_warranty.seller_name"/>
+                <t t-set="required" t-value="False"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Seller','Buyer','Owner'] and home_warranty.seller_name is not null"/>
+            </t>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'seller_email'"/>
+                <t t-set="name" t-value="'Email'"/>
+                <t t-set="value" t-value="home_warranty.seller_email"/>
+                <t t-set="required" t-value="False"/>
+                <t t-set="onchange" t-value="'valid_email();'"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Seller','Buyer','Owner'] and home_warranty.seller_email is not null"/>
+            </t>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'seller_phone'"/>
+                <t t-set="name" t-value="'Phone'"/>
+                <t t-set="value" t-value="home_warranty.seller_phone"/>
+                <t t-set="required" t-value="False"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Seller','Buyer','Owner'] and home_warranty.seller_phone is not null"/>
+            </t>
+        </div>
+      </div>
+
+        <hr class="buyer"/>
+        <h2 style="padding-left:30px;" class="buyer">Buyer</h2>
+        <br/>
+
+        <div style="padding-left:30px;font-size:0.75rem;padding-left:45px" class="row">
+
+        <div style="text-align:left" class="col-lg-6 buyer">
+            <div class="form-group row form-field">
+                <div class="col-md-3 col-sm-4 text-left">
+                    <label for="covered_buyer_product">Product
+                    </label>
+                </div>
+                <div class="col-md-7 col-sm-8">
+                    <div id="div_covered_buyer_product_id" class="covered_buyer_product_id">
+                        Please select a State
+                        <input type="hidden" id="covered_buyer_product_id" name="covered_buyer_product_id" t-att-value="home_warranty.covered_buyer_product_id.id"/>
+                    </div>
+                </div>
+            </div>
+            <div style="clear:both;"/>
+            <div class="form-group row form-field">
+                <div class="col-md-3 col-sm-4 text-left">
+                    <label class="control-label" for="covered_buyer_term" style="padding-top: 10px;margin-bottom:4px">Term</label>
+                </div>
+                <div class="col-md-7 col-sm-8">
+                    <select name="covered_buyer_term" t-att-value="home_warranty.covered_buyer_term" onchange="re_calc();" t-att-disabled="home_warranty.state in ['Buyer','Owner']" id="covered_buyer_term" class="form-control o_website_form_input">
+                        <option value="" t-att-selected="home_warranty.covered_buyer_term == False">Select One</option>
+                        <option value="12" t-att-selected="home_warranty.covered_buyer_term == '12'">12 month</option>
+                        <option value="18" t-att-selected="home_warranty.covered_buyer_term == '18'">18 month</option>
+                        <option value="24" t-att-selected="home_warranty.covered_buyer_term == '24'">24 month</option>
+                        <option value="36" t-att-selected="home_warranty.covered_buyer_term == '36'">36 month</option>
+                        <option value="NC" t-att-selected="home_warranty.covered_buyer_term == 'NC'">New Construction</option>
+                    </select>
+<!--                     <div class="covered_buyer_term" style="display:none;"> -->
+<!--                         48 month -->
+<!--                     </div> -->
+                </div>
+            </div>
+            <div style="clear:both;margin-top:10px"/>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'estimated_closing_date'"/>
+                <t t-set="ftype" t-value="'date'"/>
+                <t t-set="name" t-value="'Closing Date'"/>
+                <t t-set="value" t-value="home_warranty.estimated_closing_date or datetime.datetime.now().strftime('%Y-%m-%d')"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Buyer','Owner'] and home_warranty.estimated_closing_date is not null"/>
+            </t>
+        </div>
+        <div style="text-align:left" class="col-md-5 col-sm-5 buyer">
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'buyer_name'"/>
+                <t t-set="name" t-value="'Name'"/>
+                <t t-set="value" t-value="home_warranty.buyer_name"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Buyer','Owner'] and home_warranty.buyer_name is not null"/>
+            </t>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'buyer_email'"/>
+                <t t-set="name" t-value="'Email'"/>
+                <t t-set="value" t-value="home_warranty.buyer_email"/>
+                <t t-set="onchange" t-value="'valid_email();'"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Buyer','Owner'] and home_warranty.buyer_email is not null"/>
+            </t>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'buyer_phone'"/>
+                <t t-set="name" t-value="'Phone'"/>
+                <t t-set="value" t-value="home_warranty.buyer_phone"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Buyer','Owner'] and home_warranty.buyer_phone is not null"/>
+            </t>
+            <div class="form-group row rental">
+                <div class="col-md-3 col-sm-4 text-left">
+                    <label class="control-label" for="rental_property">Rental Property
+                    </label>
+                </div>
+                <div class="col-lg-6">
+
+
+                    <select name="rental_property" style="margin-top:-5px;padding-top: 10px;" t-att-value="home_warranty.rental_property" onchange="re_calc_rental();" t-att-disabled="home_warranty.property_type in ['Duplex']" id="rental_property" class="form-control o_website_form_input">
+                        <option value="" t-att-selected="home_warranty.rental_property == False">Select One</option>
+                        <option value="True" t-att-selected="home_warranty.rental_property == 'True'">Yes</option>
+                        <option value="False" t-att-selected="home_warranty.rental_property == 'False'">No</option>
+                    </select>
+
+                    <!--
+                    <input type='checkbox' class='form-control o_website_form_input' id="rental_property"
+                           name='rental_property' onclick="re_calc_rental();"
+                           t-att-disabled="home_warranty.property_type in ['Single Family Home']"
+                           t-att-checked="home_warranty.rental_property"/>
+                    -->
+                </div>
+            </div>
+<!--            <div class="form-group row">-->
+<!--                <div class="col-md-3 col-sm-4 text-left">-->
+<!--                    <label class="control-label" for="paying_as">Paying As-->
+<!--                    </label>-->
+<!--                </div>-->
+<!--                <div class="col-lg-6">-->
+<!--                    <select name="paying_as" style="margin-top:-4px;padding-top: 10px;" t-att-value="home_warranty.paying_as" t-att-disabled="home_warranty.state in ['Seller','Owner']" id="paying_as" class="form-control o_website_form_input">-->
+<!--                        <option value="buyer" t-att-selected="home_warranty.paying_as == 'buyer'">Select One</option>-->
+<!--                        <option value="realtor" t-att-selected="home_warranty.paying_as == 'realtor'">Realtor</option>-->
+<!--                        <option value="buyer" t-att-selected="home_warranty.paying_as == 'buyer'">Buyer</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+<!--            </div>-->
+        </div>
+        </div>
+
+
+        <div style="clear:both;"/>
+        <hr style="margin-left:30px" class="buyer"/>
+            <h3 style="padding-left:30px;text-transform:uppercase;font-size:1rem" class="buyer">Buyer Add ons</h3>
+            <div id="add-on" style="font-size:0.75rem;font-weight:500">
+              <div class="buyer buyer-addons" style="margin-left:30px">
+              <t t-call="achosa.HW_add-ons"/>
+              </div>
+            </div>
+        <div style="clear:both;"/>
+
+        <hr class="buyer"/>
+        <br/>
+        <div class="row" style="font-size:0.75rem">
+          <div class="col-lg-6 buyer" style="padding-left: 15px;">
+            <h2>Closing Agent</h2>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'closing_email'"/>
+                <t t-set="name" t-value="'Email'"/>
+                <t t-set="value" t-value="home_warranty.closing_email"/>
+                <t t-set="onchange" t-value="'valid_email();'"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Buyer','Owner'] and home_warranty.closing_email is not null"/>
+            </t>
+        </div>
+        <div class="col-lg-6 buyer">
+            <h2>Promo</h2>
+            <t t-call="achosa.input">
+                <t t-set="fname" t-value="'promo_code'"/>
+                <t t-set="name" t-value="'Promo code'"/>
+                <t t-set="value" t-value="home_warranty.promo_code"/>
+                <t t-set="readonly" t-value="home_warranty.state in ['Buyer','Owner'] or home_warranty.promo"/>
+                <t t-set="onchange" t-value="'re_calc();'"/>
+            </t>
+        </div>
+        </div>
+
+        <br/>
+
+        <div style="clear:both;"/>
+        <div id="products"/>
+
+
+        <t t-if="home_warranty.state not in ['Buyer','Owner']">
+            <div class="form-group">
+                <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7"
+                     style="margin-left: 277px;height: 42.500px;">
+                    <button style="padding-left: 15px;padding-right: 15px" type="submit" id="submit_btn"
+                            onmouseover="re_calc();" name="submit"
+                            class="btn btn-epsilon btn-lg o_website_form_send o_default_snippet_text"
+                            attrs="{'invisible':['|',('home_warranty.state','=','Owner'),('home_warranty.state','=','Buyer')]}">
+                        Submit Order
+                    </button>
+                    <span id="o_website_form_result"/>
+                </div>
+            </div>
+        </t>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+        </script>
+        <script type="text/javascript" src="/achosa/static/src/js/hw_hide_sections.js"/>
+        <script type="text/javascript">
+            chg_states();
+        </script>
+    </template>
+
+
+
+
+    <template id="achosa.HW_add-ons">
+            <input type="hidden" id="covered_buyer_addons" name="covered_buyer_addons"
+                    t-att-value="str(home_warranty.covered_buyer_addons.ids)" />
+            <div id="filtered-addons" style="text-align: left">
+                <t t-foreach="add_ons" t-as="a">
+                    <t t-call="achosa.input_addon">
+                        <t t-set="fid" t-value="str(a.id)"/>
+                        <t t-set="fname" t-value="'covered_buyer_addons[]'"/>
+                        <t t-set="name" t-value="a.name"/>
+                        <t t-set="value" t-value="a.id"/>
+                        <t t-set="checked" t-value="a.id in home_warranty.covered_buyer_addons.ids"/>
+                        <t t-set="readonly" t-value="home_warranty.state in ['Seller','Buyer','Owner']"/>
+                    </t>
+                </t>
+            </div>
+            <t t-if="pricescript">
+                <script><t t-raw="pricescript" /></script>
+            </t>
+    </template>
+
+    <template id="achosa.input_addon">
+            <div class="form-group" t-att-id="fid+'_addon'">
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="form-input" onclick="re_calc();" t-att-disabled="home_warranty.state in ['Buyer','Owner']" t-att-id="fid" t-att-name="fname" t-att-value="value" t-att-checked="checked"/>
+                <label class="form-label" t-att-for="fid">
+                    <t t-esc="name"/>&amp;nbsp;-&amp;nbsp;
+                    <label t-att-for="fid" t-att-id="fid+'_Price'"/>
+                </label>
+              </div>
+            </div>
+    </template>
+
+    <template id="achosa.input">
+              <div t-attf-class="form-group row #{'has-error' if error.get('home.warranty.realtor_contact:') else ''} form-field o_website_form_required">
+                <div class="col-md-3 col-sm-4 text-left">
+                  <label t-att-for="fname">
+                      <t t-esc="name"/>
+                      <t t-if="required">
+                          <span>*</span>
+                      </t>
+                  </label>
+                </div>
+                <div class="col-md-7 col-sm-8">
+                <input t-att-type="ftype or 'text'" t-att-id="fname" t-attf-class="form-control o_website_form_input #{'o_website_form_date' if ftype == 'date' else ''}" t-att-name="fname" t-att-required="required" t-att-value="value" t-att-disabled="readonly" t-att-onchange="onchange"/>
+                </div>
+            </div>
+    </template>
+
+    <template id="achosa.home_warranty_dropdown" name="Product DropDown">
+        <t name="HomeWarrantyOrder_dropdown" priority="29" t-name="achosa.home_warranty_dropdown">
+            <t t-foreach="products" t-as="p">
+                <div class="radio">
+                    <div t-attf-id="#{p.id}_Price" style="float:right"></div>
+                    <label>
+                        <input type="radio" class="o_website_form_input" onclick="re_calc();"
+                               t-att-name="field"
+                               t-att-disabled="disable"
+                               t-att-checked="p.id == field_value"
+                               t-att-value="p.id"/>
+                        <span>
+                            <t t-esc="p.name" />
+                        </span>
+                    </label>
+                </div>
+            </t>
+        </t>
+    </template>
+    
+    <template id="achosa.billing_address" name="Billing Address">
+            <div class="col-md-12">
+                <label for="name" style="font-size: small;">Cardholder Name</label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="" t-att-value="name" onchange="update_address()" oninput="check_first_last_name(this)"/>
+            </div>
+            <div class="col-md-12">
+                <label for="street" style="font-size: small;">Street Name</label>
+                <input type="text" class="form-control" name="street" id="street" placeholder="" t-att-value="street" onchange="update_address()"/>
+            </div>
+            <div class="col-md-12">
+                <label for="street2" style="font-size: small;">Street2 Name</label>
+                <input type="text" class="form-control" name="street2" id="street2" placeholder="" t-att-value="street2" onchange="update_address()"/>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="city" style="font-size: small;">City</label>
+                    <input type="text" class="form-control" name="city" id="city" placeholder="" t-att-value="city" onchange="update_address()"/>
+                </div>
+                <div class="col-md-3">
+                    <label for="state" style="font-size: small;">State</label>
+                    <select name="state" id="state" class="form-control" data-init="1" onchange="update_address()">
+                        <option value="">State</option>
+                        <t name="States_dropdown" priority="29" t-name="achosa.states_dropdown">
+                            <t t-foreach="states" t-as="s">
+                                <t t-if="s==state_id">
+                                    <option selected="selected" t-att-value="s.id">
+                                        <t t-esc="s.name"/>
+                                    </option>
+                                </t>
+                                <t t-if="not s==state_id">
+                                    <option t-att-value="s.id">
+                                        <t t-esc="s.name"/>
+                                    </option>
+                                </t>
+                            </t>
+                        </t>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="zip" style="font-size: small;">Zip Code</label>
+                    <input type="text" class="form-control" name="zip" id="zip" placeholder="" t-att-value="zip_code" onchange="update_address()"/>
+                </div>
+            </div>
+            <br/>
+    </template>
+
+    <template id="achosa.New" name="Submit a new home warranty order">
+        <t name="HomeWarrantyOrder" priority="29" t-name="achosa.home_warranty">
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+            </script>
+            <script type="text/javascript" src="/achosa/static/src/js/new_home_warranty.js"/>
+            <t t-call="portal.portal_layout">
+                <div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h1>New Home Warranty Order
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="padding:0px;padding-bottom:35px;box-sizing: content-box;background:white">
+                            <style>
+                                .form-horizontal .radio{
+                                text-align: left;
+                                }
+                            </style>
+                            <form method="post" style="padding:0px;background:white"
+                                  onsubmit="hide_submit_btn()"
+                                  enctype="multipart/form-data" id="website_form" name="website_form">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" id="id" name="id" t-att-value="home_warranty.id" t-if="home_warranty.id"/>
+                                <input type="hidden" name="name" value="Web"/>
+                                <input type="hidden" id="conserve_add_on_id" name="conserve_add_on_id" t-att-value="conserve_id" t-if="conserve_id"/>
+                                <input type="hidden" id="conserve_plus_add_on_id" name="conserve_plus_add_on_id" t-att-value="conserve_plus_id" t-if="conserve_plus_id"/>
+                                <input type="hidden" id="non_owner_product_add_on_id" name="non_owner_product_add_on_id" t-att-value="rental_addon_id" t-if="rental_addon_id"/>
+                                <t t-call="achosa.portal_home_warranty_fields"/>
+                                <t t-set="order" t-value="home_warranty.buyer_order" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <data>
+        <record id="achosa.model_home_warranty" model="ir.model">
+            <field name="website_form_access">True</field>
+            <field name="website_form_label">Home Warranty</field>
+        </record>
+        <record id="menu_new_home_warranty" model="website.menu">
+            <field name="name">New Home Warranty</field>
+            <field name="url">/home_warranty/New</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence" type="int">45</field>
+        </record>
+        <record model="res.groups" id="group_realtor">
+            <field name="name">Realtor Portal</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        <record id="menu_new_home_warranty_security_rule" model="ir.rule">
+            <field name="name">Website Menu</field>
+            <field name="active" eval="True"/>
+            <field name="model_id" ref="website.model_website_menu"/>
+            <field name="domain_force">[<![CDATA[('name','<>','New Home Warranty')]]>]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="global" eval="False"/>
+            <field name="groups" eval="[(4, ref('base.group_portal')), (4, ref('base.group_public'))]"/>
+        </record>
+        <record id="menu_new_home_warranty_realtor_security_rule" model="ir.rule">
+            <field name="name">Website Menu Realtor</field>
+            <field name="active" eval="True"/>
+            <field name="model_id" ref="website.model_website_menu"/>
+            <field name="domain_force">[]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="global" eval="False"/>
+            <field name="groups" eval="[(4, ref('group_realtor'))]"/>
+        </record>
+        <function model="ir.model.fields" name="formbuilder_whitelist">
+            <value>home.warranty</value>
+            <value eval="[
+                'realtor_contact',
+                'realtor_name',
+                'realtor_email',
+                'realtor_phone',
+                'property_street',
+                'property_street2',
+                'property_city',
+                'property_state',
+                'property_zip',
+                'property_type',
+                'name',
+                'realtor_representing_buyer',
+                'realtor_representing_seller',
+                'covered_seller_product_id',
+                'covered_sellers_coverage',
+                'coverage_start_date',
+                'seller_email',
+                'seller_name',
+                'seller_phone',
+                'buyer_email',
+                'buyer_name',
+                'buyer_phone',
+                'covered_buyer_product_id',
+                'covered_buyers_coverage',
+                'covered_buyer_term',
+                'covered_buyer_addons',
+                'closing_email',
+                'closing_name',
+                'estimated_closing_date',
+                'promo_code'
+            ]"/>
+        </function>
+    </data>
+</odoo>

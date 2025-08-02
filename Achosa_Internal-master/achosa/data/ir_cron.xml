@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+    <data>
+
+        <record id="anniversary_email_cron" model="ir.cron">
+            <field name="name">Subscription Anniversary Email</field>
+            <field name="model_id" ref="model_sale_subscription"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_anniversary_email()</field>
+            <field name='interval_number'>1</field>
+            <field name='interval_type'>days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+        </record>
+
+<!--         <record id="anniversary_email_cron" model="ir.cron"> -->
+<!--             <field name="name">Subscription Anniversary Email</field> -->
+<!--             <field name="model_id" ref="model_sale_subscription"/> -->
+<!--             <field name="state">code</field> -->
+<!--             <field name="code">model.cron_anniversary_email(security_days=3, target_date=datetime.date.today(), anniversary_month=1)</field> -->
+<!--             <field name='interval_number'>1</field> -->
+<!--             <field name='interval_type'>days</field> -->
+<!--             <field name="numbercall">-1</field> -->
+<!--             <field name="doall" eval="False" /> -->
+<!--         </record> -->
+
+        <record id="crm_email_cron" model="ir.cron">
+            <field name="name">CRM Automated Emails</field>
+            <field name="model_id" ref="achosa.model_crm_lead"/>
+            <field name="state">code</field>
+            <field name='interval_number'>1</field>
+            <field name='interval_type'>days</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=2, minute=30) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="code">
+            <![CDATA[    
+DAY = datetime.datetime.today().day
+
+def _cron_crm_email():
+  
+  output = {
+            "passed recs": [], 
+            "Prospects": [],
+            "VCO": [],
+            "count": 0,
+            "emails created": 0
+   
+ }
+  slackers = {}
+  temp = []
+  
+  if DAY != 5 and DAY != 20:
+     return
+  
+  else:
+    
+    prospect = model.env.ref("crm.stage_lead1")
+    vco = model.env.ref("crm.stage_lead2")
+    leads_prosvco = model.search([("stage_id", "in", [1, 2]), ('opt_email', '!=', False)])
+    mail = env["mail.mail"]
+    pros_template = env.ref("achosa.crm_prospect_email")
+    vco_template = env.ref("achosa.crm_VCO_email")
+    
+    for lead in leads_prosvco:
+        if not lead.opt_email:
+          output['passed recs'].append(lead)
+          for rec in output['passed recs']:
+            if rec.user_id.login in slackers:
+              temp.append(rec)
+
+          for key in slackers:
+            slackers[key] = len(slackers[key])
+        if DAY == 5 and lead.stage_id.id == 1:
+          output["Prospects"].append(lead)
+        elif DAY == 20 and lead.stage_id.id == 2:
+          output["VCO"].append(lead)
+    
+    for rec in output["Prospects"]:
+      output["count"] += 1
+      pros_template.send_mail(rec.id)
+      output["emails created"] += 1
+    
+    for rec in output["VCO"]:
+      output["count"] += 1
+      vco_template.send_mail(rec.id)
+      output["emails created"] += 1
+    
+    log(str(output))
+    log(str(temp))
+    log(str(slackers))
+      
+_cron_crm_email()]]>
+            </field>
+        </record>
+
+        <record id="auto_cancel_subscription" model="ir.cron">
+            <field name="name">Auto Cancel Subscription</field>
+            <field name="model_id" ref="model_sale_subscription"/>
+            <field name="state">code</field>
+            <field name="code">model.auto_cancel_subscriptions()</field>
+            <field name='interval_number'>1</field>
+            <field name='interval_type'>days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+        </record>
+
+    <record id="ir_cron_set_expiry_code" model="ir.cron">
+            <field name="name">SUB: Set Expiry Code</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=2, minute=45) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="doall" eval="False"/>
+            <field name="model_id" ref="model_sale_subscription"/>
+            <field name="code">
+                <![CDATA[
+subs = model.search([('to_renew', '=', True)])
+for sub in subs:
+    sub._get_expiry_code()
+                    ]]></field>
+    </record>
+    
+    <record id="ir_cron_update_sales_address" model="ir.cron">
+        <field name="name">Contacts: update Sales Address</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="nextcall" eval="(DateTime.now().replace(hour=2, minute=30) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="doall" eval="False"/>
+        <field name="model_id" ref="model_sale_subscription"/>
+        <field name="code">
+                <![CDATA[
+# Contacts: update Sales Address
+
+sales = env.ref('base.partner_admin')
+
+sales['name'] = "Online Sales"
+sales['email'] = "sales@achosahw.com"
+sales['street'] = "400 Chesterfield Center"
+sales['street2'] = "Suite 400"
+sales['city'] = "St. Louis"
+sales['state_id'] = env.ref("base.state_us_38").id
+sales['zip'] = "63017"
+sales['country_id'] = env.ref("base.us").id
+        ]]></field>
+        <field name="state">code</field>
+    </record>
+    <record id="ir_cron_remove_buyer_tokens" model="ir.cron">
+        <field name="name">SUB: Remove Buyer Tokens</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="nextcall" eval="(DateTime.now().replace(hour=2, minute=45) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="doall" eval="False"/>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="code">
+                <![CDATA[
+# SUB: Remove Buyer Tokens
+
+message = ''
+message_err = ''
+remove_batch = datetime.datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
+
+subs = env['sale.subscription'].search([('stage_id', 'in', [2,3]), ('home_warranty', '!=', False),
+    ('order_type','=','Buyer'),('home_warranty.state','=','Buyer'), ('partner_id.payment_token_ids','!=',False)])
+
+c = 0
+err_c = 0
+
+for r in subs:
+ msg = '\n\n' + r.name.ljust(10) + " - " + r.home_warranty.state + '\t' + r.home_warranty.name
+ msg += '\n\t' + r.stage_id.name + '\t' + str(r.date) + '\t' + str(r.recurring_amount_total)
+ for l in r.recurring_invoice_line_ids:
+    msg += '\n\t  ' + l.product_id.name.ljust(30) + '\t' + str(l.price_subtotal).rjust(10)
+    msg += '\n\t' + r.partner_id.name.ljust(30) + '\tTokens: ' + str(r.partner_id.payment_token_count)
+    hw_c = 0
+    hw = env['home.warranty'].search([('buyer_contact','=',r.partner_id.id)])
+    for h in hw:
+     msg += '\n\t  ' + h.name.ljust(30) + '\t' + h.state
+     hw_c += 1
+    try:
+      if hw_c > 1:
+          message_err += msg + '\n\t -- warning home warranty count\n-------------------------------'
+          for i in r.partner_id.payment_token_ids:
+              i["active"] = False
+              i["remove_batch"] = remove_batch
+              i["remove_status"] = "WarnHW"
+              i["remove_home_warranty"] = hw[0]
+          err_c += 1
+      elif r.partner_id.payment_token_count > 1:
+          message_err += msg + '\n\t -- warning token count\n-------------------------------'
+          for i in r.partner_id.payment_token_ids:
+              i["active"] = False
+              i["remove_batch"] = remove_batch
+              i["remove_status"] = "WarnToken"
+              i["remove_home_warranty"] = hw[0]
+          err_c += 1
+      elif r.partner_id.payment_token_count < 1:
+          message_err += msg + '\n\t -- Skipping, no tokens\n-------------------------------'
+          err_c += 1
+      elif r.partner_id.payment_token_ids[0].create_date > (datetime.datetime.today() - datetime.timedelta(days=30)):
+          message_err += msg + '\n\t -- Skipping, token created: ' + \
+            r.partner_id.payment_token_ids[0].create_date.strftime('%Y-%m-%d') + \
+            '\n-------------------------------'
+          err_c += 1
+      else:
+          message += msg + '\n-------------------------------'
+          for i in r.partner_id.payment_token_ids:
+              i["active"] = False
+              i["remove_batch"] = remove_batch
+              i["remove_status"] = "Ready"
+              i["remove_home_warranty"] = hw[0]
+          c += 1
+    except Exception  as e:
+      message_err = msg + '\n\t -- Error\n' + str(e) + '\n-------------------------------'
+      err_c += 1
+
+message += remove_batch+'\n-------------------------------\nCount: '+ str(c).rjust(10)
+message_err += remove_batch+'\n-------------------------------\nCount: '+ str(err_c).rjust(10)
+
+log(message, level='info')
+log(message_err, level='warn')
+        ]]></field>
+        <field name="state">code</field>
+    </record>
+    </data>
+</odoo>

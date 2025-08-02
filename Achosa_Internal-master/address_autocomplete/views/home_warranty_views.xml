@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="address_autocomplete_home_warranty_form_inherit" model="ir.ui.view">
+        <field name="name">address_autocomplete_home_warranty_form_inherit</field>
+        <field name="model">home.warranty</field>
+        <field name="inherit_id" ref="achosa.default_form_view_for_hw"/>
+        <field name="arch" type="xml">
+            <field name="property_street" position="attributes">
+                <attribute name="widget">address_autocomplete_property_street</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>

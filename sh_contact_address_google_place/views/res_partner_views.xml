@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+	<record id="sh_contact_address_google_form_view_inherit" model="ir.ui.view">
+		<field name="name">sh.contact.address.google.form.view.inherit</field>
+		<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form"/> 
+			<field name="arch" type="xml">
+				<field name='street' position="before">
+					<field name='sh_contact_google_location' placeholder='Enter Location' widget='sh_address_auto_complete' class='oe_edit_only'/>
+				</field>
+				<div class="o_address_format" position="attributes">
+					<attribute name="class" add="sh_custom_address_format" separator=" "></attribute>
+				</div>
+ 		</field>
+	</record>
+</odoo>

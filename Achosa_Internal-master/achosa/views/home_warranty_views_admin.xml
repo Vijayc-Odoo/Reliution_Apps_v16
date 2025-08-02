@@ -1,0 +1,250 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="admin_form_view_for_hw" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <!--
+        TODO: Coverage Start Date isn't defaulting to current date
+        TODO: Property Type is no longer defaulting to single family home
+        -->
+        <field name="arch" type="xml">
+            <form modifiers="{}">
+                <header modifiers="{}">
+                    <button name="%(achosa.hw_coupon_apply_code_action)d" string="Apply Coupon" type="action"
+                            attrs="{'invisible': [['promo','!=',False]]}"
+                            groups="base.group_user"/>
+                    <button name="action_remove_coupon" type="object" string="Remove Coupon"
+                            confirm="This will remove the coupon from the home warranty. Continue?"
+                            groups="base.group_user"/>
+                    <button name="action_remove_coupon" type="object" string="Remove Coupon"
+                            confirm="This will remove the coupon from the home warranty.
+                            This will not update the sales order, please update manually.
+                            Continue?"
+                            attrs="{'invisible': ['|',['promo','=',False],['invoice_status','in',['draft','sent']]]}"
+                            groups="base.group_user"/>
+                    <button name="%(achosa.hw_receive_check_action)d" string="Receive Check" type="action"
+                            attrs="{'invisible': ['|',['state','!=','Buyer'],['buyer_invoice_status','in',['paid','cancel']]]}"
+                            context="{'default_home_warranty':id}"
+                            groups="account.group_account_invoice"/>
+                    <button name="%(achosa.hw_email_action)d" string="Resend Email" type="action"
+                            attrs="{'invisible': [['state','not in',['Seller','Buyer']]]}"
+                            groups="base.group_user"/>
+                    <button name="action_seller_order" type="object" string="Submit Seller Order"
+                            confirm="Create Seller Order and lock related fields?"
+                        attrs="{'invisible': ['|',['state','!=','draft'],['covered_seller_product_id','=',False]]}"/>
+                    <button name="action_buyer_order" type="object" string="Submit Buyer Order"
+                            confirm="Create Buyer Order and lock related fields?
+                            If there is a seller order that must be submitted first."
+                        attrs="{'invisible': ['|',['state','=','Buyer'],['state','=','Owner']]}"/>
+                    <field name="state" widget="statusbar" modifiers="{}"/>
+                </header>
+                <sheet string="Home Warranty" modifiers="{}">
+                    <div  class="alert alert-warning clearfix" role="alert" style="float:left;position: absolute;left: 0;top: 0;">
+                        <h3>Warning: Admin form</h3>
+                    </div>
+		            <div class="oe_button_box" name="button_box" modifiers="{}">
+                        <button name="action_view_seller_order" type="object" class="oe_stat_button" icon="fa-pencil-square-o" options="{}" attrs="{'invisible': [('seller_invoice_status', '==', False)]}" modifiers="{'invisible':[['seller_invoice_status', '==', False]]}">
+                            <field name="seller_invoice_status" widget="statinfo" string="Seller Order" modifiers="{'readonly':true}"/>
+                        </button>
+                        <button name="action_view_buyer_order" type="object" class="oe_stat_button" icon="fa-pencil-square-o" options="{}" attrs="{'invisible': [('buyer_invoice_status', '==', False)]}" modifiers="{'invisible':[['buyer_invoice_status', '==', False]]}">
+                            <field name="buyer_invoice_status" widget="statinfo" string="Buyer Order" modifiers="{'readonly':true}"/>
+                        </button>
+                        <button name="action_view_sales_orders" type="object" class="oe_stat_button" icon="fa-pencil-square-o" options="{}" attrs="{'invisible': [('buyer_invoice_status', '==', False)]}" modifiers="{'invisible':[['buyer_invoice_status', '==', False]]}">
+                            <field name="sales_order_count" widget="statinfo" string="Linked Orders" modifiers="{'readonly':true}"/>
+                        </button>
+		            </div>
+                    <script>function set_Prices(){ }</script>
+                    <style>
+                        div.tab-content {
+                            min-height: 300px;
+                        }
+                        div.price {
+                            width: 50px;
+                            text-align: right;
+                        }
+                    </style>
+                    <group modifiers="{}">
+                        <group name="propery_grp" string="Property Details" modifiers="{}">
+                            <field name="property_street" required="1"
+                                   widget="char" placeholder="Street Address..."/>
+                            <field name="property_street2"
+                                   widget="char" placeholder="Street Address 2..."/>
+                            <field name="property_city" required="1"
+                                   widget="char" placeholder="City..."/>
+                            <field name="property_state" required="1" options="{'no_create': True}" on_change="1"/>
+                            <field name="property_zip" required="1"
+                                   placeholder="Postal Code..." widget="char"/>
+                        </group>
+                        <group modifiers="{}" string="Property Type">
+                            <field name="property_type" required="1"
+                                   on_change="1" default_value="Single Family Home"/>
+                            <field name="pricelist_id" readonly="1"/>
+                            <h2>Coverage</h2>
+                            <field string="Seller to Buyer"
+                                   name="covered_sellers_coverage"/>
+                            <field string="Buyer only"
+                                   name="covered_buyers_coverage"/>
+                            <field string="Owner only"
+                                   name="covered_owners_coverage"/>
+                            <field name="invoice_status" string="Order Status" invisible="True"/>
+                        </group>
+                    </group>
+                    <notebook modifiers="{}">
+                        <page string="Realtor" modifiers="{}">
+                            <group  style="min-height: 280px;">
+                                <group name="realtor_grp" modifiers="{}" string="Realtor">
+                                    <field name="realtor_contact" can_create="true" can_write="true" domain="[['supplier_rank','>',0]]"
+                                           placeholder="Name..." string="Name" context="{'default_vendor_type':'Realtor','default_customer':False,'default_supplier_rank':1}"/>
+                                    <field name="realtor_company"/>
+                                    <field name="realtor_email"
+                                           placeholder="Email..." widget="email" string="Email"/>
+                                    <field name="realtor_phone"
+                                           placeholder="Phone..." widget="phone" string="Phone"/>
+                                    <field attrs="{'readonly': False }" name="realtor_salesperson"/>
+                                    <field attrs="{'readonly': True }" name="submitter" help="Created By"
+                                           modifiers="{'readonly': True }"/>
+                                </group>
+                                <group modifiers="{}" string="Closing Agent/Attorney">
+                                    <field domain="['&amp;',['supplier_rank','>',0],['vendor_type','=','Closing']]"
+                                           name="closing_contact" placeholder="Name..." string="Name"  context="{'default_vendor_type':'Closing','default_customer':False,'default_supplier_rank':1}"/>
+                                    <field name="closing_email"
+                                           placeholder="Email..." widget="email" string="Email"/>
+                                    <field name="closing_phone"
+                                           placeholder="Phone..." widget="phone" string="Phone"/>
+                                    <field name="promo" attrs="{}" readonly="1"/>
+                                </group>
+                            </group>
+                            <group modifiers="{}" string="Total Order">
+                                <field name="product" attrs="{}" domain="[['sale_ok','=',True]]" can_create="true"
+                                       can_write="true" modifiers="{'readonly':true}" nolabel="1" context="{'pricelist': pricelist_id}">
+
+                                    <tree string="Product Variants">
+                                        <field name="name" string="Product"/>
+                                        <field name="description_sale" string="Description"/>
+                                        <field name="lst_price" modifiers="{}" invisible="1" widget="monetary" sum="Total"/>
+                                        <field name="price" widget="monetary" sum="TotalPrice"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page name="seller_page" string="Seller" modifiers="{}">
+                            <group modifiers="{}" style="min-height: 280px;">
+                                <group modifiers="{}">
+                                    <field name="covered_seller_product"
+                                           on_change="1" invisible="True"/>
+                                    <field name="covered_seller_product_id"
+                                           on_change="1" domain="[('states','=',property_state),('term_product_type','=','Seller')]" context="{'dropDown':1}"/>
+                                    <field name="coverage_start_date" widget="date"/>
+                                </group>
+                                <group modifiers="{}">
+                                    <field name="seller_contact" placeholder="Name..." string="Name"/>
+                                    <field name="seller_email" placeholder="Email..." widget="email"/>
+                                    <field name="seller_phone" placeholder="Phone..." widget="phone"/>
+                                </group>
+                            </group>
+                            <group modifiers="{}" string="Seller Order">
+                                <field name="product_seller" attrs="{}" domain="[['sale_ok','=',True]]"
+                                       can_create="true"
+                                       can_write="true" modifiers="{'readonly':true}" nolabel="1" context="{'pricelist': pricelist_id}">
+
+                                    <tree string="Product Variants">
+                                        <field name="name" string="Product"/>
+                                        <field name="description_sale" string="Description"/>
+                                        <field name="lst_price" modifiers="{}" widget="monetary" sum="Total" invisible="1"/>
+                                        <field name="price" widget="monetary" sum="TotalPrice"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+
+                        <page name="buyer_page" string="Buyer">
+                            <group modifiers="{}" style="min-height: 120px;">
+                                <group modifiers="{}">
+                                    <field name="covered_buyer_term"
+                                           on_change="1"/>
+                                    <field name="covered_buyer_product"
+                                           on_change="1" invisible="True"/>
+                                    <field name="covered_buyer_product_id"
+                                           on_change="1" domain="[('states','=',property_state),('term_product_type','=','Buyer')]" context="{'dropDown':1}"/>
+                                    <field name="estimated_closing_date" widget="date"/>
+                                </group>
+                                <group modifiers="{}">
+                                    <field name="buyer_contact" placeholder="Name..."
+                                           on_change="1" string="Name"/>
+                                    <field name="buyer_email" placeholder="Email..." widget="email"
+                                           on_change="1" string="Email"/>
+                                    <field name="buyer_phone" widget="phone" placeholder="Phone..."
+                                           on_change="1" string="Phone"/>
+                                    <field invisible="True" name="hide_rental_property" />
+                                    <field name="rental_property" />
+                                </group>
+                            </group>
+                                <field invisible="True" name="add_on_filter" />
+                            <group modifiers="{}" style="min-height: 130px;" string="Add Ons">
+                                <field name="covered_buyer_addons" domain="[['term_product_type','=','AddOn'],['states.id','=',property_state],'!',['id','=',add_on_filter]]"
+                                       context="{'dropDown':1}" widget="many2many_addons" nolabel="1"/>
+                            </group>
+                            <group modifiers="{}" string="Buyer Order">
+                                <field name="product_buyer" attrs="{}" domain="[['sale_ok','=',True]]" can_create="true"
+                                       can_write="true" modifiers="{'readonly':true}" nolabel="1" context="{'pricelist': pricelist_id}">
+
+                                    <tree string="Product Variants">
+                                        <field name="name" string="Product"/>
+                                        <field name="description_sale" string="Description"/>
+                                        <field name="lst_price" modifiers="{}" invisible="1" widget="monetary" sum="Total"/>
+                                        <field name="price" widget="monetary" sum="TotalPrice"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page name="property_page" string="Property Details" modifiers="{}">
+                            <group>
+                                <group>
+                                    <h4>Estated Property Info</h4>
+                                    <hr/>
+                                    <div class="alert alert-warning clearfix" role="alert" colspan="2"
+                                         attrs="{'invisible': [('estated_warning','=',False)]}">
+                                        <field name="estated_warning" colspan="2" nolabel="1" attrs="{'readonly':True}"/>
+                                    </div>
+                                </group>
+                                <group>
+                                    <field name="value" attrs="{'readonly':True}"/>
+                                    <field name="total_area_sq_ft" attrs="{'readonly':True}"/>
+                                    <field name="standardized_land_use_type" attrs="{'readonly':True}"/>
+                                    <field name="s_year_built" attrs="{'readonly':True}" widget="Char"/>
+                                </group>
+                            </group>
+ 	                    </page>
+                    </notebook>
+                    <field name="price_script" string="Price Script" widget="FieldScript"/>
+
+
+                </sheet>
+                <div class="oe_chatter" modifiers="{}">
+                    <field name="message_follower_ids" widget="mail_followers" modifiers="{}"/>
+                    <field name="message_ids" widget="mail_thread" modifiers="{}"
+                           options="{'display_log_button': True}"/>
+                </div>
+            </form>
+        </field>
+        <field name="field_parent" eval="False"/>
+        <field name="groups_id" eval="[(ref('achosa.group_hw_admin'), 0, [])]"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="model">home.warranty</field>
+        <field name="name">Admin form view for home warranties</field>
+        <field name="priority">18</field>
+        <field name="type">form</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="act_open_hw_admin_view">
+        <field name="name">Home Warranties Admin</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">home.warranty</field>
+
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="views">[[False, "tree"], ["admin_form_view_for_hw", "form"]]</field>
+        <field name="search_view_id" ref="default_home_warranty_search_view"/>
+        <field name="domain">[]</field>
+        <field name="context">{'dropDown':True}</field>
+    </record>
+</odoo>

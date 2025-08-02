@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_transaction_audit,access_transaction_audit,model_transaction_audit,,1,1,1,1
+access_transaction_audit_line,access_transaction_audit_line,model_transaction_audit_line,,1,1,1,1
+access_unsettled_transaction_line,access_unsettled_transaction_line,model_unsettled_transaction_line,,1,1,1,1

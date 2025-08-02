@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_register_invoice_form_validate" model="ir.ui.view">
+        <field name="name">account.payment.register.invoice.form.validate</field>
+        <field name="model">account.payment.register</field>
+        <field name="inherit_id" ref="account.view_account_payment_register_form" />
+        <field name="arch" type="xml">
+            <xpath expr='//button[@name="action_create_payments"]' position="replace">
+                <button string='Validate' name="action_validate_invoice_payment" type="object"
+                        class="btn-primary"/>
+                <button string="Validate and Email" name="action_validate_invoice_payment_email" type="object" class="btn-primary" invisible="not context.get('call_from_home_warranty', False)"/>
+                <button string="Validate and Choose Email" name="action_validate_and_choose_email" type="object" class="btn-primary" invisible="context.get('call_from_home_warranty', False)"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

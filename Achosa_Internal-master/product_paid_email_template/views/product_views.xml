@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="product_template_form_view_inherit" model="ir.ui.view">
+            <field name="name">product.template.form.inherit.mail.template</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='invoicing']//group[@name='accounting']" position="inside">
+                    <group string="Automatic Email at Invoice Paid" name="automatic_mail_at_invoice_id">
+                        <field name="paid_email_template_id" string="Email Template"
+                        help="Send a product-specific email once the invoice is paid"
+                            domain="[('model','=','account.move')]"
+                            context="{
+                                'form_view_ref':'product_paid_email_template.email_template_form_simplified',
+                                'default_model': 'account.move',
+                                'default_subject': name,
+                                'default_name': name,
+                                }"
+                        />
+                    </group>
+                </xpath>
+            </field>
+        </record>
+</odoo>

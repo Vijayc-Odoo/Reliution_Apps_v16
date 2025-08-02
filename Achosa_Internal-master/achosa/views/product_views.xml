@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_terms_form" model="ir.ui.view">
+        <field name="name">product.product.form.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="priority" eval="8"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                <page name="terms_page" string="Terms">
+                    <group name="terms_group">
+                        <field name="warranty_terms" widget="html"/>
+                    </group>
+                    <group name="terms_group">
+                        <field name="terms_short" widget="html"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_public_category_form_view_inherit" model="ir.ui.view">
+        <field name="name">product.public.category.form.inherit</field>
+        <field name="model">product.public.category</field>
+        <field name="inherit_id" ref="website_sale.product_public_category_form_view"/>
+        <field name="arch" type="xml">
+            <field name="sequence" position="after">
+                <field name="state_id" domain="[('enable_home_warranty','=',True)]" />
+            </field>
+        </field>
+    </record>
+  <record id="product_attribute_value_form" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <form>
+          <header modifiers="{}">
+              <button name="action_archive" type="object" string="Archive attachments"
+                      confirm="Archive the attachments on this Terms Object?"/>
+              <field name="state" widget="statusbar" clickable="True"/>
+          </header>
+          <sheet string="product.attribute.value">
+              <group col="4">
+                  <field name="name" modifiers="{'required': true}"/>
+                  <field name="sequence" modifiers="{}"/>
+                  <field name="attribute_id" can_create="true" can_write="true" modifiers="{'required': true}"/>
+                  <newline/>
+                  <field name="trade_call_fee" modifiers="{'invisible':[['attribute_id','!=','11']]}"/>
+                  <newline/>
+              </group>
+              <notebook modifiers="{}">
+                  <page name="terms_page" string="Term Settings">
+                      <group col="4">
+                      <field name="states" colspan="4" widget="many2many_tags"/>
+                      <newline/>
+                      <field name="term_product_type" colspan="4"/>
+                      <newline/>
+                      <field name="notes" colspan="4" />
+                      </group>
+                  </page>
+                  <page name="terms_email_page" string="Terms Email Templates">
+                      <group col="4">
+                      <field name="seller_seller_email_template" colspan="4"
+                             domain="[['model_id.model','ilike','home_warranty']]"/>
+                      <newline/>
+                      <field name="seller_realtor_email_template" colspan="4"
+                             domain="[['model_id.model','ilike','home_warranty']]"/>
+                      <newline/>
+                      </group>
+                  </page>
+                  <page name="terms_long_page" string="Terms Long">
+                      <group col="4">
+                      <field name="description" colspan="4" />
+                      <newline/>
+                      </group>
+                  </page>
+              </notebook>
+          </sheet>
+                <div class="oe_chatter" name="chatter" modifiers="{}">test
+                    <field name="message_follower_ids" widget="mail_followers" modifiers="{}"/>
+                    <field name="message_ids" widget="mail_thread" modifiers="{}"
+                           options="{'display_log_button': True}"/>
+                </div>
+      </form>
+    </field>
+    <field name="field_parent" eval="False"/>
+    <field name="groups_id" eval="[(6, 0, [])]"/>
+    <field name="inherit_id" eval="False"/>
+    <field name="mode">primary</field>
+    <field name="model">product.attribute.value</field>
+    <field name="name">Default form view for product.attribute.value</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+    <record id="default_tree_view_for_product_attribute_value" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <tree string="Variant Values">
+                <field name="sequence" widget="handle"/>
+                <field name="attribute_id"/>
+                <field name="name"/>
+                <field name="states"/>
+                <field name="state"/>
+            </tree>
+        </field>
+        <field name="field_parent" eval="False"/>
+        <field name="groups_id" eval="[(6, 0, [])]"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="model">product.attribute.value</field>
+        <field name="name">Default tree view for Product Attribute Values</field>
+        <field name="priority">16</field>
+        <field name="type">tree</field>
+    </record>
+    <record model="ir.actions.act_window" id="act_open_product_attribute_value">
+        <field name="name">Attribute Values</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.attribute.value</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" eval="False"/>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

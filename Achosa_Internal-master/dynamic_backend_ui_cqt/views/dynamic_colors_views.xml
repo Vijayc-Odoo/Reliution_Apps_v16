@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="dynamic_colors_form" model="ir.ui.view">
+            <field name="name">dynamic.colors.form</field>
+            <field name="model">dynamic.colors</field>
+            <field name="arch" type="xml">
+                <form string="Dynamic Backend Theme Color Picker">
+                    <group>
+                        <group string="Basic Colors">
+                            <separator/>
+                            <field name="text_color" widget="color"/>
+                        </group>
+                        <group string="Buttons Colors">
+                            <separator/>
+                            <field name="btn_pri_background" widget="color"/>
+                            <field name="btn_pri_fontcolor" widget="color"/>
+                        </group>
+                        <group string="Navigation Colors">
+                            <separator/>
+                            <field name="nav_background" widget="color"/>
+                            <field name="nav_fontcolor" widget="color"/>
+                            <field name="nav_hover" widget="color"/>
+                            <field name="nav_hover_fontcolor" widget="color"/>
+                        </group>
+                        <group string="Main Theme Home Background (Enterprise Only)">
+                            <separator/>
+                            <field name="home_ee_background" string="Theme Color" widget="color"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button string="Save" type="object" name="execute" class="oe_highlight"/>
+                        <button string="Cancel" class='oe_link' special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="dynamic_colors_action" model="ir.actions.act_window">
+            <field name="name">Dynamic Theme Colors</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">dynamic.colors</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="dynamic_colors_menu"
+                  action="dynamic_colors_action"
+                  name="Dynamic Theme Colors"
+                  parent="base.menu_administration"
+                  sequence="2"
+        />
+    </data>
+</odoo>

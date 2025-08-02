@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<template id="_assets_utils"
+		inherit_id="web._assets_utils" name="Wrap Text" >
+		<xpath expr="//link[last()]" position="after">
+				<link rel="stylesheet" type="text/scss"
+					href="/indi_wrap_text/static/src/scss/wrap_text_utils.scss" />
+		</xpath>
+	</template>
+	<template id="assets_backend"
+		inherit_id="web.assets_backend" name="Wrap Text List View" >
+		<xpath expr="//link[last()]" position="after">
+				<link rel="stylesheet" type="text/scss"
+					href="/indi_wrap_text/static/src/scss/wrap_text_list_view.scss" />
+		</xpath>
+	</template>
+</odoo>

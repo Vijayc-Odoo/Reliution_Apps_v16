@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+    <template id="my_portal_custom" inherit_id="portal.portal_layout">
+      <xpath expr="//div[@t-field='user_id.partner_id']" position='replace'>
+        <div t-field="user_id.partner_id" t-options='{"widget": "contact", "fields": ["email", "phone", "name"]}'/>
+      </xpath>
+    </template>
+
+</data>
+</odoo>

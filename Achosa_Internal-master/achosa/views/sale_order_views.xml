@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="sale_order_view_form_home_warranty" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+          <xpath expr="//field[@name='partner_id']" position="after">
+            <field name="realtor"/>
+            <field name="realtor_email" widget="email"/>
+          </xpath>
+          <xpath expr="//field[@name='partner_shipping_id']" position="after">
+            <field name="home_warranty" context="{'show_address': 1}" options="{'always_reload': True}"/>
+          </xpath>
+          <xpath expr="//field[@name='origin']" position="before">
+            <field attrs="{'readonly': True }" name="submitter" help="Created By"
+                                           modifiers="{'readonly': True }"/>
+          </xpath>
+          <xpath expr="//field[@name='payment_term_id']" position="after">
+            <field name="order_type"/>
+          </xpath>
+          
+          <xpath expr="//form//header//button[@name='action_quotation_send']" position="after">
+              <button name="action_invoice_send" string="Send Invoice" type="object" attrs="{'invisible': [('invoice_count', '=', 0)]}"/>
+          </xpath>          
+         
+        </field>
+    </record>
+    <record id="sale_order_view_tree_home_warranty" model="ir.ui.view">
+        <field name="name">sale.order.tree.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="create_date" invisible="1"/>
+            </field>
+            <xpath expr="//field[@name='company_id']" position="replace"/>
+            <xpath expr="//field[@name='website_id']" position="replace">
+                <field name="hw_property_street" string="Street"/>
+                <!--<field name="hw_property_state" string="State"/>-->
+            </xpath>
+            <xpath expr="//field[@name='expected_date']" position="replace"/>
+            <xpath expr="//field[@name='commitment_date']" position="replace">
+                <field name="realtor"/>
+            </xpath>
+            <xpath expr="//tree[1]" position="attributes">
+                <attribute name="default_order">date_order desc</attribute>
+            </xpath>
+        </field>
+    </record>
+     <record id="achosa_sale_order_view_tree_inherit" model="ir.ui.view">
+        <field name="name">achosa.sale.order.tree.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree[1]" position="attributes">
+                <attribute name="default_order">date_order desc</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

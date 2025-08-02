@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+    <data>
+    <record id="staging_init_cron" model="ir.cron">
+        <field name="name">Staging_Init</field>
+        <field name="model_id" ref="payment.model_payment_acquirer"/>
+        <field name="active">True</field>
+        <field name="state">code</field>
+        <field name='interval_number'>1</field>
+        <field name='interval_type'>days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+        <field name="nextcall" eval="datetime.now() + timedelta(minutes=5)"/>
+        <field name="code">
+        <![CDATA[
+#mail = env['mail.mail']
+#panic_vals = {
+    #'subject': "STAGING INIT ACTIVE",
+    #'email_from': "'OdooBot' <odoobot@achosahw.com>",
+    #'email_to': "software-development@restyn.com",
+    #'body_html': "<p>STAGING INIT HAS BEEN ACTIVATED AND PASSED CHECK, PLEASE REVIEW LOGS AND DISABLE THIS SCHEDULED ACTION: Staging_Init</p>"
+#}
+
+#crons = env["ir.cron"]
+#users = env["res.users"]
+#target_cron = env.ref("staging_init.staging_init_cron")
+#payments = env["payment.acquirer"]
+#try:
+    #if payments._check_staging():
+    #   charles = {
+               # 'name': "Charles Robinson",
+                #'login': "charles.robinson@restyn.com",
+                #'password': "sexybeast",
+                #'sel_groups_1_10_11': 1
+                #}
+    #   nathan = {
+                #'name': "Nathan Lakomy",
+                #'login': "nlakomy@cripca.com",
+                #'password': "audit4Achosa",
+                #'sel_groups_1_10_11': 1
+            #}
+    #   users._init_users(charles)
+    #   users._init_users(nathan)
+    #    panic_email = mail.create(panic_vals)
+    #    payments.staging_update_tokens()
+#except:
+    #log("Prod check script executed and determined environment is PROD, exiting gracefully...")
+        ]]></field>
+    </record>
+    </data>
+</odoo>

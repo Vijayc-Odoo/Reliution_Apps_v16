@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="sale_coupon_program_form_achosa" model="ir.ui.view">
+        <field name="name">sale.coupon.program.form.achosa</field>
+        <field name="model">coupon.program</field>
+        <field name="inherit_id" ref="sale_coupon.sale_coupon_program_view_promo_program_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='rule_products_domain']" position="after">
+                <field name="rule_home_warranty_domain" widget="domain" options="{'model': 'home.warranty'}"/>
+            </xpath>
+            <xpath expr="//field[@name='rule_date_to']" position="after">
+                <field name="rule_home_warranty_help" widget="text"/>
+            </xpath>
+            <xpath expr="//field[@name='discount_line_product_id']" position="after">
+                <field name="cost"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

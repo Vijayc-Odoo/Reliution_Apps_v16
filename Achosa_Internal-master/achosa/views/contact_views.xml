@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="res_partner_form" model="ir.ui.view">
+        <field name="name">res.partner.form.claims</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="priority" eval="8"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" name="action_view_home_warranties" type="object"
+                            attrs="{'invisible': [('vendor_type', '!=', 'Realtor')]}" icon="fa-shopping-cart">
+                        <field string="Home Warranties" name="total_orders" widget="statinfo"/>
+                    </button>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" name="action_view_claims" type="object"
+                            icon="fa-shopping-cart">
+                        <field string="Claims" name="total_claims" widget="statinfo"/>
+                    </button>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                <page name="claims_page" string="Claims">
+                    <group name="claims_group">
+                        <!-- TODO: create a new claim from subscription -->
+                        <!-- TODO: claims tab Date and amount paid fields -->
+                        <field name="claims" nolabel="1" options="{'no_create': True}"/>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="vendor_rating" widget="selection"/>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="vendor_type"/>
+                <field name="coordinator" domain="[['parent_id.id','=',parent_id],['vendor_type','=','Coordinator']]"
+                       attrs="{ 'invisible': [['vendor_type','!=','Realtor']]}"/>
+            </xpath>
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="home_warranty" string="Home Warranty" />
+                <field name="property_type" string="Property Type" help="SFH, Townhome/Condo, etc."/>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='sales_purchases']/group[@name='container_row_2']/group[@name='sale']/field[@name='user_id']"
+                   position="after">
+                <field name="team_id"/>
+                <field name="realtor_contact" string="Contact (Realtor)"/>
+                <field name="closing_contact" string="Contact (Title/Escrow/Attorney)"/>
+            </xpath>
+            <xpath expr="//group[@name='container_row_2']" position="after">
+                <group>
+                    <field name="sale_order_ids"/>
+                    <field name="invoice_ids"/>
+                </group>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                <page string="Serviced Zip Codes" modifiers="{}">
+                    <group modifiers="{}">
+                        <field name="zip_code_vendors">
+                            <tree string="vendor.zip.codes" editable="top">
+                                <field name="zip_code"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+                <page string="Referrals">
+                    <group>
+                        <field name="referrals" string="Customer Referrals">
+                            <tree string="Contacts">
+                                <field name="display_name" string="Name" modifiers="{&quot;readonly&quot;: true}"/>
+                                <field name="city"/>
+                                <field name="activity_state"/>
+                                <field name="function" invisible="1" modifiers="{&quot;column_invisible&quot;: true}"/>
+                                <field name="phone" on_change="1" modifiers="{}"/>
+                                <field name="email" on_change="1" modifiers="{}"/>
+                                <field name="subscription_count"/>
+                                <field name="sale_order_ids"/>
+                                <field name="user_id" invisible="1" can_create="true" can_write="true"
+                                       modifiers="{&quot;column_invisible&quot;: true}"/>
+                                <field name="is_company" invisible="1" on_change="1"
+                                       modifiers="{&quot;column_invisible&quot;: true}"/>
+                                <field name="country_id" invisible="1" on_change="1" can_create="true" can_write="true"
+                                       modifiers="{&quot;column_invisible&quot;: true}"/>
+                                <field name="parent_id" invisible="1" on_change="1" can_create="true" can_write="true"
+                                       modifiers="{&quot;column_invisible&quot;: true}"/>
+                                <field name="active" invisible="1" modifiers="{&quot;column_invisible&quot;: true}"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="default_vendor_zip_view_tree">
+        <field eval="True" name="active"/>
+        <field name="arch" type="xml">
+            <tree string="vendor.zip.codes" editable="top">
+                <field name="zip_code"/>
+                <field name="vendor"/>
+            </tree>
+        </field>
+        <field eval="False" name="field_parent"/>
+        <field eval="[(6, 0, [])]" name="groups_id"/>
+        <field eval="False" name="inherit_id"/>
+        <field name="mode">primary</field>
+        <field name="model">vendor.zip.codes</field>
+        <field name="name">Default tree view for vendor.zip.codes</field>
+        <field name="priority">16</field>
+        <field name="type">tree</field>
+    </record>
+    <record model="ir.actions.act_window" id="act_open_vendor_zip_view">
+        <field name="name">Vendor Zip Codes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vendor.zip.codes</field>
+
+        <field name="view_mode">tree</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+    <menuitem id="vendor_zip_view"
+        action="act_open_vendor_zip_view"
+        parent="contacts.menu_contacts"
+        groups="base.group_system"
+        sequence="12"/>
+</odoo>

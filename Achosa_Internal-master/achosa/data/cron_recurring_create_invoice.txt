@@ -1,0 +1,26 @@
+future_date = datetime.datetime.now() + datetime.timedelta(days=60)
+future_date = future_date.strftime('%Y-%m-%d')
+domain = [('recurring_next_date', '<=', future_date),('state', 'in', ['open', 'pending']),('home_warranty','!=',False)]
+message =''
+
+subscriptions = model.search(domain)
+for sub in subscriptions:
+  hw = sub.home_warranty
+  if sub.order_type == 'Buyer' and hw.state == 'Buyer' and hw.covered_buyer_term == '12':
+    message += '\n' + sub.name + ' ' + hw.name + ' ' + sub.recurring_next_date
+    for p in hw.product_buyer:
+     message += '\n\t- ' + str(p.name)
+    start_date = datetime.datetime.strptime(sub.recurring_next_date, '%Y-%m-%d') + datetime.timedelta(days=1)
+    template = env.ref('achosa.email_template_edi_renewal')
+    hw.with_context({'sales_id':hw.realtor_contact.user_id.id, 'validate': True}).create_owner_subscription(start_date, sub,
+                    mail_template=template)
+    sub['recurring_next_date'] = False
+  elif sub.order_type == 'Seller':
+    # do not renew seller subscriptions
+    sub['recurring_next_date'] = False
+
+subscriptions = model.search_read(domain,['name','recurring_next_date','home_warranty','order_type'])
+message += '\n' + str(subscriptions)
+
+log(message, level='info')
+#model._cron_recurring_create_invoice()

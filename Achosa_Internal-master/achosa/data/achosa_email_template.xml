@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_subscription.mail_template_subscription_invoice" model="mail.template">
+        <field name="name">Invoice: Payment Confirmation</field>
+        <field name="model_id" ref="achosa.model_account_move"/>
+        <field name="email_from">{{(object.invoice_user_id.email_formatted or user.email_formatted)}}</field>
+        <field name="partner_to">{{ object.partner_id.id }}</field>
+        <field name="subject">{{object.company_id.name}} Invoice (Ref {{object.name or 'n/a'}})</field>
+        <field name="report_name">Invoice_{{ (object.name or '').replace('/','_') }}{{ object.state == 'draft' and '_draft' or '' }}</field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="body_html" type="html">
+            <t t-if="object.home_warranty and object.home_warranty.state == 'Buyer'" data-oe-t-group="0" data-oe-t-selectable="true" data-oe-t-group-active="true" data-oe-t-inline="true">
+   Congratulations on your new home! We are sending you this e-mail to confirm that we have received payment for your home warranty. As we know moving is a hectic time and sometimes our paperwork gets lost in the closing documents, we are sending you a few items.
+</t>
+<t t-else="" data-oe-t-selectable="true" data-oe-t-group="0" data-oe-t-inline="true">
+   We are sending you this e-mail to confirm that we have received payment for your home warranty. Further, we are sending you a few items for your information.
+</t>
+<p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">We have included an invoice that shows your home warranty has been paid, this item is attached at the bottom of this email. There are also 2 links directly below. The first link we have included is a document that explains our service process, and the second link is for the terms &amp; conditions of your home warranty.</p>
+<p style="box-sizing:border-box;margin-right: 20em;">
+   <a target="_blank" class="badge badge-pill badge-info" style="box-sizing:border-box;text-decoration:none;border-radius:120px;border-style:solid;padding:0.25em 0.6em 0.25em 0.6em;margin:1px 2px 1px 0px;border-left-color:#00a09d;border-bottom-color:#00a09d;border-right-color:#00a09d;border-top-color:#00a09d;border-left-width:1px;border-bottom-width:1px;border-right-width:1px;border-top-width:1px;transition-property:color, background-color, border-color, box-shadow;transition-delay:0s, 0s, 0s, 0s;transition-timing-function:ease-in-out, ease-in-out, ease-in-out, ease-in-out;transition-duration:0.15s, 0.15s, 0.15s, 0.15s;vertical-align:baseline;white-space:nowrap;text-align:center;line-height:1;font-weight:700;font-size:100%;display:inline-block;background-color:#87c0d1;color:#212529;" t-attf-href="{{ object.env['ir.config_parameter'].sudo().get_param('web.base.url') }}/web/content/{{ object.env.company.service_map_attachment_id }}">
+      <t t-out="object.env.company.service_map_attachment_name" contenteditable="false" data-oe-t-inline="true" oe-keep-contenteditable=""></t>
+      .pdf
+   </a>
+</p>
+<p style="box-sizing:border-box;margin-bottom: 0px;">
+   <a target="_blank" class="badge badge-pill badge-info" style="box-sizing:border-box;text-decoration:none;border-radius:120px;border-style:solid;padding:0.25em 0.6em 0.25em 0.6em;margin:1px 2px 1px 0px;border-left-color:#00a09d;border-bottom-color:#00a09d;border-right-color:#00a09d;border-top-color:#00a09d;border-left-width:1px;border-bottom-width:1px;border-right-width:1px;border-top-width:1px;transition-property:color, background-color, border-color, box-shadow;transition-delay:0s, 0s, 0s, 0s;transition-timing-function:ease-in-out, ease-in-out, ease-in-out, ease-in-out;transition-duration:0.15s, 0.15s, 0.15s, 0.15s;vertical-align:baseline;white-space:nowrap;text-align:center;line-height:1;font-weight:700;font-size:100%;display:inline-block;background-color:#87c0d1;color:#212529;" t-attf-href="{{ object.env['ir.config_parameter'].sudo().get_param('web.base.url') }}/web/content/{{ object.env.company.homeowner_attachment_id }}">
+      <t t-out="object.env.company.homeowner_attachment_name" contenteditable="false" data-oe-t-inline="true" oe-keep-contenteditable=""></t>
+      .pdf
+   </a>
+</p>
+            <p style="box-sizing:border-box;margin-bottom: 0px;"><br></br>
+</p>
+<p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">If you have any questions, you can reach us at (888) 509-2916 or at info@achosahw.com. Thank you and have a wonderful day!</p>
+<t t-if="object.first_invoice and not object.check_renewal_product() and not object.home_warranty.state == 'Buyer'" data-oe-t-group="1" data-oe-t-selectable="true" data-oe-t-group-active="true">
+   <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"><b style="box-sizing:border-box;font-weight:bolder;">Note for New Customers</b></p>
+   <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">Please remember that your coverage will not begin until 30 days after today. Your next monthly payment will automatically process at that time. All recurring payments will automatically process monthly thereafter.</p>
+</t>
+<t t-elif="object.first_invoice and object.check_renewal_product()" data-oe-t-selectable="true" data-oe-t-group="1">
+   <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"><b style="box-sizing:border-box;font-weight:bolder;">Note for Customers Just Renewing</b></p>
+   <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">Your renewal plan will begin immediately after your current plan expires. Your second monthly payment will automatically process one month after your renewal plan begins. All recurring payments will automatically process monthly thereafter.</p>
+</t>
+<p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;color:#888888;">
+   <t t-if="object.user_id and object.user_id.signature" data-oe-t-group="2" data-oe-t-group-active="true" data-oe-t-inline="true">
+      <t t-out="object.user_id.signature" contenteditable="false" data-oe-t-inline="true" oe-keep-contenteditable=""></t>
+   </t>
+</p>
+<p style="box-sizing:border-box;margin-bottom: 0px;">
+   <!-- The two buttons need to be updated whenever the terms or process map are updated.  The companies parameters page should be updated to have the link for both (JIRA AO-845)-->
+</p>
+<p style="margin:0px 0 12px 0;box-sizing:border-box;"></p>
+        </field>
+    </record>
+    
+    <record id="achosa_mail_template_subscription_invoice_backup" model="mail.template">
+        <field name="name">Subscription Invoice: Send by Email (backup)</field>
+        <field name="model_id" ref="achosa.model_account_move"/>
+        <field name="email_from">{{(object.invoice_user_id.email_formatted or user.email_formatted)}}</field>
+        <field name="partner_to">{{ object.partner_id.id }}</field>
+        <field name="subject">{{object.company_id.name}} Invoice (Ref {{object.name or 'n/a'}})</field>
+        <field name="body_html" type="html">
+            <p style="box-sizing:border-box;margin-bottom: 0px;">
+   <!-- This template previously had ID = 138, but was referenced by XML_ID = "sale_subscription.mail_template_subscription_invoice" in enterprise code.  This backup is to preserve the functionality in case we want it again some day. -->
+</p>
+<div style="background:#F0F0F0;color:#515166;padding:10px 0px;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
+   <table style="box-sizing:border-box;border-collapse:collapse;width:600px;margin:5px auto;" width="600px">
+      <tbody>
+         <tr>
+            <td>
+               <a href="/" style="text-decoration:none;box-sizing:border-box;background-color:transparent;color:#008f8c;"><img src="/web/binary/company_logo" style="border-style:none;box-sizing:border-box;vertical-align: baseline; max-width: 100px; width: 100px; height: 100px;" width="100px" height="100"/></a>
+            </td>
+            <td style="text-align:right;vertical-align:middle;">
+               Subscription Invoice
+            </td>
+         </tr>
+      </tbody>
+   </table>
+   <table style="border-style:solid;box-sizing:border-box;border-left-color:#e1e1e1;border-bottom-color:#e1e1e1;border-right-color:#e1e1e1;border-top-color:#e1e1e1;border-left-width:1px;border-bottom-width:1px;border-right-width:1px;border-top-width:1px;background-color:white;background-clip:initial;background-origin:initial;background-attachment:initial;background-repeat-y:initial;background-repeat-x:initial;background-size:initial;background-position-y:initial;background-position-x:initial;background-image:initial;border-collapse:collapse;width:600px;margin:0px auto;background:white;border:1px solid #e1e1e1;" width="600px">
+      <tbody>
+         <tr>
+            <td style="padding:15px 20px 10px 20px;">
+               <p style="margin:0px 0 12px 0;box-sizing:border-box;">
+                  Dear 
+                  <t t-out="object.partner_id.name or ''" contenteditable="false" data-oe-t-inline="true">Brandon Freeman</t>
+                  <t t-if="object.partner_id.parent_id" data-oe-t-group="0" data-oe-t-group-active="true" data-oe-t-inline="true">
+                     (
+                     <t t-out="object.partner_id.parent_id.name or ''" contenteditable="false" data-oe-t-inline="true">Azure Interior</t>
+                     )
+                  </t>
+               </p>
+               <p style="margin:0px 0 12px 0;box-sizing:border-box;">
+                  Here is, in attachment, your
+                  <t t-if="object.name" data-oe-t-group="1" data-oe-t-selectable="true" data-oe-t-group-active="true" data-oe-t-inline="true">
+                     invoice <strong t-out="object.name or ''" style="box-sizing:border-box;font-weight:500;" contenteditable="false">Office Cleaning Service"</strong>
+                  </t>
+                  <t t-else="" data-oe-t-selectable="true" data-oe-t-group="1" data-oe-t-inline="true">
+                     invoice
+                  </t>
+                  <t t-if="object.invoice_origin" data-oe-t-group="2" data-oe-t-group-active="true" data-oe-t-inline="true">
+                     (with reference: 
+                     <t t-out="object.invoice_origin or ''" contenteditable="false" data-oe-t-inline="true">INVOICE_ORIGIN</t>
+                     )
+                  </t>
+                  amounting in <strong t-out="format_amount(object.amount_total, object.currency_id) or ''" style="box-sizing:border-box;font-weight:500;" contenteditable="false">$ 10.00</strong>
+                  from 
+                  <t t-out="object.company_id.name or ''" contenteditable="false" data-oe-t-inline="true">YourCompany</t>
+                  .
+                  <t t-if="object.payment_state in ('paid', 'in_payment')" data-oe-t-group="3" data-oe-t-selectable="true" data-oe-t-group-active="true" data-oe-t-inline="true">
+                     This invoice is already paid.
+                  </t>
+                  <t t-else="" data-oe-t-selectable="true" data-oe-t-group="3" data-oe-t-inline="true">
+                     Please remit payment at your earliest convenience.
+                  </t>
+               </p>
+               <p style="margin:0px 0 12px 0;box-sizing:border-box;">Do not hesitate to contact us if you have any questions.</p>
+            </td>
+         </tr>
+         <tr>
+            <td style="padding:15px 20px 10px 20px;" t-out="object.invoice_user_id.signature or ''" contenteditable="false">--<br>Mitchell Admin</br></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+        </field>
+        </record>
+    
+    <record id="achosa_mail_template_user_signup_account_created" model="mail.template">
+        <field name="name">Auth Signup: Odoo Account Created</field>
+        <field name="model_id" ref="achosa.model_res_users"/>
+        <field name="email_from">"{{object.company_id.name}}" {{(object.company_id.email or user.email)}}</field>
+        <field name="email_to">{{ object.email}}</field>
+        <field name="subject">Welcome to {{object.company_id.name}}!</field>
+        <field name="body_html" type="html">
+            <div style="font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+    <table cellspacing="0" cellpadding="0" style="box-sizing:border-box;background-clip:inherit;background-origin:inherit;background-attachment:inherit;background-repeat-y:inherit;background-repeat-x:inherit;background-size:inherit;background-position-y:inherit;background-position-x:inherit;background-image:inherit;border-collapse:collapse;background-color:transparent;width:600px;background:inherit;color:inherit" width="600px">
+        <tbody><tr>
+            <td valign="center" width="200" style="padding:10px 10px 10px 5px;font-size: 12px">
+                <img src="/logo.png" style="box-sizing:border-box;border-top-width:0px;border-right-width:0px;border-bottom-width:0px;border-left-width:0px;border-style: none; vertical-align: middle; border-width: 0px; padding: 0px; margin: 0px; height: 0px; width: 80px;" width="80px" height="0" t-attf-alt="{{ user.company_id.name }}"/>
+            </td>
+        </tr></tbody>
+    </table>
+</div>
+<div style="font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+    <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif; 0px 9px 0px;">Dear <t t-out="object.name" contenteditable="false" data-oe-t-inline="true"></t>,</p>
+    <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif; 0px 9px 0px;">
+        Your account has been successfully created!
+    </p>
+    <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif; 0px 9px 0px;">
+        Your login: <t t-out="object.email" contenteditable="false" data-oe-t-inline="true"></t>
+        <br/>
+    </p>
+    <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif; 0px 9px 0px;">
+        To gain access to your account, you can use the following link:
+    </p>
+    <div style="font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;text-align: center; margin-top: 16px;">
+        <a style="border-style:solid;box-sizing:border-box;border-left-color:#875a7b;border-bottom-color:#875a7b;border-right-color:#875a7b;border-top-color:#875a7b;border-left-width:1px;border-bottom-width:1px;border-right-width:1px;border-top-width:1px;text-decoration:none;background-color:transparent;color:#008784;padding: 5px 10px; font-size: 12px; line-height: 18px; color: #FFFFFF; border-color:#875A7B; text-decoration: none; display: inline-block; margin-bottom: 0px; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; white-space: nowrap; background-image: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius:3px" t-attf-href="/web/login?auth_login={{object.email}}">Go to My Account</a>
+    </div>
+    <p style="box-sizing:border-box;margin:0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif; 0px 9px 0px;">Best regards,</p>
+</div>
+<div style="font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;padding:0px;width:600px;margin:auto; margin-top: 10px; background: #fff repeat top /100%;color:#777777">
+    <t t-out="user.signature" contenteditable="false" data-oe-t-inline="true"></t>
+    <p style="box-sizing:border-box;margin:0px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif; 0px 9px 0px;font-size: 11px; margin-top: 10px;">
+        <strong style="box-sizing:border-box;font-weight:bold;">Sent by <t t-out="user.company_id.name" contenteditable="false" data-oe-t-inline="true"></t> using <a href="www.odoo.com" style="box-sizing:border-box;text-decoration:none;background-color:transparent;color:#008784; color: #875A7B;">Odoo</a></strong>
+    </p>
+</div>
+        </field>
+    </record>
+    
+    <record id="achosa_mail_template_data_unregistered_users" model="mail.template">
+        <field name="name">Auth Signup: Unregistered Users</field>
+        <field name="model_id" ref="achosa.model_res_users"/>
+        <field name="email_from">{{object.company_id.partner_id.email_formatted}}</field>
+        <field name="email_to">{{object.email_formatted}}</field>
+        <field name="subject">Reminder for unregistered users</field>
+        <field name="body_html" type="html">
+            <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#F1F1F1;font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"><tbody><tr><td align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="590" style="border-collapse:collapse;padding:16px;background-color: white; color: #454748; border-collapse:separate;">
+<tbody>
+    <!-- CONTENT -->
+    <tr>
+        <td align="center" style="min-width:590px;">
+            
+                 <t t-set="invited_users" t-value="ctx.get('invited_users', [])" data-oe-t-inline="true"></t>
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="border-collapse:collapse;min-width:590px;background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"><tbody><tr><td style="text-align:left">
+                    <span style="font-size:20px;font-weight: bold;">
+                        Pending Invitations
+                    </span><br/><br/>
+                </td>
+                </tr><tr><td valign="top" style="font-size:13px;">
+                    <div style="font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;">
+                        Dear <t t-out="object.name or ''" contenteditable="false" data-oe-t-inline="true" oe-keep-contenteditable=""></t>,<br/> <br/>
+                        You added the following user(s) to your database but they haven't registered yet:
+                        <ul style="margin:0px 0 1rem 0;">
+                            <t t-foreach="invited_users" t-as="invited_user">
+                                <li><t t-out="invited_user" contenteditable="false" data-oe-t-inline="true" oe-keep-contenteditable=""></t></li>
+                            </t>
+                        </ul>
+                        Follow up with them so they can access your database and start working with you.
+                        <br/><br/>
+                        Have a nice day!<br/>
+                        --<br/>The <t t-out="object.company_id.name" contenteditable="false" data-oe-t-inline="true" oe-keep-contenteditable=""></t> Team
+                    </div>
+                </td></tr>
+                <tr><td style="text-align:center;">
+                  <hr width="100%" style="margin:1rem 0 1rem 0;border-top-color:rgba(0, 0, 0, 0.1);border-top-style:solid;border-top-width:1px;border-left-width:0px;border-bottom-width:0px;border-right-width:0px;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;" contenteditable="false" oe-keep-contenteditable=""/>
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+</tbody></table>
+        </field>
+    </record>
+            
+    <!-- Email template for Subscriber Anniversary -->
+    <record id="subscriber_anniversary_mail" model="mail.template">
+        <field name="name">Homeowner Anniversary Email</field>
+        <field name="model_id" ref="achosa.model_sale_subscription"/>
+        <field name="email_from">{{ object.company_id.email }}</field>
+        <field name="email_to">{{ object.partner_id.email }}</field>
+        <field name="subject">
+            One Month Until Your
+             {{ object.get_anniversary_details()['anniversary_number'] }} Achosa Anniversary!
+        </field>
+
+        <field name="body_html" type="html">
+            <p>Thank you for your home warranty with Achosa.</p><br/>
+            <t t-set="anniversary_details" t-value='object.get_anniversary_details()'/>
+            <p>We are sending you this note to let you know that <strong t-esc='anniversary_details["anniversary_date"]'> </strong>
+                 will mark your <strong t-esc='anniversary_details["anniversary_number"]'> </strong> Anniversary with Achosa.
+                 Since you protected your home, we have saved our customers millions
+                 of dollars in home repair bills while seeing more and more customers choose Achosa.</p><br/>
+            <p>As you are already on a monthly plan, you need do nothing to continue with our service.
+                However, if you wish to cancel, just
+                <t t-if="object.get_portal_url()">
+                    <a target="_blank" class="badge badge-pill badge-info" t-attf-href="/my/subscription/cancel/{{object.id}}/{{object.access_token}}">Click Here</a>
+                </t>
+                to initiate your cancellation request. </p>
+            <br/>
+            <p>We appreciate your business!</p>
+            <p>
+                <t t-if="object.user_id.signature">
+                    <t t-out="object.user_id.signature or ''"/>
+                </t>
+            </p>
+        </field>
+    </record>
+
+    <record id="crm_prospect_email" model="mail.template">
+        <field name="name">Prospect Monthly Email</field>
+        <field name="model_id" ref="achosa.model_crm_lead"/>
+        <field name="email_from">{{object.user_id.login}}</field>
+        <field name="email_to">{{ object.partner_id.email }}</field>
+        <field name="subject">ACHOSA Monthly Email</field>
+        <field name="body_html" type='html'>
+            <h3 style="margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">For years real estate agents have been asking home warranty companies to be better. At Achosa Home Warranty, we've listened! We empower the homeowner to control the entire claim process by working with any service provider they choose.<br/></h3>
+            <p style="margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">
+                <br/>
+            </p>
+            <ul style="margin:0px 0 12px 0;box-sizing:border-box;">
+                <li>Homeowner selects the licensed service provider of their choice. This leads to faster response times, improved communication, better contractors and happier home owners.<br/></li>
+                <li>Achosa pays service providers their full retail rates (up to our limits) for repairs or replacements while they are in the home when the work is completed to the homeowner's satisfaction.<br/></li>
+                <li>Labor and parts can be sourced hyper-locally, keeping claim dollars in the local economy and reducing homeowner wait times.<br/></li>
+                <li>Based on surveys completed by homeowners after the claim, we have an industry leading NPS (Net Promoter Score) of 75.<br/></li>
+            </ul>
+            <p style="margin:0px 0 12px 0;box-sizing:border-box;">
+                <br/>
+            </p>
+            <h3 style="margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">Is this week or next week better for you to learn more about providing this protection to your clients?</h3>
+        </field>
+    </record>
+
+    <record id="crm_VCO_email" model="mail.template">
+        <field name="name">VCO Monthly Email</field>
+        <field name="model_id" ref="achosa.model_crm_lead"/>
+        <field name="email_from">{{object.user_id.login}}</field>
+        <field name="email_to">{{object.partner_id.email}}</field>
+        <field name="subject">ACHOSA Monthly Email</field>
+        <field name="body_html" type='html'>
+            <h3 style="margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">Based on our last conversation, I know you're excited about what Achosa Home Warranty has to offer your clients. Now is the best time to be sure your clients are protected!</h3>
+            <p style="margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">
+                <br/>
+            </p>
+            <h3 style="margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">Do you have a closing coming up with a home warranty written in the contract? If so, I'm happy to get the warranty ordered for you. I just need the address, buyers name, email &amp; phone number, closing date and the amount written in for the warranty.</h3>
+            <p style="caret-color:#37352f;position:relative;margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">
+                <br/>
+            </p>
+            <h3 style="margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">If you have a closing without a warranty written in, I'd love to reach out to your client and share the benefits of Achosa. Just connect us by email or share their contact information with me, and I'll take it from there.</h3>
+            <p style="margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">
+                <br/>
+            </p>
+            <h3 style="margin:0px 0 6px 0;box-sizing:border-box;font-size:16.9px;color:#091124;line-height:1.2;font-weight:500;">While a home warranty might seem like a small detail before closing, you will be the hero when Achosa saves them money on costly home repairs to the systems and appliances in their home.
+                <br/>
+            </h3>
+        </field>
+    </record>
+
+<!--     Email template for Cancellation Request -->
+    <record id="subscriber_cancellation_request_mail" model="mail.template">
+        <field name="name">Homeowner Cancel Subscription Request</field>
+        <field name="model_id" ref="achosa.model_sale_subscription"/>
+        <field name="email_from">{{object.company_id.email}}</field>
+        <field name="email_to">{{object.partner_id.email}}</field>
+        <field name="subject">Confirmation of Cancellation Request</field>
+        <field name="body_html" type="html">
+<!--            <p>We are in receipt of your cancellation request. Your warranty is scheduled to cancel on {{object.date.strftime('%B %d, %Y') }} when the current billing cycle ends.-->
+<!--We will send a confirmation email when the cancellation is completed.-->
+<!--You will not be charged any additional monthly payments.-->
+<!--Thank you for your business!</p>-->
+            <p>
+                <t t-if="object.user_id.signature">
+                    <t t-out="object.user_id.signature"/>
+                </t>
+            </p>
+        </field>
+    </record>
+
+    <!-- Email template for Cancellation -->
+    <record id="subscriber_cancellation_mail" model="mail.template">
+        <field name="name">Homeowner Cancel Subscription</field>
+        <field name="model_id" ref="achosa.model_sale_subscription"/>
+        <field name="email_from">{{object.company_id.email}}</field>
+        <field name="email_to">{{object.partner_id.email}}</field>
+        <field name="subject">Cancellation Confirmation</field>
+        <field name="body_html" type="html">
+            <p>This note is to confirm that we have cancelled your warranty per your request. Thank you for your business!</p>
+             <p>
+                <t t-if="object.user_id.signature">
+                    <t t-out="object.user_id.signature"/>
+                </t>
+            </p>
+        </field>
+    </record>
+</odoo>

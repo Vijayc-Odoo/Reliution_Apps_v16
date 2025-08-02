@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- Merge Opportunities  -->
+    <record id="update_property_data_form" model="ir.ui.view">
+        <field name="name">update.property.data.form</field>
+        <field name="model">update.property.data</field>
+        <field name="arch" type="xml">
+            <form string="Update Property Data">
+                <group string="Select Home Warranties">
+                    <field name="home_warranty_ids" nolabel="1">
+                        <tree>
+                            <field name="create_date"/>
+                            <field name="name"/>
+                            <field name="state"/>
+                            <field name="buyer_invoice_status"/>
+                            <field name="value"/>
+                            <field name="property_street"/>
+                            <field name="property_city"/>
+                            <field name="property_state"/>
+                            <field name="property_zip"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button name="action_update" type="object" string="Update" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!--  Update property data action  -->
+    <record id="action_update_property_datas" model="ir.actions.act_window">
+        <field name="name">Update Property Data</field>
+        <field name="res_model">update.property.data</field>
+        <field name="view_id" ref="update_property_data_form"/>
+        <field name="binding_model_id" ref="achosa.model_home_warranty"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
+    </record>
+    <!--        <act_window-->
+    <!--            id="action_update_property_data"-->
+    <!--            name="Update Property Data"-->
+    <!--            res_model="update.property.data"-->
+    <!--            binding_model="home.warranty"-->
+    <!--            view_mode="form"-->
+    <!--            view_id="update_property_data_form"-->
+    <!--            target="new"-->
+    <!--            groups="account.group_account_invoice" />-->
+
+</odoo>

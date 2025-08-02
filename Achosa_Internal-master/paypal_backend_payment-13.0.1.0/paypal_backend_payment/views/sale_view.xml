@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="transaction_form_website_sale" model="ir.ui.view">
+        <field name="name">payment.transaction.form.website_sale</field>
+        <field name="model">payment.transaction</field>
+        <field name="inherit_id" ref="payment.transaction_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='reference']" position="after">
+                <field name="sale_order_id" />
+            </xpath>
+        </field>
+    </record>
+    <!--  Add payment options to sale order form -->
+    <record id="sale_order_form_payment" model="ir.ui.view">
+        <field name="name">sale.order.form.payment</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <notebook position="before">
+                <div class='oe_right'>
+                    <label for='due_amount' string='Due Amount : ' />
+                    <field name='due_amount' widget='monetary' options="{'currency_field': 'currency_id'}" />
+                    <button name='button_pay' type='object' string='Pay with Paypal' style="margin-left:5px !important;" class='oe_highlight' attrs="{'invisible': ['|', ('due_amount', '=', 0.00), ('state', '!=', 'sale')]}" />
+                </div>
+            </notebook>
+        </field>
+    </record>
+</odoo>

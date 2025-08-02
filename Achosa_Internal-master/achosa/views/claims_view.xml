@@ -1,0 +1,311 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record model="ir.actions.act_window" id="act_open_claims">
+        <field name="name">Claims</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">claims</field>
+
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" eval="False"/>
+        <field name="domain">[('claims','in',[active_id])]</field>
+        <field name="context">{}</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="default_form_view_for_claims" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form modifiers="{}" delete="false"
+                  confirm="Are you sure you want to create another claim for this customer?">
+                <header modifiers="{}">
+                    <!-- TODO: Confirm popup for status -->
+                    <button name="action_diag" type="object" string="Diagnosis Complete"
+                            confirm="Mark Diagnosis Complete?"
+                            attrs="{'invisible': [('status', '!=', 'Init')]}"/>
+                    <button name="action_auth" type="object" string="Claim Amount Authorized"
+                            confirm="Mark Claim Amount Authorized?"
+                            attrs="{'invisible': [('status', '!=', 'Diag')]}"/>
+                    <button name="action_complete" type="object" string="Claim Complete"
+                            confirm="Mark Claim Complete?"
+                            attrs="{'invisible': [('status', '!=', 'Auth')]}"/>
+                    <button name="action_send_email" type="object" string="Send Email"
+                            attrs="{'invisible': [('status', '=', 'Comp')]}"/>
+                    <button name="action_unlock" type="object" string="Unlock"
+                            confirm="Unlock?" groups="account.group_account_invoice"
+                            attrs="{'invisible': [('status', '!=', 'Comp')]}"/>
+                    <button name="action_lock" type="object" string="Lock"
+                            confirm="Lock?"
+                            attrs="{'invisible': [('status', '!=', 'Unlocked')]}"/>
+                    <field name="status" widget="statusbar" modifiers="{}" statusbar_visible="Init,Diag,Auth,Comp"/>
+                </header>
+                <sheet string="claims" modifiers="{}">
+                    <div class="oe_button_box" name="button_box" modifiers="{}">
+                        <button class="oe_stat_button" name="%(achosa.act_open_claims)d" type="action" icon="fa-folder"
+                                modifiers="{}"
+                                options="{}">
+                            <field string="Claims" name="cust_claims" widget="statinfo" modifiers="{}"/>
+                        </button>
+                        <!--
+                        <button class="oe_stat_button" name="btn1" type="object" icon="fa-phone" modifiers="{}"
+                                options="{}">
+                            <field string="Calls" name="call_count" widget="statinfo" modifiers="{}"/>
+                        </button>-->
+                        <button class="oe_stat_button" name="action_open_emails" target="_blank" type="object"
+                                icon="fa-envelope" modifiers="{}"
+                                options="{}">
+                            <field string="Emails" name="email_count" widget="statinfo" modifiers="{}"/>
+                        </button>
+                        <button class="oe_stat_button" name="action_open_attachments" type="object" icon="fa-file">
+                            <field string="Portal Files" name="attachment_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_title" modifiers="{}">
+                        <h1 modifiers="{}">
+                            <field name="name" required="1" attrs="{}" string="Claim Number"
+                                   modifiers="{'required':true}"/>
+                        </h1>
+                    </div>
+                    <group modifiers="{}">
+                        <group modifiers="{}">
+                            <field name="subscription" attrs="{}" required="1" string="Subscription"
+                                   context="{'show_address': 1}" options="{'no_create': True, 'always_reload': True}"
+                                   on_change="1" can_create="true" can_write="true" modifiers="{'required':true}"
+                                   domain="['|','&amp;',['date_start','&lt;=',current_date],['stage_id.category','=','progress'],('stage_id.name','=','Draft')]"
+                            />
+                            <!--                                    domain="['|','&amp;',['date_start','&lt;=',current_date],['subscription_stage','=','progress']]" -->
+                            <field name="subscription_stage" modifiers="{'readonly':true}" attrs="{}" readonly="1"/>
+                            <field name="subscription_start" string="Start" modifiers="{'readonly':true}"
+                                   attrs="{'invisible': [('subscription_stage', '==', 'draft')]}" readonly="1"/>
+                            <field name="subscription_end" string="End" modifiers="{'readonly':true}"
+                                   attrs="{'invisible': [('subscription_stage', '==', 'draft')]}" readonly="1"/>
+                            <field name="estimated_sub_start_date" string="Est. Start" modifiers="{'readonly':true}"
+                                   attrs="{'invisible': [('subscription_stage', '!=', 'draft')]}" readonly="1"/>
+                            <field name="estimated_sub_end_date" string="Est. End" modifiers="{'readonly':true}"
+                                   attrs="{'invisible': [('subscription_stage', '!=', 'draft')]}" readonly="1"/>
+                            <field name="subscription_realtor"/>
+                            <field name="customer" can_create="true" can_write="true" modifiers="{}"
+                                   context="{'show_address': 1}" options="{'always_reload': True}"/>
+                            <field name="cust_email" string="Email" modifiers="{'readonly':true}" attrs="{}"
+                                   readonly="1"/>
+                            <field name="cust_phone" string="Phone" modifiers="{'readonly':true}" attrs="{}"
+                                   readonly="1"/>
+                        </group>
+                        <group modifiers="{}">
+                            <!--                                 <field name="product" widget="radio" attrs="{}" required="1" on_change="1" can_create="true" -->
+                            <!--                                        can_write="true" modifiers="{'required':true}" domain="[['analytic_account_id.id','=',subscription]]"/> -->
+                            <field name="product" attrs="{}" required="1" on_change="1" can_create="true"
+                                   can_write="true" modifiers="{'required':true}"
+                                   domain="[['analytic_account_id.id','=',subscription]]"/>
+                            <field name="coverage_desc" string="Coverage" modifiers="{'readonly':true}" attrs="{}"
+                                   readonly="1"/>
+                            <field name="goodwill" type="checkbox"/>
+                            <field name="goodwill_amount" widget="monetary"
+                                   attrs="{'invisible':[['goodwill','=',False]]}"/>
+                            <field name="goodwill_reason" attrs="{'invisible':[['goodwill','=',False]]}"/>
+                            <field name="nipwo"/>
+                            <field name="last_payment_date" invisible="1" modifiers="{'invisible':true}" attrs="{}" readonly="1"/>
+                            <field name="diag_date" string="Date Diagnosed" modifiers="{'readonly':true}"
+                                   attrs="{}" readonly="1"/>
+                            <field name="auth_date" string="Date Authorized" modifiers="{'readonly':true}"
+                                   attrs="{}" readonly="1"/>
+                            <field name="comp_date" string="Date Completed" modifiers="{'readonly':true}" attrs="{}"
+                                   readonly="1"/>
+                            <field name="trade_call_fee"/>
+                            <field name='claim_not_covered'/>
+                            <field name='type_not_covered' attrs="{'invisible':[('claim_not_covered', '=', False)] }"/>
+                            <field name='reason_not_covered_init' string="Not Covered Reason"
+                                   attrs="{'invisible':['|', ('claim_not_covered', '=', False), '|', ('type_not_covered', '=', 'diagnostic'), ('type_not_covered', '=', False)]}"/>
+                            <field name='reason_not_covered_diagnostic' string="Not Covered Reason"
+                                   attrs="{'invisible':['|', ('claim_not_covered', '=', False), '|', ('type_not_covered', '=', 'init'), ('type_not_covered', '=', False)]}"/>
+                            <field name='reason_not_covered' invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook modifiers="{}">
+                        <page string="Claim Description" modifiers="{}">
+                            <group modifiers="{}">
+                                <field name="claim_desc" string="Description" modifiers="{}"/>
+                            </group>
+                        </page>
+                        <page string="Amount" modifiers="{}">
+                            <group modifiers="{}">
+                                <group modifiers="{}">
+                                    <field name="requested_amt" string="Amount Requested" widget="monetary"
+                                           attrs="{'readonly': [['status', '!=', 'Unlocked'],['request_date','!=',False]]}"/>
+                                    <field name="approved_amt" string="Amount Approved"
+                                           attrs="{'readonly': [['status', '!=', 'Unlocked'],'|',['requested_amt','=',0],['approved_date','!=',False]]}"/>
+                                    <field name="paid_amt" string="Amount Paid"
+                                           attrs="{'readonly': [['status', '!=', 'Unlocked'],'|',['approved_amt','=',0],['paid_date','!=',False]]}"/>
+                                </group>
+                                <group modifiers="{}">
+                                    <field name="request_date" string="Date Requested"
+                                           attrs="{'readonly':[['status', '!=', 'Unlocked']]}"/>
+                                    <field name="approved_date" string="Date Approved"
+                                           attrs="{'readonly':[['status', '!=', 'Unlocked']]}"/>
+                                    <field name="paid_date" string="Date Paid"
+                                           attrs="{'readonly':[['status', '!=', 'Unlocked']]}"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Technician" modifiers="{}">
+                            <group modifiers="{}">
+                                <group modifiers="{}">
+                                    <!-- TODO: filter partners to technicians - vendor type -->
+                                    <field name="tech" string="Technician" can_create="true"
+                                           attrs="{'readonly': [['status', '=', 'Comp']]}"
+                                           can_write="true" modifiers="{'readonly': [['status', '=', 'Comp']]}"/>
+                                    <field name="tech_email" string="Tech Email"
+                                           attrs="{'readonly': [['status', '=', 'Comp']]}"/>
+                                    <field name="tech_phone" string="Tech Phone"
+                                           attrs="{'readonly': [['status', '=', 'Comp']]}"/>
+                                </group>
+                                <group modifiers="{}">
+                                    <field name="company" string="Company"
+                                           attrs="{'readonly': [['status', '=', 'Comp']]}"
+                                           context="{'default_company_type':'company'}"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Diagnosis" modifiers="{}">
+                            <group modifiers="{}">
+                                <field name="diag_desc" string="Description" modifiers="{}"/>
+                            </group>
+                        </page>
+                        <page string="Items" modifiers="{}">
+                            <group modifiers="{}">
+                                <field name="items">
+                                    <tree string="claim.items" editable="top">
+                                        <field name="product_id"
+                                               domain="['|',('id','=',product_id),('can_be_expensed','=',True),('warranty_terms_id','=',parent.warranty_terms_id)]"/>
+                                        <field name="repair_amt" string="Cost" widget="monetary"/>
+                                        <field name="repair_date" string="Date Paid"/>
+                                        <field name="status"/>
+                                    </tree>
+                                </field>
+                                <field name="coverage_list">
+                                    <tree edit="false">
+                                        <field name="product_id"/>
+                                        <field name="name"/>
+                                        <field name="used_amt"/>
+                                        <field name="coverage"/>
+                                    </tree>
+                                </field>
+                                <field name="item_name" attrs="{'invisible':True}"/>
+                            </group>
+                        </page>
+                        <page string="Terms" modifiers="{}">
+                            <group modifiers="{}">
+                                <field name="warranty_terms_id" invisible="True"/>
+                                <field name="terms"/>
+                            </group>
+                        </page>
+                        <page string="Claims" modifiers="{}">
+                            <group modifiers="{}">
+                                <field name="claims" string="Claims" ref="claims" modifiers="{'readonly':true}"
+                                       attrs="{'nolabel':'True'}" readonly="1">
+                                    <tree string="claims">
+                                        <field name="name" modifiers="{}"/>
+                                        <field name="status" modifiers="{}"/>
+                                        <field name="request_date" modifiers="{}"/>
+                                        <field name="approved_date" modifiers="{}"/>
+                                        <field name="paid_date" modifiers="{}"/>
+                                        <field name="paid_amt" modifiers="{}"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Suggested Technicians" modifiers="{}">
+                            <group>
+                                <field name="suggested_vendors">
+                                    <tree string="res.partner">
+                                        <field name="name"/>
+                                        <field name="display_name" string="Company Name"/>
+                                        <field name="phone"/>
+                                        <field name="vendor_rating"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter" name="chatter" modifiers="{}">test
+                    <field name="message_follower_ids" widget="mail_followers" modifiers="{}"/>
+                    <field name="message_ids" widget="mail_thread" modifiers="{}"
+                           options="{'display_log_button': True}"/>
+                </div>
+            </form>
+        </field>
+        <field name="field_parent" eval="False"/>
+        <field name="groups_id" eval="[(6, 0, [])]"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="model">claims</field>
+        <field name="name">Default form view for claims</field>
+        <field name="priority">16</field>
+        <field name="type">form</field>
+    </record>
+    <record id="admin_form_view_for_claims_inherit" model="ir.ui.view">
+        <field name="name">claims.form admin</field>
+        <field name="model">claims</field>
+        <field name="inherit_id" ref="default_form_view_for_claims"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]" position="attributes">
+                <attribute name="delete">true</attribute>
+            </xpath>
+        </field>
+        <field name="groups_id" eval="[(ref('achosa.group_hw_admin'), 0, [])]"/>
+    </record>
+    <record id="default_tree_view_for_claims" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <tree string="claims" default_order="create_date desc" delete="false">
+                <field name="name" modifiers="{}"/>
+                <field name="create_date"/>
+                <field name="subscription" string="Subscription" on_change="1" can_create="true" can_write="true"
+                       modifiers="{}"/>
+                <field name="property_street" string="Street"/>
+                <field name="customer" can_create="true" can_write="true" modifiers="{}"/>
+                <field name="status" modifiers="{}"/>
+                <field name="approved_amt"/>
+                <field name="paid_amt"/>
+                <field name="property_state" string="State"/>
+                <field name="product"/>
+                <field name="request_date" modifiers="{}"/>
+                <field name="approved_date" modifiers="{}"/>
+                <field name="paid_date" modifiers="{}"/>
+            </tree>
+        </field>
+        <field name="field_parent" eval="False"/>
+        <field name="groups_id" eval="[(6, 0, [])]"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="model">claims</field>
+        <field name="name">Default tree view for claims</field>
+        <field name="priority">16</field>
+        <field name="type">tree</field>
+    </record>
+    <record id="group_claim_del" model="res.groups">
+        <field name="name">Claim Delete</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+    <record id="admin_tree_view_for_claims" model="ir.ui.view">
+        <field name="name">claims.tree admin</field>
+        <field name="model">claims</field>
+        <field name="inherit_id" ref="default_tree_view_for_claims"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree[1]" position="attributes">
+                <attribute name="delete">true</attribute>
+            </xpath>
+        </field>
+        <field name="groups_id" eval="[(ref('achosa.group_claim_del'), 0, [])]"/>
+    </record>
+    <record model="ir.actions.act_window" id="act_open_claims_view">
+        <field name="name">Claims</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">claims</field>
+
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" eval="False"/>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

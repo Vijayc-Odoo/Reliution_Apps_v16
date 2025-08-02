@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="payment_transaction_audit_tree_view" model="ir.ui.view">
+        <field name="name">product.transaction.audit</field>
+        <field name="model">transaction.audit</field>
+        <field name="arch" type="xml">
+            <tree string="Payment Transaction Audit" create="0">
+                <field name="record_date"/>
+<!--                <field name="transaction_date"/>-->
+            </tree>
+        </field>
+    </record>
+
+    <record id="payment_transaction_audit_form_view" model="ir.ui.view">
+        <field name="name">product.transaction.audit.form.view</field>
+        <field name="model">transaction.audit</field>
+        <field name="arch" type="xml">
+            <form string="Vaccine Information" create="0">
+                <sheet>
+                    <group>
+                        <field name="record_date"/>
+<!--                        <field name="transaction_details"/>-->
+                    </group>
+                    <notebook>
+                        <page string="Transaction Details">
+                            <field name="transaction_audit_line_ids">
+                                <tree create="0">
+                                    <field name="transaction_id" invisible="1"/>
+                                    <field name="customer_name"/>
+                                    <field name="invoice_no"/>
+                                    <field name="transaction_no"/>
+                                    <field name="transaction_date"/>
+                                    <field name="amount"/>
+                                    <field name="status"/>
+                                    <field name="card_response" string="Card Status"/>
+                                    <field name="cavv_response" string="CAVV Status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Unsettled Transaction Details">
+                            <field name="unsettled_transaction_ids">
+                                <tree create="0">
+                                    <field name="unsettled_transaction_id" invisible="1"/>
+                                    <field name="customer_name"/>
+                                    <field name="invoice_no"/>
+                                    <field name="unsettled_transaction_no"/>
+                                    <field name="unsettled_transaction_date"/>
+                                    <field name="amount"/>
+                                    <field name="status"/>
+                                    <field name="card_response" string="Card Status"/>
+                                    <field name="cavv_response" string="CAVV Status"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_payment_transaction_audit" model="ir.actions.act_window">
+        <field name="name">Payment Transaction Audit</field>
+        <field name="res_model">transaction.audit</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="payment_transaction_audit_menu"
+              name="Payment Transaction Audit"
+              parent="account.account_invoicing_menu"
+              action="action_payment_transaction_audit"
+              sequence="11"/>
+</odoo>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="sale_subscription_template_view_form_inherit_sale_subscription_asset_inherit">
+        <field name="name">sale.subscription.template.form.inherit</field>
+        <field name="model">sale.subscription.template</field>
+        <field name="inherit_id" ref="sale_subscription.sale_subscription_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='invoicing']/group" position="inside">
+                <field name="trade_call_fee"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <template id="confirm_cancel_subscription" name="Confirm Cancellation Of Subscription">
+        <t t-call="portal.portal_layout">
+            <t t-set="wrapwrap_classes" t-value="'o_portal_bg_dark'"/>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <div class="row no-gutters align-items-center pt-2">
+                        <div class="col-md">
+                            <h3 class="mb-1 mb-md-0">
+                                <span t-field="subscription.display_name"/>
+                            </h3>
+                        </div>
+                        <div class="col-md text-md-right">
+                            <small class="text-right">Status:</small>
+                            <span t-field="subscription.stage_id.name" class=" badge badge-pill badge-info" title="Current stage of this subscription"/>
+                        </div>
+                    </div>
+                </t>
+                <t t-set="card_body">
+                    <div class="row mx-3 py-3">
+                        <div class="col-12 py-2">
+                            If you wish to cancel, please press the button below. Upon pressing the button, your warranty will be scheduled to cancel on <span t-if="end_date" t-esc="end_date.strftime('%B %d, %Y')"/> (when the current billing cycle ends).
+                            We will send you a confirmation email after we finalize the cancellation that day.
+                            You will not be charged any additional monthly payments.
+                            Thank you for your business!
+                        </div>
+                        <div class="col-12 py-2">
+                            <a class="badge badge-pill badge-info" t-att-href="'/my/subscription/confirm_cancel/' + str(subscription.id)">Confirm Cancellation</a>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="cancellation_confirmation_subscription" name="Cancellation Confirmed">
+        <t t-call="portal.portal_layout">
+            <t t-set="wrapwrap_classes" t-value="'o_portal_bg_dark'"/>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_body">
+                    <div class="row mx-3 py-3">
+                        <div class="col-12 py-2">
+                            <p style="color:#25aae1 !important">Cancellation Confirmed.</p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="cancellation_confirmation_subscription_error" name="Cancellation Confirmed">
+        <t t-call="portal.portal_layout">
+            <t t-set="wrapwrap_classes" t-value="'o_portal_bg_dark'"/>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_body">
+                    <div class="row mx-3 py-3">
+                        <div class="col-12 py-2">
+                            <p style="color:#25aae1 !important">Error in cancellation.</p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+    
+    <record id="sale_subscription_close_reason_view_tree_cancel" model="ir.ui.view">
+	<field name="name">sale.subscription.close.reason.view.tree.cancel</field>
+	<field name="model">sale.subscription.close.reason</field>
+	<field name="inherit_id" ref="sale_subscription.sale_subscription_close_reason_view_tree"/>
+	<field name="arch" type="xml">
+	    <xpath expr="//tree/field[@name='name']" position="after">
+	        <field name="cancellation_reason"/>
+	    </xpath>
+	</field>
+    </record>
+
+</odoo>

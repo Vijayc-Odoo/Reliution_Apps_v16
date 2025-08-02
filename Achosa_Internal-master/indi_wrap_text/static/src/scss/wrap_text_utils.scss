@@ -1,0 +1,10 @@
+// ------------------------------------------------------------------
+// Text overflow
+// ------------------------------------------------------------------
+@mixin o-text-overflow($display: inline-block, $max-width: 100%) {
+    display: $display;
+    max-width: $max-width;
+    overflow: hidden;
+    vertical-align: top; // To update display context changed by overflow:hidden
+}
+

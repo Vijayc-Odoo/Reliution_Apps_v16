@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hw_email_form" model="ir.ui.view">
+        <field name="name">home.warranty.email.form</field>
+        <field name="model">home.warranty.email</field>
+        <field name="arch" type="xml">
+            <form string="Resend email">
+                <group>
+                    <field name="email_to"/>
+                    <i>Note: if you edit you'll need to reattach the terms.</i>
+                    <field name="copy_coordinator"/>
+                </group>
+                <footer>
+                    <button name="send_email" string="Send Email" type="object" class="oe_highlight"/>
+                    <button name="edit_email" string="Edit and Send Email" type="object" />
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hw_email_action" model="ir.actions.act_window">
+        <field name="name">Resend Email</field>
+        <field name="res_model">home.warranty.email</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="hw_email_form"/>
+     </record>
+</odoo>

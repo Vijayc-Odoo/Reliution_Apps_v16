@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <template id="address_autocomplete.assets_frontend_backend" name="address_autocomplete">
+
+        <t t-set="google_places_autocomplete_api_key"
+           t-value="request.env['ir.config_parameter'].sudo().get_param('google_places_autocomplete.api_key')"/>
+        <t t-set="google_places_autocomplete_libraries"
+           t-value="request.env['ir.config_parameter'].sudo().get_param('google_places_autocomplete.libraries')"/>
+        <t t-if="not google_places_autocomplete_api_key or not google_places_autocomplete_libraries">
+            <script t-attf-src="https://maps.googleapis.com/maps/api/js?libraries=places"/>
+        </t>
+        <t t-else="">
+            <script t-attf-src="https://maps.googleapis.com/maps/api/js?key=#{google_places_autocomplete_api_key}&amp;libraries=#{google_places_autocomplete_libraries}"/>
+        </t>
+        <style>
+                .pac-container:after {
+                /* Disclaimer: not needed to show 'powered by Google' if also a Google Map is shown */
+
+                background-image: none !important;
+                height: 0px;
+            }
+        </style>
+    </template>
+    <template id="webclient_bootstrap_address_autocomplete" name="webclient_bootstrap google_places_autocomplete" inherit_id="web.webclient_bootstrap">
+        <xpath expr="//t[@t-call-assets='web.assets_common']" position="before">
+            <t t-call="address_autocomplete.assets_frontend_backend"/>
+        </xpath>
+    </template>
+<!--     <template id="assets_backend" name="Address Autocomplete Assets" inherit_id="web.assets_backend"> -->
+<!--         <xpath expr="." position="inside"> -->
+<!--             <t t-set="google_api_key" -->
+<!--             t-value="request.env['ir.config_parameter'].sudo().get_param('google_places_autocomplete.api_key')"/> -->
+<!--             <t t-if="google_api_key and not google_api_key == 'False' and not google_api_key == '' and not google_api_key == '0'"> -->
+<!--                 <script type="text/javascript" src="/address_autocomplete/static/src/js/address_autocomplete_fieldchar.js" /> -->
+<!--             </t> -->
+<!--         </xpath> -->
+<!--     </template> -->
+</odoo>

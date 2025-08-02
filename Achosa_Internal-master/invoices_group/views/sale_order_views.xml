@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="invoices_group_sale_order_form_inherit" model="ir.ui.view">
+        <field name="name">invoices_group_sale_order_inherit_form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//header//button[3]" position="attributes">
+                <attribute name="groups">invoices_group.group_sale_create_invoices</attribute>
+            </xpath>
+            <xpath expr="//form//header//button[4]" position="attributes">
+                <attribute name="groups">invoices_group.group_sale_create_invoices</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

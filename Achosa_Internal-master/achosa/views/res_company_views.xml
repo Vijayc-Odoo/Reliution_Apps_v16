@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Form View to Modify it -->
+    <record id="achosa_res_company_inherit_view_form" model="ir.ui.view">
+        <field name="name">achosa.res.company.inherit.view.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Payment Acquirers" name="achosa_payment_acquirers">
+                    <group>
+                        <group string="Authorize.net Configurations (test mode)">
+                            <field name="authorize_login_test"/>
+                            <field name="authorize_transaction_key_test"/>
+                            <field name="authorize_signature_key_test"/>                            
+                        </group>
+                    </group>
+                </page>
+                <page string="Other Configurations" name="achosa_other_configurations">
+                    <group>
+                         <group string="Addons product configurations">
+                            <field name="add_on_attribute_value_non_owner"/>
+                            <field name="add_on_attribute_value_conserve"/>
+                            <field name="add_on_attribute_value_conserve_plus"/>
+                        </group>
+                        <group string="Others">
+                            <field name="estated_url"/>
+                            <field name="estated_token"/>
+                        </group>
+                    </group>
+                    <group string="Products and Service Map">
+                        <group>
+                            <field name="service_map_attachment_id"/>
+                            <field name="buyer_attachment_id"/>
+                            <field name="buyer_idaho_attachment_id"/> 
+                            <field name="homeowner_attachment_id"/>
+                            <field name="homeowner_idaho_attachment_id"/>                                                       
+                            <field name="seller_attachment_id"/>
+                        </group>
+                        <group>
+                            <field name="service_map_attachment_name"/>
+                            <field name="buyer_attachment_name"/>
+                            <field name="buyer_idaho_attachment_name"/>
+                            <field name="homeowner_attachment_name"/>
+                            <field name="homeowner_idaho_attachment_name"/>                            
+                            <field name="seller_attachment_name"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

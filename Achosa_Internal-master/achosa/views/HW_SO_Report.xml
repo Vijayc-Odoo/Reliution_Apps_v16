@@ -1,0 +1,175 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record model="ir.actions.report" id="hw_report_so">
+        <field eval="False" name="attachment"/>
+        <field eval="False" name="attachment_use"/>
+        <field name="binding_model_id" ref="achosa.model_home_warranty"/>
+        <field name="binding_type">report</field>
+        <field eval="[(6, 0, [])]" name="groups_id"/>
+        <field name="model">home.warranty</field>
+        <field eval="False" name="multi"/>
+        <field name="name">Home Warranty Sales Orders</field>
+        <field name="report_name">achosa.hw_report</field>
+        <field name="report_type">qweb-pdf</field>
+    </record>
+    <template id="hw_report">
+        <t t-call="web.html_container">
+            <t t-set="is_pro_forma" t-value="True"/>
+            <t t-foreach="docs" t-as="hw">
+                <t t-foreach="hw.sales_order" t-as="doc">
+                    <t t-call="sale.report_saleorder_document" t-lang="doc.partner_id.lang"/>
+                </t>
+            </t>
+        </t>
+    </template>
+    <template id="report_saleorder_document_realtor" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@id='informations']" position="inside">
+            <div t-if="doc.home_warranty and doc.home_warranty.realtor_contact" class="col-xs-2">
+                <strong>Realtor:</strong>
+                <p t-field="doc.home_warranty.realtor_contact.name"/>
+            </div>
+            <div t-if="doc.home_warranty and doc.home_warranty.property_street" class="col-xs-3">
+                <strong>Covered Property:</strong>
+                <p>
+                    <span t-field="doc.home_warranty.property_street"/>
+                    <span t-field="doc.home_warranty.property_street2"/>
+                    <br></br>
+                    <span t-field="doc.home_warranty.property_city"/>
+                    <span t-field="doc.home_warranty.property_state_code"/>
+                    <span t-field="doc.home_warranty.property_zip"/>
+                </p>
+            </div>
+            <div t-if="doc.subscriptions and doc.order_type and doc.order_type != 'Seller'" class="col-xs-2">
+                <strong>Contract Term:</strong>
+                <t t-if="doc.order_type == 'Buyer' and doc.invoice_status != 'invoiced'">
+                    <t t-if="doc.home_warranty and doc.home_warranty.estimated_closing_date">
+                        <p>
+                            <span t-field="doc.home_warranty.estimated_closing_date"/> - <span t-field="doc.estimated_sub_end_date"/>
+                        </p>
+                    </t>
+                </t>
+                <t t-else="">
+                    <t t-foreach="doc.subscriptions" t-as="s">
+                        <p>
+                        <span t-field="s.date_start"/> - <span t-field="s.date"/>
+                        </p>
+                    </t>
+                </t>
+            </div>
+        </xpath>
+        <xpath expr="//tbody[hasclass('sale_tbody')]" position="replace">
+            <t t-foreach="doc.order_line" t-as="l">
+                <t t-if="not l.related_program or l.price_unit != 0">
+                    <tr>
+                        <td>
+                            <span t-field="l.name"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="l.product_uom_qty"/>
+                            <span t-field="l.product_uom" groups="product.group_uom"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="l.price_unit"/>
+                        </td>
+                        <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                            <span t-field="l.discount"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_id))"/>
+                        </td>
+                        <!--<td class="text-right">-->
+                        <!--    <span t-field="l.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>-->
+                        <!--</td>-->
+                        <td class="text-right">
+                            <span t-field="l.price_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                        </td>
+                    </tr>
+                </t>
+            </t>
+        </xpath>
+        <xpath expr="//div[@name='signature']/div" position="before">
+            <div class="col-xs-8 pull-left" t-if="doc.home_warranty.property_state_code == 'TX'">
+                <p style="font-size:10pt;Font-weight:bold;">
+                    NOTICE TO TEXAS CUSTOMERS: YOU THE BUYER HAVE OTHER RIGHTS AND REMEDIES UNDER THE TEXAS DECEPTIVE
+                    TRADE PRACTICES CONSUMER PROTECTION ACT WHICH ARE IN ADDITION TO ANY REMEDY WHICH MAY BE AVAILABLE
+                    UNDER THIS CONTRACT.
+                    <br/>
+                    <br/>
+                    FOR MORE INFORMATION CONCERNING YOUR RIGHTS CONTACT THE CONSUMER PROTECTION DIVISION OF THE ATTORNEY
+                    GENERAL'S OFFICE, YOUR LOCAL DISTRICT OR COUNTY ATTORNEY OR THE ATTORNEY OF YOUR CHOICE.
+                </p>
+                <div style="color:red">
+                PLEASE NOTE OUR REMITTANCE ADDRESS HAS CHANGED.
+                <br/>
+                <b>Achosa Home Warranty, LLC</b>
+                <br/>
+                Department # SF 101
+                <br/>
+                PO Box 830525
+                <br/>
+                Birmingham, AL  35283-0525
+                </div>
+            </div>
+            <div style="color:red" t-if="doc.home_warranty.property_state_code != 'TX'">
+                PLEASE NOTE OUR REMITTANCE ADDRESS HAS CHANGED.
+                <br/>
+                <b>Achosa Home Warranty, LLC</b>
+                <br/>
+                Department # SF 101
+                <br/>
+                PO Box 830525
+                <br/>
+                Birmingham, AL  35283-0525
+            </div>
+            <div class="col-xs-2 pull-right" t-if="doc.home_warranty.property_state_code == 'TX'">
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+            </div>
+        </xpath>
+    </template>
+    <template id="report_saleorder_document_payment_info" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='information_block']" position="replace">
+        </xpath>
+        <xpath expr="//div[@name='total']" position="after">
+            <t t-if="doc.transaction_ids.acquirer_id.name">
+                <t t-set="transaction_id" t-value="doc.transaction_ids[0]"/>
+                <t t-set="acquirer_id" t-value="transaction_id.acquirer_id"/>
+                <table class="table table-condensed mt32 mb32">
+                    <thead>
+                        <tr>
+                            <th>Payment Information</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                   </thead>
+                   <tbody class="sale_tbody">
+                        <tr>
+                            <td>
+                                <strong>Payment Acquirer:</strong> <t t-esc="acquirer_id.name"/><br/>
+                                <strong>Payment Status:</strong>
+                                <t>
+                                    <t t-if="transaction_id.state == 'pending'">
+                                        <t t-raw="acquirer_id.pending_msg"/>
+                                    </t>
+                                    <t t-if="transaction_id.state in ['done', 'authorized']">
+                                        <t t-raw="acquirer_id.done_msg"/>
+                                    </t>
+                                    <t t-if="transaction_id.state == 'cancel'">
+                                        <t t-raw="acquirer_id.cancel_msg"/>
+                                    </t>
+                                    <t t-if="transaction_id.state == 'error'">
+                                        <t t-raw="acquirer_id.error_msg"/>
+                                    </t>
+                                </t>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="doc.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </xpath>
+    </template>
+</odoo>

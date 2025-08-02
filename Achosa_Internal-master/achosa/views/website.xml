@@ -1,0 +1,1001 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+<!--     <template id="assets_frontend" name="Achosa frontend assets" inherit_id="website.assets_frontend"> -->
+<!--         <xpath expr="//link[last()]" position="after"> -->
+<!--             <style> -->
+<!--                 #top_menu li:nth-child(9) { -->
+<!--                 font-weight:bold; -->
+<!--                 } -->
+<!--                 .oe_website_sale :not(.modal-body){overflow: visible} -->
+<!--                 .badge { -->
+<!--                 background-color: #1b93c5; -->
+<!--                 color: white; -->
+<!--                 } -->
+<!--                 .navbar .container .navbar-toggler { -->
+<!--                 top: 4px; -->
+<!--                 right: -25px; -->
+<!--                 border-color: #111111; -->
+<!--                 border-radius: 30px; -->
+<!--                 background-color: #dcdcdc; -->
+<!--                 z-index: 2; -->
+<!--                 padding: 7px 15px; -->
+<!--                 transition: background-color 0.2s ease-out; -->
+<!--                 } -->
+<!--             </style> -->
+<!--          </xpath> -->
+<!--      </template> -->
+    
+    <template id="remove_payment_token_checkbox" name="Achosa Remove Payment Token Checkbox" inherit_id="payment.checkout">
+         <xpath expr="//div[@name='o_payment_inline_form']" position="replace">
+            <div t-attf-id="o_payment_acquirer_inline_form_{{acquirer.id}}" name="o_payment_inline_form" class="card-footer d-none">
+                <!-- === Inline form content (filled by acquirer) === -->
+                <t t-if="acquirer.sudo()._should_build_inline_form(is_validation=False)">
+                    <t t-set="inline_form_xml_id" t-value="acquirer.sudo().inline_form_view_id.xml_id"/>
+                        <div t-if="inline_form_xml_id" class="clearfix">
+                            <t t-call="{{inline_form_xml_id}}">
+                                <t t-set="acquirer_id" t-value="acquirer.id"/>
+                            </t>
+                        </div>
+                    </t>
+                <!-- === "Save my payment details" checkbox === -->
+                <!-- Only included if partner is known and if the choice is given -->
+                <t t-set="tokenization_required" t-value="True"/>
+            </div>
+        </xpath>
+    </template> 
+    
+    <template id="remove_payment_text" name="Achosa Remove Payment Text" inherit_id="payment.checkout">
+         <xpath expr="//div[@class='text-muted ml-3']" position="replace">
+        </xpath>
+    </template>
+    
+    <template id="update_payment_language" name="Achosa Update Payment Language" inherit_id="sale.sale_order_portal_template">
+         <xpath expr="//div[@class='modal-content']//p[1]" position="replace">
+            <p>
+                <span>I agree that by paying this proposal, I accept it on the behalf of </span><b t-field="sale_order.partner_id.commercial_partner_id"/><span>, for an amount of </span> <b data-id="total_amount" t-field="sale_order.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: sale_order.pricelist_id.currency_id}"/>.<span>I certify that I am an authorized user of this credit card, and that I understand that this authorization will remain in effect for automated recurring monthly payments for all plans that require such payments.</span>
+            </p>
+            <input type="hidden" class="quotation_id" t-att-data-quotation_id="sale_order.id"/>
+        </xpath>
+    </template>
+    
+    
+    <template id="remove_payment_text" name="Achosa Remove Payment Text" inherit_id="payment.checkout">
+         <xpath expr="//div[@class='text-muted ml-3']" position="replace">
+        </xpath>
+    </template>
+    
+    <template id="remove_payment_manage_text" name="Achosa Remove Manage Payment Text" inherit_id="payment.manage">
+         <xpath expr="//div[@class='text-muted ml-3']" position="replace">
+        </xpath>
+    </template>
+    
+<!--    <template id="add_billing_address" name="Achosa Add Billing Address" inherit_id="payment_authorize.inline_form">-->
+<!--         <xpath expr="//div[@class='o_authorize_form']" position="before">-->
+<!--            <script type="text/javascript" src="/achosa/static/src/js/billing_address.js"/>-->
+<!--            <input type="hidden" name="csrf_token" id="csrf_token" t-att-value="request.csrf_token()"/>-->
+<!--            <h3>Edit billing info</h3>-->
+<!--            <div class="form-group card" id="billing_address" style="border: none;background-color: #f7f7f7;">-->
+<!--            </div>-->
+<!--            <h3>Edit payment info</h3>-->
+<!--        </xpath>-->
+<!--    </template>    -->
+    
+    
+    
+    
+     <template id="website_sale_products" name="Achosa website sale products" inherit_id="website_sale.products_categories">
+         <xpath expr="//div[@id='wsale_products_categories_collapse']" position="replace">
+             <div class="collapse d-lg-block" id="wsale_products_categories_collapse">
+                 <ul class="nav nav-pills flex-column mb-2">
+                     <t t-foreach="categories" t-as="c">
+                         <t t-call="website_sale.categories_recursive" />
+                     </t>
+                 </ul>
+             </div>
+        </xpath>
+    </template>
+    <template id="address" name="Address Management - Achosa" inherit_id="website_sale.address">
+        <xpath expr="//select[@name='country_id']" position="replace">
+            <select id="country_id" name="country_id" class="form-control">
+                <option value="">Country...</option>
+                <t t-foreach="countries" t-as="c">
+                    <t t-if="c.name == 'United States'">
+                        <option t-att-value="c.id" selected="selected">
+                            <t t-esc="c.name"/>
+                        </option>
+                    </t>
+                </t>
+            </select>
+        </xpath>
+        <xpath expr="//select[@name='state_id']" position="replace">
+            <select name="state_id" class="form-control" data-init="1">
+                <option value="">State...</option>
+                <t t-foreach="country and country.state_ids or []" t-as="s">
+                    <t t-if="s.country_id.name == 'United States'">
+                        <option t-att-value="s.id"
+                                t-att-selected="s.id == ('state_id' in checkout and country and checkout['state_id'] != '' and int(checkout['state_id']))">
+                            <t t-esc="s.name"/>
+                        </option>
+                    </t>
+                </t>
+            </select>
+        </xpath>
+        <xpath expr="//div[hasclass('alert-warning')]" position="replace">
+        </xpath>
+    </template>
+    <template id="order_now_update_text" name="Order Now - Update Text - Achosa" inherit_id="website_sale.products_categories">
+        <xpath expr="//button[@type='button']" position="replace">
+            <button type="button" class="btn btn-link d-lg-none" data-target="#wsale_products_categories_collapse" data-toggle="collapse">
+                Show States
+            </button>
+        </xpath>
+    </template>
+    <template id="warranty_info_option" name="Warranty Info Option" inherit_id="website_sale.wizard_checkout" customize_show="True">
+
+    </template>
+    <template id="certify_payment" name="Certify Payment Text - Achosa" inherit_id="website_sale.payment">
+        <xpath expr="//div[@id='payment_method']" position="before">
+          <span>
+              <b>
+                I CERTIFY THAT I AM AN AUTHORIZED USER OF THIS CREDIT CARD, AND THAT I UNDERSTAND THAT THIS AUTHORIZATION WILL REMAIN IN EFFECT FOR AUTOMATED RECURRING MONTHLY PAYMENTS FOR ALL PLANS THAT REQUIRE SUCH PAYMENTS.
+              </b>
+          </span>
+        </xpath>
+    </template>
+    <!--
+    <template id="cart" name="Shopping Cart" inherit_id="website_sale.cart">
+        <xpath expr="//a[@href='/shop/checkout']" position="attributes">
+            <attribute name="href">/shop/warranty_info</attribute>
+        </xpath>
+    </template>
+    -->
+
+    <template id="warranty_info" name="Checkout Warranty Info - Achosa" >
+        <style>
+            #add-on {
+            column-count: 2;
+            column-gap: 100px;
+            }
+            .oe_website_sale :not(.modal-body) {
+            overflow: visible;
+            }
+        </style>
+        <t t-call="website.layout">
+            <t t-set="no_footer">1</t>
+            <div id="wrap">
+                <div class="oe_website_sale">
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2 oe_cart" style="margin-left: 15%">
+                            <div>
+                                <t t-call="website_sale.wizard_checkout">
+                                    <t t-set="step" t-value="15"/>
+                                </t>
+                            </div>
+                            <div class="row">
+                                <h2 class="page-header mt8 ml16">Warranty Info</h2>
+             <div class="col-md-12 o_website_sale_rightfit">
+                <div t-if="error_message" class="alert alert-danger">
+                    <t t-foreach="error_message" t-as="err">
+                        <t t-esc="err"/>
+                        <br/>
+                    </t>
+                </div>
+                <hr/>
+                <form method="post" class="checkout_autoformat s_website_form" name="website_form" id="website_form">
+                    <h3 class="mb8 mt8">Property Owner</h3>
+                    <div t-attf-class="row form-group #{error.get('buyer_name') and 'has-error' or ''} col-md-12 div_name">
+                        <label class="control-label" for="owner_name">Name</label>
+                        <input type="text" name="owner_name" class="form-control"
+                               t-att-value="'owner_name' in checkout and checkout['owner_name']"/>
+                    </div>
+                    <div class="clearfix"/>
+                    <div class="row">
+                    <div t-attf-class="form-group #{error.get('owner_email') and 'has-error' or ''} col-md-6" id="div_email">
+                        <label class="control-label" for="owner_email">Email</label>
+                        <input type="email" name="owner_email" class="form-control"
+                               t-att-value="'owner_email' in checkout and checkout['owner_email']"/>
+                    </div>
+                    <div t-attf-class="form-group #{error.get('owner_phone') and 'has-error' or ''} col-md-6" id="div_phone">
+                        <label class="control-label" for="owner_phone">Phone</label>
+                        <input type="tel" name="owner_phone" class="form-control"
+                               t-att-value="'owner_phone' in checkout and checkout['owner_phone']"/>
+                    </div>
+                    </div>
+                    <h3 class="mb8 mt8">Property Address</h3>
+                    <div class="clearfix"/>
+                    <div t-attf-class="row form-group #{error.get('property_street') and 'has-error' or ''} col-md-12 div_street">
+                        <label class="control-label" for="property_street">Street
+                            <span class="hidden-xs">and Number</span>
+                        </label>
+                        <input type="text" name="property_street" class="form-control"
+                               t-att-value="'property_street' in checkout and checkout['property_street']"/>
+                    </div>
+                    <div t-attf-class="row form-group #{error.get('property_street2') and 'has-error' or ''} col-md-12 div_street2">
+                        <label class="control-label label-optional" for="property_street2">Street 2</label>
+                        <input type="text" name="property_street2" class="form-control"
+                               t-att-value="'property_street2' in checkout and checkout['property_street2']"/>
+                    </div>
+                    <div class="clearfix"/>
+                    <div class="row">
+                    <div t-attf-class="form-group #{error.get('property_city') and 'has-error' or ''} col-sm-8 div_city">
+                        <label class="control-label" for="property_city">City</label>
+                        <input type="text" name="property_city" class="form-control"
+                               t-att-value="'property_city' in checkout and checkout['property_city']"/>
+                    </div>
+                    <div t-attf-class="form-group #{error.get('property_zip') and 'has-error' or ''} col-sm-4 div_zip">
+                        <label class="control-label" for="property_zip">Zip Code</label>
+                        <input type="text" name="property_zip" class="form-control"
+                               t-att-value="'property_zip' in checkout and checkout['property_zip']"/>
+                    </div>
+                    </div>
+                    <div class="clearfix"/>
+                    <div class="row">
+                        <div t-attf-class="form-group #{error.get('country_id') and 'has-error' or ''} col-md-6 div_country">
+                            <label class="control-label" for="country_id">Country</label>
+                            <select id="country_id" mode="billing" name="country_id" class="form-control">
+                                <option value="">Country...</option>
+                                <t t-foreach="countries" t-as="c">
+                                    <t t-if="c.name == 'United States'">
+                                        <option t-att-value="c.id" selected="selected">
+                                            <t t-esc="c.name"/>
+                                        </option>
+                                    </t>
+                                </t>
+                            </select>
+                        </div>
+                        <div t-attf-class="form-group #{error.get('property_state') and 'has-error' or ''} col-md-6 div_state">
+                            <label class="control-label" for="property_state">State</label>
+                            <select name="property_state" class="form-control" data-init="1" onchange="re_calc();">
+                                <option value="">State...</option>
+                                <t t-foreach="states or []" t-as="s">
+                                    <option t-att-value="s.id"
+     t-att-selected="'property_state' in checkout and checkout['property_state'] != '' and s.id == int(checkout['property_state'])">
+                                        <t t-esc="s.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+<!--                        <div style="display:none;" t-attf-class="form-group #{error.get('state_id') and 'has-error' or ''} col-md-6 div_state">-->
+<!--                            <label class="control-label" for="state_id">State</label>-->
+<!--                            <select name="state_id" class="form-control" data-init="1" onchange="re_calc();">-->
+<!--                                <option value="">State...</option>-->
+<!--                                <t t-foreach="states or []" t-as="s">-->
+<!--                                    <option t-att-value="s.id"-->
+<!--     t-att-selected="'state_id' in checkout and checkout['state_id'] != '' and s.id == int(checkout['state_id'])">-->
+<!--                                        <t t-esc="s.name"/>-->
+<!--                                    </option>-->
+<!--                                </t>-->
+<!--                            </select>-->
+<!--                        </div>-->
+                    </div>
+
+                    <h3 class="mb8 mt8">Billing Address</h3>
+                    <div class="clearfix"/>
+                    <div t-attf-class="form-group col-md-12">
+                        <label><input id="useProperyAddress" name="useProperyAddress" class="form-control" type="checkbox" style="display: inline;width: 68px;vertical-align: middle;" checked="checked" onchange="sync_address();"/>
+                         Use Property address
+                        </label>
+                    </div>
+                    <div class="clearfix"/>
+                    <div id="billing_address" name="billing_address" style="display:none;">
+                        <div t-attf-class="row form-group #{error.get('street') and 'has-error' or ''} col-md-12">
+                            <label class="control-label" for="street">Street
+                                <span class="hidden-xs">and Number</span>
+                            </label>
+                            <input type="text" name="street" class="form-control"
+                                   t-att-value="street"/>
+                        </div>
+                        <div t-attf-class="row form-group #{error.get('street2') and 'has-error' or ''} col-md-12">
+                            <label style="margin-top: 9px;" class="control-label label-optional" for="street2">Street 2</label>
+                            <input type="text" name="street2" class="form-control"
+                                   t-att-value="street2"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="row">
+                            <div t-attf-class="form-group #{error.get('city') and 'has-error' or ''} col-sm-6">
+                                <label style="margin-bottom: 14px;margin-top: 13px;" class="control-label" for="city">City</label>
+                                <input type="text" name="city" class="form-control"
+                                       t-att-value="city"/>
+                            </div>
+                            <div t-attf-class="form-group col-sm-3">
+                                <label style="margin-top:14px;" class="control-label" for="zip">Zip Code</label>
+                                <input type="text" name="zip" class="form-control"
+                                       t-att-value="zip"/>
+                            </div>
+                            <div t-attf-class="form-group #{error.get('state') and 'has-error' or ''} col-md-3">
+                                <t t-set="states" t-value="request.env['res.country.state'].search([('country_id','=','united_states')])"/>
+                                <label class="control-label" for="state_id">State</label>
+                                <select name="state_id" class="form-control" data-init="1" onchange="re_calc();">
+                                    <option value="">State...</option>
+                                    <t t-foreach="states or []" t-as="s">
+                                        <option t-att-value="s.id"
+         t-att-selected="state != '' and s.id == int(state)">
+                                            <t t-esc="s.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="clearfix"/>
+                    <h3 class="mb8 mt8">Home Warranty Add ons</h3>
+                    <div t-attf-class="form-group row col-md-12">
+                        <div id="add-on">
+                        <div class='buyer buyer-addons'>
+                            <t t-call="achosa.HW_add-ons" />
+                        </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="conserve_add_on_id" name="conserve_add_on_id" t-att-value="conserve_id" t-if="conserve_id"/>
+                    <input type="hidden" id="conserve_plus_add_on_id" name="conserve_plus_add_on_id" t-att-value="conserve_plus_id" t-if="conserve_plus_id"/>
+                    <input type="hidden" id="non_owner_product_add_on_id" name="non_owner_product_add_on_id" t-att-value="rental_addon_id" t-if="rental_addon_id"/>
+                    <div class="clearfix"/>
+                    <h3 class="mb8 mt8">Terms and Conditions</h3>
+					<div class="clearfix"/>
+                    <div t-attf-class="form-group #{error.get('accept') and 'has-error' or ''} col-md-12">
+                        <label><input id="accept" name="accept" class="form-control" type="checkbox" style="display: inline;width: 68px;vertical-align: middle;"/>
+                         Check here to indicate that you have read and accept the following terms and conditions for this home warranty:
+                        </label>
+                    </div>
+                    <div class="clearfix"/>
+                    <div class="form-group col-md-12 terms-list" style="padding-left:85px;">
+                        <t t-call="achosa.sale_terms"></t>
+                    </div>
+
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="submitted" value="1"/>
+                    <input type="hidden" name="partner_id" t-att-value="partner_id or '0'"/>
+                    <input type="hidden" name="callback" t-att-value="callback"/>
+                    <!-- Example -->
+                    <input type="hidden" name="field_required" t-att-value="'phone,name'"/>
+
+                    <div class="clearfix"/>
+                    <div style='padding: 0 15px'>
+                        <a href="/shop/checkout" class="btn btn-default mb32 pull-left">
+                            <span class="fa fa-long-arrow-left"/>
+                            Previous
+                        </a>
+                        <a class="btn btn-primary pull-right mb32 a-submit a-submit-disable a-submit-loading"
+                           href="/shop/extra_info">Next
+                            <span class="fa fa-long-arrow-right"/>
+                        </a>
+                    </div>
+                </form>
+            </div>
+                            </div>
+                            <script>
+                                function serialize_form(){
+                                    var myform = $( "#website_form" );
+                                    var disabled = myform.find(':input:disabled').removeAttr('disabled');
+                                    var formData = myform.serializeArray();
+                                    var conserveID = parseInt($("#conserve_add_on_id").val());
+                                    var conservePlusID = parseInt($("#conserve_plus_add_on_id").val());
+                                    console.log("Conserve ID: ", conserveID);
+                                    console.log("Conserve Plus ID: ", conservePlusID);
+                                    var conserveChecked = "False";
+                                    var conservePlusChecked = "False";
+                                    for (var i = formData.length - 1; i &gt;= 0; --i) {
+                                        if (formData[i].name == 'covered_buyer_addons[]') {
+                                            if (formData[i].value == conserveID) {
+                                                conserveChecked = "True";
+                                            }
+                                        }
+                                    }
+                                    for (var i = formData.length - 1; i &gt;= 0; --i) {
+                                        if (formData[i].name == 'covered_buyer_addons[]') {
+                                            if (formData[i].value == conservePlusID) {
+                                                conservePlusChecked = "True";
+                                            }
+                                        }
+                                    }
+                                    if(conserveChecked == "True"){
+                                        console.log("Conserve Checked");
+                                        $(`#${conservePlusID}_addon`).hide();
+                                        for (var i = formData.length - 1; i &gt;= 0; --i) {
+                                            if (formData[i].name == 'covered_buyer_addons[]') {
+                                                if (formData[i].value == conservePlusID) {
+                                                    formData.splice(i,1);
+                                                }
+                                             }
+                                        }
+                                    } else {
+                                        console.log("Conserve Not Checked");
+                                        $(`#${conservePlusID}_addon`).show();
+                                    }
+
+                                    if(conservePlusChecked == "True"){
+                                        console.log("Conserve Plus Checked");
+                                        $(`#${conserveID}_addon`).hide();
+                                        for (var i = formData.length - 1; i &gt;= 0; --i) {
+                                            if (formData[i].name == 'covered_buyer_addons[]') {
+                                                if (formData[i].value == conserveID) {
+                                                    formData.splice(i,1);
+                                                }
+                                             }
+                                        }
+                                    } else {
+                                        console.log("Conserve Plus Not Checked");
+                                        $(`#${conserveID}_addon`).show();
+                                    }
+                                    var serialized = {};
+                                    $.each(formData, function (index, fieldData) {
+                                        if (fieldData.name == 'covered_buyer_addons[]') {
+                                            let name = fieldData.name.substring(0, fieldData.name.length - 2);
+                                            if (!(name in serialized)) {
+                                                serialized[name] = [];
+                                            }
+                                            serialized['covered_buyer_addons'].push(fieldData.value);
+                                        } else if(fieldData.name != 'covered_buyer_addons') {
+                                            serialized[fieldData.name] = fieldData.value;
+                                        }
+                                    });
+                                    if('covered_buyer_addons' in serialized){
+                                        $('#covered_buyer_addons').val(serialized['covered_buyer_addons'].toString());
+                                        serialized['covered_buyer_addons'] = serialized['covered_buyer_addons'].toString();
+                                    } else {
+                                        $('#covered_buyer_addons').val("");
+                                    }
+                                    disabled.attr('disabled','disabled');
+                                    return serialized;
+                                }
+                                function re_calc(){
+                                    console.log("CONSERVE TESTINGfcard");
+                                    $.post("/shop/addons",serialize_form(),
+                                        function( data ) { $(".buyer-addons").html(data); load_terms(); }
+                                    );
+                                }
+                                function load_terms(){
+                                    $.post("/shop/terms",serialize_form(),
+                                        function( data ) { $(".terms-list").html(data); }
+                                    );
+                                }
+                                function sync_address()
+                                {
+                                    if($("#useProperyAddress").is(':checked')){
+                                        $("#billing_address").hide();
+                                        $("input[name='street']").val($("input[name='property_street']").val());
+                                        $("input[name='street2']").val($("input[name='property_street2']").val());
+                                        $("input[name='city']").val($("input[name='property_city']").val());
+                                        $("input[name='zip']").val($("input[name='property_zip']").val());
+                                        $("select[name='state']").val($("input[name='property_state']").val());
+                                    }else{
+                                        $("input[name='street']").val($("input[name='property_street']").val());
+                                        $("input[name='street2']").val($("input[name='property_street2']").val());
+                                        $("input[name='city']").val($("input[name='property_city']").val());
+                                        $("input[name='zip']").val($("input[name='property_zip']").val());
+                                        $("select[name='state']").val($("input[name='property_state']").val());
+                                        $("#billing_address").show();
+                                    }
+                                }
+                                re_calc();
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="oe_structure row" />
+        </t>
+    </template>
+
+    <template id="sale_terms" name="Product Terms">
+        <t t-foreach="terms or []" t-as="term">
+            <a t-att-href="term.website_url" target="_blank">
+                <h4>
+                    &amp;#9675;&amp;nbsp;&amp;nbsp;<t t-esc="term.name"></t>
+                </h4>
+            </a>
+        </t>
+    </template>
+    <template id="product_terms" name="achosa - product terms"  inherit_id="website_sale.product">
+        <xpath expr="//div[@id='product_attributes_simple']" position="replace">
+          <p id="product_attributes_simple">
+            <br/>
+            <t t-foreach="product.sudo().attribute_line_ids.sorted(key=lambda x: x.attribute_id.sequence)" t-as="variant_id">
+              <t t-if="variant_id.attribute_id.name=='Terms' and len(variant_id.value_ids[0].attachment_ids) &gt; 0">
+                <span t-field="variant_id.attribute_id"/>:
+                <a t-att-href="variant_id.value_ids[0].attachment_ids[0].website_url" type="application/pdf" t-att-download="variant_id.value_ids[0].name.replace(' ','_') + '.pdf'">
+                  <span t-field="variant_id.value_ids[0].name"/>
+                </a>
+              <br/>
+              </t>
+            </t>
+          </p>
+            <style>
+                .js_attribute_value {
+                    min-width:300px;
+                }
+                #o_product_terms_and_share{
+                    display:none;
+                }
+            </style>
+        </xpath>
+<!--         <xpath expr="//p[text()[contains(.,'Free Shipping')]]" position="replace"> -->
+<!--         </xpath> -->
+    </template>
+    <template id="address" name="Address Management - Achosa" inherit_id="website_sale.address">
+        <xpath expr="//select[@name='country_id']" position="replace">
+            <select id="country_id" name="country_id" class="form-control">
+                <option value="">Country...</option>
+                <t t-foreach="countries" t-as="c">
+                    <t t-if="c.name == 'United States'">
+                    <option t-att-value="c.id" selected="selected">
+                        <t t-esc="c.name"/>
+                    </option></t>
+                </t>
+            </select>
+        </xpath>
+    </template>
+
+    <template id="terms_page" name="terms_page">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Terms</t>
+            <div id="wrap" class="js_sale">
+                <div class="oe_structure"/>
+                        <div class="row" style="width: 100%;">
+                         <div class="col-md-3 col-sm-4 dropdown_expanded" style="background-color: #242327; height: 110vh">
+                             <br/>
+                             <br/>
+                             <br/>
+                             <h3 style="color: #CDD0A2;padding-left:15px">Select your state
+                             </h3>
+                             <ul class="nav nav-pills nav-stacked mt16" style="color: #957985">
+                                 <t t-foreach="states.sorted(key=lambda r: r.name)" t-as="s">
+                                 <li>
+                                     <a t-att-href="'/terms_and_conditions/'+s.code">
+                                         <t t-esc="s.name"/>
+                                     </a>
+                                 </li>
+                                 </t>
+                             </ul>
+                         </div>
+                         <div class="dropdown_collapsed" style="background-color: #242327; 100%">
+                             <br/>
+                             <br/>
+                             <br/>
+                             <div class="dropdown">
+                             <h3 style="color: #CDD0A2;padding-left:15px;text-align: center;">Select your state
+                             </h3>
+                             <div class="dropdown-content">
+                             <ul class="nav nav-pills nav-stacked mt16" style="color: #957985">
+                                 <t t-foreach="states.sorted(key=lambda r: r.name)" t-as="s">
+                                 <li>
+                                     <a t-att-href="'/terms_and_conditions/'+s.code">
+                                         <t t-esc="s.name"/>
+                                     </a>
+                                 </li>
+                                 </t>
+                             </ul>
+                             </div>
+                             </div>
+                         </div>
+                            <div class="col-md-9 col-sm-8" style="padding:15px">
+                                <div class="oe_structure"/>
+                                
+                                <div class="panel-group" id="myCollapse1532805583340" role="tablist">
+                  
+                                    <div class="panel">
+                                        <div class="panel-heading bg-gray-lighter collapsed">
+                                            <h4 class="panel-title">General Terms and Conditions</h4>
+                                        </div>
+                                        
+                                    
+                                 
+                                <div align="left" style="padding: 25px">
+                                    <t t-foreach="product_attributes" t-as="attr" align="left">
+                                        <span t-field="attr.term_product_type"/>:
+                                        <a t-att-href="attr.attachment_ids[0].website_url" type="application/pdf" t-att-download="attr.name.replace(' ','_') + '.pdf'">
+                                            <span t-field="attr.name"/>
+                                        </a>
+                                        <br/>
+                                    </t>
+                                </div>
+                                <div class="oe_structure"/>
+                                
+                                </div>        
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                <div class="panel">
+              <div class="panel-heading bg-gray-lighter collapsed" role="tab" aria-expanded="false" data-toggle="collapse" data-target="#myCollapseTab1532808019385" data-parent="#myCollapse1532805583340">
+                <h4 class="panel-title"> privacy policy</h4>
+              </div>
+              <div class="panel-collapse collapse" id="myCollapseTab1532808019385" role="tabpanel" aria-expanded="false" style="height: 0px;">
+                <div class="bg-white-50 panel-body">
+                  <p class="MsoNormal" style="text-align: left;"><b>&amp;nbsp;</b>This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from achosahw.com (the “Site”).</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">PERSONAL INFORMATION WE COLLECT</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">When you visit the Site, we automatically collect certain
+information about your device, including information about your web browser, IP
+address, time zone, and some of the cookies that are installed on your device.
+Additionally, as you browse the Site, we collect information about the
+individual web pages or products that you view, what websites or search terms
+referred you to the Site, and information about how you interact with the Site.
+We refer to this automatically-collected information as “Device Information.”</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">We collect Device Information using the following technologies:</p>
+                  <p>
+                  </p>
+                  <ul>
+                    <li>
+                      <p class="MsoNormal" style="text-align: left;">“Cookies” are data files that are placed on your device or computer and often include an anonymous unique identifier. For more information about cookies, and how to disable cookies, visit <a href="http://www.allaboutcookies.org/">http://www.allaboutcookies.org</a></p>
+                    </li>
+                    <li>
+                      <p class="MsoNormal" style="text-align: left;">“Log files” track actions occurring on the Site, and collect data including your IP address, browser type, Internet service provider, referring/exit pages, and date/time stamps.</p>
+                      <p>
+                    </p>
+                    </li>
+                    <li>
+                      <p class="MsoNormal" style="text-align: left;">“Web beacons,” “tags,” and “pixels” are electronic files used to record information about how you browse the Site.</p>
+                      <p/>
+                      <p>
+                  </p>
+                    </li>
+                  </ul>
+                  <p class="MsoNormal" style="text-align: left;">Additionally, when you make a purchase or attempt to make a
+purchase through the Site, we collect certain information from you, including
+your name, billing address, shipping address, payment information (including
+credit card numbers), email address, and phone number.&amp;nbsp; We refer to this information as “Order
+Information.”</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">When we talk about “Personal Information” in this Privacy
+Policy, we are talking both about Device Information and Order Information.</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">HOW DO WE USE YOUR PERSONAL INFORMATION?</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">We use the Order Information that we collect generally to
+fulfill any orders placed through the Site (including processing your payment
+information, arranging for shipping, and providing you with invoices and/or
+order confirmations).&amp;nbsp; Additionally, we
+use this Order Information to:</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <ul>
+                    <li>
+                      <p class="MsoListParagraphCxSpFirst" style="text-align: left; text-indent: -0.25in;">&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;Communicate with you;</p>
+                      <p/>
+                      <p/>
+                    </li>
+                    <li>
+                      <p class="MsoListParagraphCxSpMiddle" style="text-align: left; text-indent: -0.25in;">&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;Screen our orders for potential risk or fraud; and</p>
+                      <p/>
+                      <p/>
+                    </li>
+                    <li>
+                      <p class="MsoListParagraphCxSpLast" style="text-align: left; text-indent: -0.25in;">&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;When in line with the preferences you have shared with us, provide you with information or advertising relating to our products or services.</p>
+                      <p/>
+                      <p>
+                  </p>
+                    </li>
+                  </ul>
+                  <p class="MsoNormal" style="text-align: left;">We use the Device Information that we collect to help us
+screen for potential risk and fraud (in particular, your IP address), and more
+generally to improve and optimize our Site (for example, by generating
+analytics about how our customers browse and interact with the Site, and to
+assess the success of our marketing and advertising campaigns).</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">SHARING YOUR PERSONAL INFORMATION</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">We share your Personal Information with third parties to help us use your Personal Information, as described above.&amp;nbsp; &amp;nbsp;We also use Google Analytics to help us understand how our customers use the Site--you can read more about how Google uses your Personal Information here:&amp;nbsp; <a href="https://www.google.com/intl/en/policies/privacy/">https://www.google.com/intl/en/policies/privacy/</a>. You can also opt-out of Google Analytics here:&amp;nbsp; <a href="https://tools.google.com/dlpage/gaoptout">https://tools.google.com/dlpage/gaoptout</a>.</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">Finally, we may also share your Personal Information to
+comply with applicable laws and regulations, to respond to a subpoena, search
+warrant or other lawful request for information we receive, or to otherwise
+protect our rights.</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">BEHAVIOURAL ADVERTISING</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">As described above, we use your Personal Information to
+provide you with targeted advertisements or marketing communications we believe
+may be of interest to you.&amp;nbsp; For more
+information about how targeted advertising works, you can visit the Network
+Advertising Initiative’s (“NAI”) educational page at <a href="https://www.networkadvertising.org/understanding-online-advertising/how-does-it-work">http://www.networkadvertising.org/understanding-online-advertising/how-does-it-work</a>.</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">You can opt out of targeted advertising by going to the
+following links:</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">FACEBOOK - <a href="https://www.facebook.com/settings/?tab=ads">https://www.facebook.com/settings/?tab=ads</a></p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">GOOGLE - <a href="https://www.google.com/settings/ads/anonymous">https://www.google.com/settings/ads/anonymous</a></p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">BING - <a href="https://advertise.bingads.microsoft.com/en-us/resources/policies/personalized-ads">https://advertise.bingads.microsoft.com/en-us/resources/policies/personalized-ads</a></p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">Additionally, you can opt out of some of these services by
+visiting the Digital Advertising Alliance’s opt-out portal at:&amp;nbsp; <a href="http://optout.aboutads.info/">http://optout.aboutads.info/</a>.</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">DO NOT TRACK</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">Please note that we do not alter our Site’s data collection
+and use practices when we see a Do Not Track signal from your browser.</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">DATA RETENTION</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">When you place an order through the Site, we will maintain
+your Order Information for our records unless and until you ask us to delete
+this information.</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">CHANGES</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">We may update this privacy policy from time to time in order
+to reflect, for example, changes to our practices or for other operational,
+legal or regulatory reasons.</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">CONTACT US</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">For more information about our privacy practices, if you
+have questions, or if you would like to make a complaint, please contact us by
+e-mail at <a href="mailto:info@1stchp.com" data-original-title="" title="">info@achosahw.com</a> or by mail using
+the details provided below:</p>
+                  <p/>
+                  <p>
+                  </p>
+                  <p>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;">5438 Lockwood Ridge Rd, #301, Bradenton, FL 34203</p>
+                  <p/>
+                  <p>
+                </p>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-heading bg-gray-lighter collapsed" role="tab" aria-expanded="false" data-toggle="collapse" data-target="#myCollapseTab1533313962254" data-parent="#myCollapse1532805583340">
+                <h4 class="panel-title">Website terms of use</h4>
+              </div>
+              <div class="panel-collapse collapse" id="myCollapseTab1533313962254" role="tabpanel" aria-expanded="false" style="height: 0px;">
+                <div class="bg-white-50 panel-body">
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Introduction</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Your use of this website is governed by the terms and conditions set forth below (the “Terms of Use”). THE FOLLOWING TERMS OF USE SHOULD BE READ CAREFULLY BEFORE USING THIS WEBSITE AND SHALL APPLY TO ALL USES OF THIS WEBSITE. By using this website, you agree to comply with and to be bound by these terms. If you do not agree to the Terms of Use, you may not use this website and should exit from it now. Achosa Inc., which owns this website, and its subsidiary, Achosa Home Warranty, LLC., which operates this website (collectively, “Company”), reserve the right to change this website and these Terms of Use at any time without notice to you by posting such changes to this website. </font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Usage Restrictions</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">You may not copy, distribute, or transmit any of the content of this website without the Company’s prior written consent. You may, however, make one copy of any material on this website for personal, non-commercial use if you neither modify nor alter the material in any way, nor delete or change any copyright or trademark notice. The Company reserves complete title and full intellectual property rights for materials copied from this website. The Company provides the content of this website for lawful purposes only.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">You may not attempt to gain unauthorized access to any portion or feature of this website, or any other systems or networks connected to this website or to any of the Company’s servers, or to any of the services offered on or through this website, by hacking, password “mining” or any other illegitimate means.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">You may not use any “deep-link”, “page-scrape”, “robot”, “spider” or other automatic device, program, algorithm or methodology, or any similar or equivalent manual process, to access, acquire, copy or monitor any portion of this website or any of its content, or in any way reproduce or circumvent the navigational structure or presentation of this website or any of its content, to obtain or attempt to obtain any materials, documents or information through any means not purposely made available through this website. The Company reserves the right to bar any such activity.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">You may not probe, scan or test the vulnerability of this website or any network connected to this website, nor breach the security or authentication measures on this website or any network connected to this website. You agree not to use any device, software or routine to interfere or attempt to interfere with the proper working of this website or any transaction being conducted on this website, or with any other person’s use of this website. You may not use this website or any of its content for any purpose that is unlawful or prohibited by the Terms of Use, or to solicit the performance of any illegal activity or other activity which infringes the Company’s rights or the rights of others.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">The Company does not guarantee or warrant that files made available for downloading through this website will be free of infection or viruses, worms, Trojan horses or other code that manifests contaminating or destructive properties. By accessing this website, you acknowledge and agree that it is your responsibility to implement safeguards and procedures to ensure that any files obtained through this website are free from such contamination.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Accounts, Passwords and Security</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Certain features or services offered on or through this website may require you to open an account or create a profile. You are entirely responsible for maintaining the confidentiality of the information you hold for your account, including your password, and for all activity that occurs under your account because of you failing to keep this information secure and confidential. You agree to notify us immediately of any unauthorized use of your account or password, or any other breach of security. You may be held liable for losses incurred by us or any other user of or visitor to this website due to someone else using your username, password or account because of your failing to keep your account information secure and confidential.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Privacy of Personal Information</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Please see the “Privacy Policy" in the Terms section of this website regarding the collection and use of your personal information.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Copyright</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">The entire contents of this website are the property of Company, its content suppliers, or its clients and are protected by domestic and international trade dress, patent, copyright and trademark laws and various other intellectual property rights and unfair competition laws. You may not modify, copy, reproduce, republish, upload, post, transmit or distribute any portion of the website contents without the Company’s prior express written consent.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Your submissions of files constitute your agreement to grant us a nonexclusive, royalty-free, worldwide, sublicensable, perpetual license to reproduce, distribute, transmit, modify, adapt, sublicense and publicly display any such submissions. You also grant us the right to utilize your name in connection with all advertising, marketing and promotional materials related thereto.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Links to Other Sites </font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">This Site may contain one or more links to third-party websites. These links are provided solely as a convenience and do not constitute an endorsement of the content or availability of such third-party websites or the product or services of the third party. You acknowledge and agree that the third-party website may not comply with the Privacy Policy and may violate your intellectual property rights, privacy rights, or publicity rights or those of third parties. You further acknowledge and agree that Company has no control over third-party websites or their content, products or services, and you shall not hold Company responsible for any injury or damage resulting from them. You should direct any concerns with respect to any other website to that website’s administrator or webmaster. </font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Warranty; Limitation of Liability</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">THIS SITE, EACH COMPONENT THEREOF, AND ALL CONTENT ARE PROVIDED STRICTLY ON AN “AS IS” AND “AS AVAILABLE” BASIS WITHOUT ANY WARRANTIES OF ANY KIND, INCLUDING, BUT NOT LIMITED TO, ANY EXPRESS OR IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR USE, ERROR-FREE OPERATION, ACCURACY, CORRECTNESS, OR RELIABILITY, FREEDOM FROM MALWARE, COMPATABILITY WITH ANY HARDWARE OR APPLICATION, OR THAT THE QUALITY OF ANY PRODUCT, SERVICE, OR INFORMATION PURCHASED OR OBTAINED BY YOU THROUGH THE SITE WILL MEET YOUR EXPECTATIONS. UNDER NO CIRCUMSTANCES SHALL COMPANY BE RESPONSIBLE FOR THE ACTS OR OMISSIONS OF YOU OR ANY THIRD PARTY.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, NEITHER COMPANY NOR ANY OF ITS AFFILIATES, NOR ANY OF THEIR RESPECTIVE OWNERS, DIRECTORS, EMPLOYEES, AGENTS, OR REPRESENTATIVES, SHALL BE LIABLE FOR ANY INJURY OR DAMAGE INCURRRED BY YOU OR ANY THIRD PARTY THAT ARISES FROM OR IS RELATED TO ANY USE OF THIS SITE OR CONTENT, OR ANY LINK TO OR USE OF ANY THIRD-PARTY WEBSITE OR PRODUCT, INCLUDING, BUT NOT LIMITED TO, ANY CONSEQUENTIAL OR INCIDENTAL DAMAGES, LOST REVENUE, PROFITS, OR BUSINESS, OR PUNITIVE OR SPECIAL DAMAGES, WHETHER OR NOT THE DAMAGES WERE FORESEEABLE OR COMPANY WAS ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. BECAUSE SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF WARRANTIES OR LIMITATION OF LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, THE FOREGOING LIMITATION MAY NOT APPLY TO YOU. IF ANY OF THE FOREGOING LIMITATIONS OF LIABILITY, OR THE EXCLUSION OF WARRANTIES SET FORTH ABOVE, IS HELD TO BE INAPPLICABLE OR UNENFORCEABLE FOR ANY REASON, THEN YOU HEREBY EXPRESSLY AGREE THAT THE MAXIMUM LIABILITY THAT COMPANY SHALL HAVE FOR ANY AND ALL INJURIES INCURRED BY YOU, INCLUSIVE OF COSTS AND EXPENSES, SHALL NOT EXCEED A TOTAL AMOUNT OF ONE HUNDRED DOLLARS (U.S. $100.00) IN THE AGGREGATE.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Indemnification</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">By using this Site you agree to indemnify and hold harmless Company and its affiliates, and their respective owners, directors, employees, agents, and representatives, from and against any and all losses, liabilities, expenses, damages, and costs, including reasonable attorneys’ fees, arbitration fees (if any), and court costs, arising out of or resulting from your use of this Site, the platform and software comprising the Site, or any of the Content, or from your breach of these Terms of Use. If you cause a technical disruption of this Site or the systems transmitting this Site, you hereby agree that you will be responsible for all losses, liabilities, expenses, damages, and costs, including reasonable attorneys’ fees, expert fees, and court costs, incurred by Company or any third party and arising out of or resulting from that disruption. Company reserves the right to assume exclusive defense and control of any matter subject to this indemnification provision and you shall cooperate with Company in the defense of such matter.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Violations of these Terms of Use</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">You agree that the Company, in its sole discretion and without prior notice, may terminate your access to this website and/or block your future access to this website if it determines that you have violated these Terms of Use or other agreements or guidelines which may be associated with your use of this website. You also agree that any violation by you of these Terms of Use will constitute an unlawful and unfair business practice, and will cause irreparable harm to the Company, for which monetary damages would be inadequate; and you consent to the Company obtaining any injunctive or equitable relief that the Company deems necessary or appropriate in such circumstances. These remedies are in addition to any other remedies the Company may have at law or in equity.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">You agree that Company, in its sole discretion and without prior notice, may terminate your access to this website for cause, which includes: (1) requests by law enforcement or other government agencies, (2) a request by you (self-initiated account deletions), (3) discontinuance or material modification of this website or any service offered on or through this website, or (4) unexpected technical issues or problems.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Disputes; Arbitration. </font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">At Company’s election, any dispute arising from these Terms of Use, the Privacy Policy, or your use of this Site or any of the Content may be resolved by final and binding arbitration under the rules of the American Arbitration Association, to be held in Cleveland, Ohio, at any time before suit is filed with a court of competent jurisdiction. </font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Choice of Law; Jurisdiction </font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">These Terms of Use and the Privacy Policy, and your use of this Site and Content, shall be governed by the laws of the State of Ohio without regard to its conflict of laws principles. By using this Site, to the extent permitted by applicable law, you hereby irrevocably consent to the personal and subject matter jurisdiction of the courts located in Cuyahoga County, Ohio for any action arising out of or relating to these Terms of Use and the Privacy Policy, or your use of this Site or any of the Content. You hereby recognize that it is impractical, if not impossible, for Company to have knowledge of all laws applicable to the Site and therefore agree that the foregoing choice of law and jurisdiction provision is reasonable and shall not be later challenged. IF YOUR USE OF THIS SITE OR ANY OF THE CONTENT VIOLATES THE LAWS OF THE PLACE WHERE THEY ARE ACCESSED BY YOU, OR WHERE YOU RESIDE, YOU SHOULD IMMEDIATELY CEASE AND DESIST ALL SUCH USE AND INFORM COMPANY. You shall be solely responsible for informing yourself of all laws applicable to your use of this Site and the Content. </font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Additional Terms</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Our failure to insist upon or enforce strict performance of any provision of these Terms of Use shall not be construed as a waiver of any provision or right. Neither the course of conduct between the parties nor trade practice shall act to modify any provision of these Terms of Use. The Company may assign its rights and duties under these Terms of Use to any party at any time without notice to you. If any of these terms shall be deemed invalid, void or, for any reason, unenforceable, that term shall be deemed severable and shall not affect the validity or enforceability of any remaining term. Any rights not expressly granted herein are reserved.</font>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <b style="mso-bidi-font-weight:normal">
+                      <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">Entire Agreement</font>
+                    </b>
+                  </p>
+                  <p class="MsoNormal" style="text-align: left;"/>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">These Terms of Use constitute the entire agreement between you and the Company regarding this website. These Terms of Use supersede all prior or contemporaneous communications and proposals, whether electronic, oral, or written, between you and us regarding this website. No modification of these Terms of Use will be effective unless the Company authorizes it.</font>
+                  </p>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">
+                      <b>Contact Us</b>
+                    </font>
+                  </p>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">For more information, if you have questions, or if you would like to make a complaint, please contact us by e-mail at info@achosahw.com or by mail using the details provided below:</font>
+                  </p>
+                  <p style="margin: 0px 0px 10.66px; text-align: left;">
+                    <font color="#000000" face="Calibri" size="3" style="font-size: 14px;">5438 Lockwood Ridge Road, #301, Bradenton, FL 34203.</font>
+                  </p>
+                  <p/>
+                  <p> </p>
+                </div>
+              </div>
+            </div>  
+           </div>
+                            </div>
+                        </div>
+                <div class="oe_structure"/>
+            </div>
+            <style>
+              div .dropdown_collapsed {
+                 width: 100%;
+                 display: none;
+              }
+
+              @media (max-width: 600px) {
+                 div .dropdown_expanded     { display: none; }
+                 div .dropdown_collapsed { display: inline-block; }
+              }
+
+              .dropdown-content {
+                 display: none;
+              }
+
+              .dropdown:hover .dropdown-content {
+                 display: block;
+              }
+            </style>
+        </t>
+    </template>
+</odoo>

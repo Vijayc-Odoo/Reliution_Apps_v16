@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="home_warranties_menu" model="ir.ui.menu">
+    <field name="action" eval="False"/>
+    <field name="active" eval="True"/>
+    <field name="groups_id" eval="[(6, 0, [])]"/>
+    <field name="name">Home Warranties</field>
+    <field name="parent_id" eval="False"/>
+    <field name="sequence">10</field>
+    <field name="web_icon">fa fa-home,#FFFFFF,#56829f</field>
+  </record>
+  <record model="ir.ui.menu" id="home_warranties_home">
+    <field ref="act_open_hw_view" name="action"/>
+    <field eval="True" name="active"/>
+    <field eval="[(6, 0, [])]" name="groups_id"/>
+    <field name="name">Home Warranty</field>
+    <field ref="home_warranties_menu" name="parent_id"/>
+    <field name="sequence">10</field>
+    <field eval="False" name="web_icon"/>
+  </record>
+    <menuitem id="menu_owner_hw"
+              name="Owner Home Warranties"
+        action="act_open_hw_view_owner"
+        parent="home_warranties_menu"
+        groups="base.group_system"
+        sequence="11"/>
+    <menuitem id="menu_country_state_hw"
+        action="action_country_state"
+        parent="home_warranties_menu"
+        groups="base.group_system"
+        sequence="12"/>
+    <menuitem id="menu_open_hw_admin_view"
+        action="act_open_hw_admin_view"
+        parent="home_warranties_menu"
+        groups="achosa.group_hw_admin"
+        sequence="13"/>
+    <menuitem id="product_attribute_value"
+        action="act_open_product_attribute_value"
+        parent="sale.prod_config_main"
+        groups="base.group_system"
+        sequence="12"/>
+</odoo>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$USER_HOME$/all_odoo/v15/community15/odoo" vcs="Git" />
+    <mapping directory="$USER_HOME$/all_odoo/v15/enterprise15" vcs="Git" />
+  </component>
+</project>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hw_receive_check_view_form" model="ir.ui.view">
+        <field name="name">home.warranty.receive.check.form</field>
+        <field name="model">home.warranty.receive.check</field>
+        <field name="arch" type="xml">
+            <form string="Receive Check">
+                <group>
+                    <group>
+                        <h4>Estated Property Info</h4>
+                        <hr/>
+                        <div class="alert alert-warning clearfix" role="alert" colspan="2"
+                             attrs="{'invisible': [('warning_text','=',False)]}">
+                            <field name="warning_text" colspan="2" nolabel="1" attrs="{'readonly':True}"/>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="value"/>
+                        <field name="total_area_sq_ft" attrs="{'readonly':True}"/>
+                        <field name="standardized_land_use_type" attrs="{'readonly':True}"/>
+                        <field name="s_year_built" attrs="{'readonly':True}" widget="Char"/>
+                    </group>
+                </group>
+
+                <group>
+                    <field name="subscription_start_date"/>
+                    <field name="home_warranty" attrs="{'readonly':True}"/>
+                    <field name="realtor_salesperson" attrs="{'readonly':False}"/>
+                    <field name="buyer_email" attrs="{'readonly':True}"/>
+                    <br/>
+                    <div class="alert alert-warning clearfix" role="alert"
+                         attrs="{'invisible': [('buyer_email','!=',False)]}">
+                        <p>Warning: Buyer email missing. No confirmation will be sent</p>
+                    </div>
+                </group>
+                <footer>
+                    <button name="receive_check" string="Process Payment" type="object" class="oe_highlight"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hw_receive_check_action" model="ir.actions.act_window">
+        <field name="name">Receive Check</field>
+        <field name="res_model">home.warranty.receive.check</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="hw_receive_check_view_form"/>
+     </record>
+</odoo>
