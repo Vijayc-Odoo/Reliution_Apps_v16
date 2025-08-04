@@ -28,6 +28,13 @@
                         <field name="mail_icon_id" invisible ="1"/>
                     </div>
                 </div>
+                <div>
+                    <div class="o_setting_right_pane">
+                        <label for="model_selection_for_email"/>
+                        <field name="model_selection_for_email"
+                               string="Custom Mail Logo" widget="many2many_tags"/>
+                    </div>
+                </div>
             </xpath>
         </field>
     </record>

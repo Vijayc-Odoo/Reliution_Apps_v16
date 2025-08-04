@@ -27,7 +27,7 @@ class MailMail(models.Model):
     document_record_id = fields.Integer(string="Document Record ID")
     mail_template_id = fields.Many2one('mail.template', string="Template")
     is_active = fields.Boolean(default=True,help="Flag indicating whether the mail is active.")
-    is_thread_root = fields.Boolean(compute='_compute_is_thread_root', store=True, string="Thread Root")
+    # is_thread_root = fields.Boolean(store=True, string="Thread Root")
     mail_message_id = fields.Many2one('mail.message', string="Related Message", ondelete='set null')
     is_odoo_mail = fields.Boolean('Odoo Mail')
 
@@ -65,13 +65,16 @@ class MailMail(models.Model):
         plain_text = tools.html_sanitize(body_html)
 
         attachments = []
-        for report in template.report_template_ids:
-            pdf_content, _ = report._render_qweb_pdf(report.report_name, [record.id])
-            attachments.append({
-                'name': f"{report.name}.pdf",
-                'datas': base64.b64encode(pdf_content).decode(),
-                'mimetype': 'application/pdf',
-            })
+        try:
+            for report in template.report_template_ids:
+                pdf_content, _ = report._render_qweb_pdf(report.report_name, [record.id])
+                attachments.append({
+                    'name': f"{report.name}.pdf",
+                    'datas': base64.b64encode(pdf_content).decode(),
+                    'mimetype': 'application/pdf',
+                })
+        except Exception:
+            print(Exception)
 
         return {
             'subject': subject or '',
@@ -84,10 +87,10 @@ class MailMail(models.Model):
         soup = BeautifulSoup(html, 'html.parser')
         return soup.get_text()
 
-    @api.depends('parent_id')
-    def _compute_is_thread_root(self):
-        for record in self:
-            record.is_thread_root = not bool(record.parent_id)
+    # @api.depends('parent_id')
+    # def _compute_is_thread_root(self):
+    #     for record in self:
+    #         record.is_thread_root = not bool(record.parent_id)
 
     @api.model
     def get_mail_count(self):
@@ -751,19 +754,25 @@ class MailMessage(models.Model):
     def get_inbox_mails(self):
         """Return only top-level, nomzit-done, not-trashed mails addressed to the current user."""
         user_email = self.env.user.email
+        print(user_email)
         now = fields.Datetime.now()
 
-        domain = [
-            ('parent_id', '=', False),
-            # ('child_ids', '!=', False),
-            ('is_trashed', '=', False),
-            ('is_odoo_mail_message', '=', True),
-            '|',
-            '|',
-            ('email_from', 'ilike', user_email),
-            ('email_msg_to', 'ilike', user_email),
-            ('partner_ids', 'in', self.env.user.partner_id.ids),
-        ]
+        # domain = [
+        #     ('parent_id', '=', False),
+        #     # ('child_ids', '!=', False),
+        #     ('is_trashed', '=', False),
+        #     ('is_odoo_mail_message', '=', True),
+        #     '|',
+        #     '|',
+        #     ('email_from', 'ilike', user_email),
+        #     ('email_msg_to', 'ilike', user_email),
+        #     ('partner_ids', 'in', self.env.user.partner_id.ids),
+        # ]
+        domain = ['&', '&', ('parent_id', '=', False), ('is_trashed', '=', False), ('is_odoo_mail_message', '=', True),
+                  '|', '|', ('email_from', 'ilike', user_email), ('email_msg_to', 'ilike', user_email),
+                  ('partner_ids', 'in', self.env.user.partner_id.ids)]
+        # domain = ['&', '&', ('parent_id', '=', False), ('is_trashed', '=', False), ('is_odoo_mail_message', '=', True),
+        #           '|',('email_from', 'ilike', user_email), ('email_msg_to', 'ilike', user_email)]
 
         parent_messages = self.sudo().search(domain)
         # parent_messages = self.sudo().search([('is_odoo_mail_message', '=', True),('parent_id','=',False)])
@@ -787,6 +796,7 @@ class MailMessage(models.Model):
 
         # Show latest mail in teh top
         sorted_data = sorted(data, key=lambda x: x['Last_Message_Date'], reverse=True)
+        print(sorted_data)
         return sorted_data
 
     @api.model
@@ -933,3 +943,14 @@ class MailThread(models.AbstractModel):
 
     def _message_compute_parent_id(self, parent_id):
         return super()._message_compute_parent_id(parent_id)
+
+class IrModel(models.Model):
+    _inherit = 'ir.model'
+
+    @api.model
+    def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None,is_compose_mail=False, **read_kwargs):
+
+        if is_compose_mail and len(self.env.company.model_selection_for_email.mapped('id')):
+            data=self.search([('id','in',self.env.company.model_selection_for_email.mapped('id'))])
+            return data.read()
+        return super().search_read(domain,fields,offset,limit,order)

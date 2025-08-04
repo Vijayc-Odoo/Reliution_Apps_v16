@@ -105,7 +105,7 @@ export class ComposeMail extends Component {
     async onDocumentRecordSelected(recordId){
         this.state.selectedTemplate = false;
         this.state.content = "";
-        this.state.recipients = [];
+        // this.state.recipients = [];
         this.state.attachedFiles = [];
         this.state.images = [];
 
@@ -274,7 +274,8 @@ export class ComposeMail extends Component {
     async loadDocumentModels() {
         this.state.loadingDocuments = true;
         try {
-            const models = await this.orm.call('ir.model', 'search_read', [], {fields: ['model', 'name']});
+            const models = await this.orm.call('ir.model', 'search_read', [], {fields: ['model', 'name'],is_compose_mail:true});
+            // const models = await this.orm.call('ir.model', 'search_read1', []);
             this.state.availableDocuments = models;
         } catch (error) {
             console.error("Error loading document models:", error);
@@ -288,7 +289,7 @@ export class ComposeMail extends Component {
         this.state.availableRecords = [];
         this.state.selectedTemplate = false;
         this.state.templates = [];
-        this.state.recipients = [];
+        // this.state.recipients = [];
         this.state.attachedFiles = [];
         this.state.images = [];
         this.state.content = "";
@@ -298,11 +299,13 @@ export class ComposeMail extends Component {
             this.state.documentId = false;
             return;
         }
+        console.log(model)
 
         this.state.loadingRecords = true;
         try {
             // Only request essential fields - partner_id is assumed to exist
 //            debugger;
+
             const records = await this.orm.call(
                 model,
                 'search_read',
@@ -377,6 +380,7 @@ export class ComposeMail extends Component {
 
 
     async onTemplateChange(templateId) {
+        debugger;
         this.state.attachedFiles = [];
         this.state.images = [];
 
@@ -390,8 +394,9 @@ export class ComposeMail extends Component {
         try {
             const templateData = await this.orm.call( 'mail.mail','load_template',[templateId, [this.state.documentId]]);
             if (templateData) {
+                this.state.subject=templateData.subject;
                 this.setTemplateContent(templateData);
-
+                debugger;
                 // Auto-attach the returned reports
                 if (templateData.attachments && templateData.attachments.length) {
                     for (const att of templateData.attachments) {
@@ -412,7 +417,7 @@ export class ComposeMail extends Component {
 
     /* Method to send the composed mail. */
     async sentMail() {
-
+        debugger;
         this.state.errors = {
             recipients: "",
             documentRecord: "",
@@ -454,7 +459,7 @@ export class ComposeMail extends Component {
         }
 
         const recipientEmails = recipients.map(r => r.email).join(',');
-
+        debugger;
         let sendMail = []
         try {
             const sendMail = await this.orm.call('mail.mail', 'sent_mail', [], {

@@ -454,7 +454,7 @@ class odooMail extends  Component {
         const domain = [
 //            ['create_uid', '=', currentUserId],
             ['is_odoo_mail_message', '=', true],
-//            ['is_trashed', '=', false],
+           ['is_trashed', '=', false],
             ['parent_id', '=', false],
             ['message_type', 'in', ['comment','email','email_outgoing']],
 //            ['email_from', 'ilike', currentUserEmail]
