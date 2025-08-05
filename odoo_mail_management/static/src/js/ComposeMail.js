@@ -11,8 +11,6 @@ import {ImportDialog} from "./AttachmentMail";
  */
 export class ComposeMail extends Component {
     setup() {
-        debugger;
-        debugger;
         this.orm = useService('orm')
         this.root = useRef('root');
         this.action = useService('action')
@@ -112,7 +110,6 @@ export class ComposeMail extends Component {
         if (!this.state.documentModel || !recordId) return;
 
         try {
-            debugger;
             const numericId = typeof recordId === 'string' ? parseInt(recordId) : recordId;
             const record = await this.orm.read(
                 this.state.documentModel,
@@ -304,7 +301,6 @@ export class ComposeMail extends Component {
         this.state.loadingRecords = true;
         try {
             // Only request essential fields - partner_id is assumed to exist
-//            debugger;
 
             const records = await this.orm.call(
                 model,
@@ -380,7 +376,6 @@ export class ComposeMail extends Component {
 
 
     async onTemplateChange(templateId) {
-        debugger;
         this.state.attachedFiles = [];
         this.state.images = [];
 
@@ -396,7 +391,6 @@ export class ComposeMail extends Component {
             if (templateData) {
                 this.state.subject=templateData.subject;
                 this.setTemplateContent(templateData);
-                debugger;
                 // Auto-attach the returned reports
                 if (templateData.attachments && templateData.attachments.length) {
                     for (const att of templateData.attachments) {
@@ -417,7 +411,6 @@ export class ComposeMail extends Component {
 
     /* Method to send the composed mail. */
     async sentMail() {
-        debugger;
         this.state.errors = {
             recipients: "",
             documentRecord: "",
@@ -459,7 +452,6 @@ export class ComposeMail extends Component {
         }
 
         const recipientEmails = recipients.map(r => r.email).join(',');
-        debugger;
         let sendMail = []
         try {
             const sendMail = await this.orm.call('mail.mail', 'sent_mail', [], {
@@ -559,7 +551,6 @@ export class ComposeMail extends Component {
      * Method to close the mail composition window.
      */
     Close() {
-    debugger;
         const result=confirm("Are you sure you want to delete this email?","confirmation dialog");
         if (result){
             this.props.close()
@@ -588,7 +579,6 @@ export class ComposeMail extends Component {
         })
     }
     closeInput(index){
-        debugger;
         const removedFile = this.state.attachedFiles[index];
         // Remove from attachedFiles
         const updatedAttachments = [...this.state.attachedFiles];
@@ -598,7 +588,6 @@ export class ComposeMail extends Component {
         this.state.images = this.state.images.filter(img => img.name !== removedFile.name);
     }
     addAttachment(attachment) {
-    debugger;
     this.state.attachedFiles.push(attachment);
 
     // Handle uploaded file (File object)

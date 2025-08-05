@@ -7,7 +7,6 @@ import {ImportDialog} from "./AttachmentMail";
 
 export class ComposeReplyDialog extends Component {
     setup() {
-    debugger;
         this.orm = useService("orm");
         this.dialog = useService("dialog");
         this.action = useService("action");
@@ -29,8 +28,7 @@ export class ComposeReplyDialog extends Component {
         }
         this.state = useState({
 
-            recipient: this.props.mail.email_from,
-//            recipient: this.props.mail.email_to,
+            // recipient: this.props.mail.email_from,
             subject: `${this.props.mail.subject}`,
             content: "",
             attachedFiles: [],
@@ -44,14 +42,12 @@ export class ComposeReplyDialog extends Component {
         else{
             this.state.recipient= this.props.mail.email_from
         }
-        debugger;
         this.fileInputRef = useRef('fileInput');
         this.recipientInputRef = useRef('recipientInput');
         this.ccInputRef = useRef('ccInput');
     }
 
     closeInput(index){
-        debugger;
         const removedFile = this.state.attachedFiles[index];
         // Remove from attachedFiles
         const updatedAttachments = [...this.state.attachedFiles];
@@ -63,7 +59,6 @@ export class ComposeReplyDialog extends Component {
 
     async sendReply() {
         const { recipient, subject, content, images, cc} = this.state;
-        debugger;
         if (!content) {
             alert("Please enter a message");
             return;
@@ -88,14 +83,12 @@ export class ComposeReplyDialog extends Component {
     }
 
     async attachmentAction() {
-        debugger;
         this.dialog.add(ImportDialog, {
             addAttachment: this.addAttachment.bind(this)
         })
     }
 
     async imageReader(file) {
-        debugger;
         const fileReader = new FileReader();
         fileReader.onload = (event) => {
             const imageDataUrl = event.target.result; // Data URL of the image
@@ -108,7 +101,6 @@ export class ComposeReplyDialog extends Component {
     }
 
     contentHandler(file) {
-        debugger;
         switch (file.type) {
             case "image/jpeg":
             case "image/png":
@@ -126,7 +118,6 @@ export class ComposeReplyDialog extends Component {
     }
 
     addAttachment(attachment) {
-        debugger;
         this.state.attachedFiles.push(attachment);
 
         // Handle uploaded file (File object)

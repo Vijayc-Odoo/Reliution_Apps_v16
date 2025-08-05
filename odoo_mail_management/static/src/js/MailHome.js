@@ -15,8 +15,6 @@ import { session } from "@web/session";
  */
 class odooMail extends  Component {
     setup() {
-    debugger;
-    debugger;
         this.mailState = useState({
             loadLogo: "",
             loadMail: [],
@@ -55,7 +53,6 @@ class odooMail extends  Component {
 //    Method to get the count of different mail categories.
     async getCount(){
         this.mailState.getCount = await this.orm.call('mail.mail','get_mail_count',[])
-        debugger;
     }
     /**
      * Method to compose a new mail.
@@ -137,7 +134,6 @@ class odooMail extends  Component {
      * Method to reset the mail view.
      */
     resetView(a=false){
-        debugger;
         this.mailState.formData = {}
         this.mailState.mode = "list"
         if(a == true){
@@ -149,7 +145,6 @@ class odooMail extends  Component {
      * @param {Object} mail - Mail object.
      */
     openMail(mail) {
-        debugger;
         this.mailState.formData = mail
         this.mailState.mode = "form"
 
@@ -171,7 +166,6 @@ class odooMail extends  Component {
      * @param {Boolean} check - Checked or not.
      */
     onSelectMail(mailId, check) {
-    debugger;
         if (check) {
             if (!this.selectedMails.includes(mailId)) {
                 this.selectedMails.push(mailId);
@@ -258,7 +252,6 @@ class odooMail extends  Component {
      * @param {Object} event - Event object.
      */
     refreshPage(event){
-        debugger;
         if (this.mailState.mailType === 'all') {
             this.allMailView(); // Refresh All Mail view
         } else if (this.mailState.mailType === 'sent') {
@@ -280,7 +273,6 @@ class odooMail extends  Component {
      * @param {Object} event - Event object.
      */
     async deleteMail(event){
-    debugger;
             if (this.selectedMails.length){
                 this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
                 if (this.mailState.mailType === 'trash'){
@@ -338,7 +330,6 @@ class odooMail extends  Component {
         }
     }
     refreshCurrentView() {
-    debugger;
         if (this.mailState.mailType === 'all') {
             this.allMailView(); // Refresh All Mail view
         } else if (this.mailState.mailType === 'sent') {
@@ -380,7 +371,6 @@ class odooMail extends  Component {
         }
         else{
             if(this.mailState.formData.id){
-                debugger;
                 var mailId=[this.mailState.formData.id]
                 await this.orm.call('mail.message','restore_mail',[mailId])
 //                this.refreshPage()
@@ -390,7 +380,6 @@ class odooMail extends  Component {
     }
 
     async inboxMailView () {
-    debugger;
         const root = this.root.el;
         root.querySelector('.inbox')?.classList.add('active');
         root.querySelector('.all_mail')?.classList.remove('active');
@@ -414,7 +403,6 @@ class odooMail extends  Component {
         const total =  await this.orm.call('mail.message', 'get_inbox_mails', []);
         this.mailState.totalRecords = total.length;
         const paginatedRecords = await this.orm.call('mail.message', 'get_inbox_mails', []);
-        debugger;
         const records = paginatedRecords.slice(
             this.mailState.offset,
             this.mailState.offset + this.mailState.limit
@@ -449,7 +437,6 @@ class odooMail extends  Component {
         this.resetView()
         const currentUserId = await this.orm.call('res.users', 'get_current_user_id', []);
         const currentUser = await this.orm.call('res.users', 'read', [[currentUserId], ['email']]);
-        debugger;
         const currentUserEmail = currentUser[0].email;
         const domain = [
 //            ['create_uid', '=', currentUserId],
@@ -469,7 +456,6 @@ class odooMail extends  Component {
               order: "create_date desc",
               mailType:this.mailState.mailType }
         );
-        debugger;
         this.mailState.loadMail = records;
         this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;
         this.addPaginationControls();
@@ -692,7 +678,6 @@ class odooMail extends  Component {
      * Method to view sent mails.
      */
 async sentMail(){
-        debugger;
        const root = this.root.el
        root.querySelector('.sent')?.classList.add('active');
        root.querySelector('.archieved-mail')?.classList.remove('active');
@@ -727,8 +712,6 @@ async sentMail(){
               order: "create_date desc",
               mailType:this.mailState.mailType}
         );
-//        const a=await this.orm.call('mail.message', 'search_read',[domain, []],{ limit: this.mailState.limit,offset: this.mailState.offset,order: "create_date desc" });
-        debugger;
         this.mailState.loadMail = records;
         this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;
         this.addPaginationControls();

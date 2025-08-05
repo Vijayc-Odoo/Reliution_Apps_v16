@@ -27,10 +27,9 @@ export class ComposeForwardDialog extends Component {
                 el.remove();
             });
         }
-
         this.state = useState({
             recipient: "",
-            subject: `Fwd: ${this.props.mail.subject}`,
+            subject: `Fwd: ${this.props.mail.main_subject || this.props.mail.subject}`,
             content: "",
             cc:"",
             attachedFiles: [],
@@ -43,7 +42,6 @@ export class ComposeForwardDialog extends Component {
     }
 
     closeInput(index){
-        debugger;
         const removedFile = this.state.attachedFiles[index];
         const updatedAttachments = [...this.state.attachedFiles];
         updatedAttachments.splice(index, 1);
@@ -52,7 +50,6 @@ export class ComposeForwardDialog extends Component {
     }
 
     async sendForward() {
-        debugger;
         const { recipient, content, existingAttachments, cc} = this.state;
         if (!recipient || !content) {
             alert("Please enter recipient and message");
@@ -92,14 +89,12 @@ export class ComposeForwardDialog extends Component {
     }
 
     async attachmentAction() {
-        debugger;
         this.dialog.add(ImportDialog, {
             addAttachment: this.addAttachment.bind(this)
         });
     }
 
     async imageReader(file) {
-        debugger;
         const fileReader = new FileReader();
         fileReader.onload = (event) => {
             const imageDataUrl = event.target.result;
@@ -111,7 +106,6 @@ export class ComposeForwardDialog extends Component {
     }
 
     contentHandler(file) {
-        debugger;
         switch (file.type) {
             case "image/jpeg":
             case "image/png":
@@ -129,7 +123,6 @@ export class ComposeForwardDialog extends Component {
     }
 
     addAttachment(attachment) {
-        debugger;
         this.state.attachedFiles.push(attachment);
 
         if (attachment instanceof File) {

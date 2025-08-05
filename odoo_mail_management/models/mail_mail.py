@@ -21,7 +21,7 @@ class MailMail(models.Model):
     child_ids = fields.One2many('mail.mail', 'parent_id', string='Child Mails',
                                 help='Replies and forwards of this mail')
     thread_id = fields.Many2one('mail.mail', string='Threads', help='Root mail of the thread')
-    is_read = fields.Boolean(string="Is Read", default=False)
+    is_read = fields.Boolean(string="Is Read")
     # bcc_email = fields.Char(string="BCC Email")
     document_model_id = fields.Many2one('ir.model', string="Document Model")
     document_record_id = fields.Integer(string="Document Record ID")
@@ -438,6 +438,7 @@ class MailMail(models.Model):
                     'message_type':msg.message_type,
                     'id': f"msg-{msg.id}",  # ensure unique key for JS
                     'subject': msg.subject,
+                    'main_subject':parent_mail.subject,
                     'email_from': msg.email_from,
                     'email_to': msg.email_msg_to if msg.email_msg_to else ', '.join(
                         [partner.email_formatted for partner in msg.partner_ids]),
@@ -496,11 +497,18 @@ class MailMail(models.Model):
                 attachment = self.env['ir.attachment'].create(attachment_data)
                 attachment_ids.append((4, attachment.id))
 
+        email_msg_to=""
+        if original.message_type == 'email':
+            email_msg_to=original.email_from
+        else:
+            email_msg_to=original.email_msg_to
+
         msg_vals = {
             'subject': reply_subject,
             'body': body_html,
             'email_from': self.env.user.email,
-            'email_msg_to': original.email_from,
+            # 'email_msg_to': original.email_from,
+            'email_msg_to': email_msg_to,
             'email_msg_cc': cc,
             'message_type': 'email_outgoing',
             'model': original.model,
@@ -515,7 +523,8 @@ class MailMail(models.Model):
 
         mail_vals = {
             'subject': reply_subject,
-            'email_to': recipient,
+            # 'email_to': recipient,
+            'email_to': email_msg_to,
             'email_from': self.env.user.email,
             'email_cc': cc,
             'body_html': body_html,
@@ -647,7 +656,7 @@ class MailMessage(models.Model):
     is_odoo_mail_message = fields.Boolean('Odoo mail message')
     email_msg_to = fields.Char('To', help='Message recipients (emails_message)')
     email_msg_cc = fields.Char('Cc')
-    is_read = fields.Boolean(string="Is Read", default=True)
+    is_read = fields.Boolean(string="Is Read")
     is_starred = fields.Boolean(string="Starred Mail", default=False,
                                 help="Flag indicating whether the mail is starred.")
     is_trashed = fields.Boolean(string="Is Trashed", default=False)
@@ -732,7 +741,6 @@ class MailMessage(models.Model):
 
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None,mailType=False, **read_kwargs):
-        print(domain)
         data = super().search_read(domain)
         if mailType:
             search_data = self.search(domain)
@@ -754,7 +762,6 @@ class MailMessage(models.Model):
     def get_inbox_mails(self):
         """Return only top-level, nomzit-done, not-trashed mails addressed to the current user."""
         user_email = self.env.user.email
-        print(user_email)
         now = fields.Datetime.now()
 
         # domain = [
@@ -796,7 +803,6 @@ class MailMessage(models.Model):
 
         # Show latest mail in teh top
         sorted_data = sorted(data, key=lambda x: x['Last_Message_Date'], reverse=True)
-        print(sorted_data)
         return sorted_data
 
     @api.model

@@ -16,7 +16,6 @@ export class ImportDialog extends Component {
         this.file = files[0]
     }
     async onFileUpload(ev) {
-        debugger;
         if (this.file){
         this.props.addAttachment(this.file)
         this.cancel()

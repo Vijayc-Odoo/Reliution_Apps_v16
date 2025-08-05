@@ -82,25 +82,8 @@
                                        t-on-input="(ev) => this.searchPartners(ev.target.value)"
                                        t-on-keydown="handleKeyDown"
                                        placeholder="To">
-<!--                                    <div class="selected-recipients"-->
-                                    <!--                                         style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px;">-->
-                                    <!--                                    <t t-foreach="state.recipients" t-as="recipient" t-key="recipient.id">-->
-                                    <!--                                        <div class="recipient-tag"-->
-                                    <!--                                             style="background: #e0e0e0; border-radius: 12px; padding: 2px 8px; font-size: 12px; display: flex; align-items: center;">-->
-                                    <!--                                            <span t-out="recipient.name || recipient.email"/>-->
-                                    <!--                                            <span t-out="recipient.email ? ` &lt;${recipient.email}&gt;` : ''"-->
-                                    <!--                                                  t-raw="true"/>-->
-                                    <!--                                            <button type="button"-->
-                                    <!--                                                    style="background: none; border: none; margin-left: 4px; cursor: pointer; color: #666;"-->
-                                    <!--                                                    t-on-click="() => this.removeRecipient(recipient_index)">-->
-                                    <!--                                                ×-->
-                                    <!--                                            </button>-->
-                                    <!--                                        </div>-->
-                                    <!--                                    </t>-->
-                                    <!--                                </div>-->
                                 </input>
-                                <!--                                       style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 13px;"/>-->
-
+                                
                                 <t t-if="state.errors.recipients">
                                     <div style="color: #dc3545; font-size: 12px; margin-top: 4px;">
                                         <t t-esc="state.errors.recipients"/>

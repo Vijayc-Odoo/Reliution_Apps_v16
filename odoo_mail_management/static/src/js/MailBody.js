@@ -12,7 +12,6 @@ import { formatDateTime } from "@web/core/l10n/dates";
  */
 export class MailBody extends  Component {
     async setup() {
-    debugger;
         this.ref = useRef('root');
         this.orm = useService('orm');
         this.mailUtils = useMailUtils();
@@ -21,7 +20,6 @@ export class MailBody extends  Component {
         this.state.latest_mail=[];
         this.state.date='';
 //        this.state.latest_mail=await this.orm.call('mail.message', 'get_inbox_mails', [this.props.mail.child_ids,true])
-//        debugger;
 //        this.state.date=formatDateTime(this.state.latest_mail[0]?.date || this.props.mail.date)
 //        this.state.date=formatDateTime(DateTime.fromISO(this.state.latest_mail[0]?.date || this.props.mail.date))
         this.handleSelectAll = (event) => {
@@ -78,7 +76,6 @@ export class MailBody extends  Component {
      */
 
     async deleteMail(event){
-        debugger;
        var mail = this.props.mail.id
        if(this.props.mailType === 'trash'){
         await this.orm.call('mail.message','delete_forever_mail',[mail])
@@ -94,7 +91,6 @@ export class MailBody extends  Component {
      * @param {Object} event - Event object.
      */
      async starMail(event) {
-     debugger;
         const mailId = this.props.mail.id;
         const currentStarred = this.props.mail.is_starred;
 
@@ -113,7 +109,6 @@ export class MailBody extends  Component {
      * @param {Object} event - Event object.
      */
    async openMail(event){
-    debugger;
      var mail = this.props.mail
      this.props.openMail(mail)
      if (!mail.is_read) {
@@ -170,7 +165,6 @@ export class MailBody extends  Component {
 //    }
 
     async markAsRead(mail) {
-        debugger;
         if (!mail?.id || mail.is_read) return;
         await this.orm.call('mail.message', 'mark_as_read', [mail.id]);
         mail.is_read = true;
