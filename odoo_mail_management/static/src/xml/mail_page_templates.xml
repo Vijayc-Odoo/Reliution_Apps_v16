@@ -5,34 +5,77 @@
         <div class="odoo_mails" t-ref="root">
         <div class="body-wrapper">
             <!-- HEADER -->
-            <header class="head" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #fff; border-bottom: 1px solid #ddd;">
-                <!-- Logo Section -->
-                <div class="header-group" style="display: flex; align-items: center;">
+<!--            <header class="head"-->
+<!--                    style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #fff; border-bottom: 1px solid #ddd;">-->
+<!--                &lt;!&ndash; Logo Section &ndash;&gt;-->
+<!--                <div class="header-group " style="flex: 1; display: flex; align-items: center; border: 1px solid #FfF;">-->
+<!--                    <img t-attf-src="data:image/png;base64,{{mailState.loadLogo}}"-->
+<!--                         style="height: 40px; width: auto; object-fit: contain;"/>-->
+<!--                </div>-->
+<!--                &lt;!&ndash; Search Section &ndash;&gt;-->
+<!--                <form class="header-search " action=""-->
+<!--                      style="align-items: center; position: relative; min-width: 250px; border: 1px solid #f9f;">-->
+<!--                    <div class="icons"-->
+<!--                         style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1;">-->
+<!--                        <button id="js-header-search"-->
+<!--                                class="btn btn-nofill tooltip"-->
+<!--                                data-info="Search"-->
+<!--                                style="background: transparent; border: none; padding: 0;">-->
+<!--                            <img src="/odoo_mail_management/static/src/img/search_black_24dp.svg"-->
+<!--                                 alt="Search"-->
+<!--                                 class="btn-icon btn-icon-alt"-->
+<!--                                 style="width: 20px; height: 20px;"/>-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <input type="search"-->
+<!--                           class="header-search-input "-->
+<!--                           placeholder="Search mail"-->
+<!--                           t-on-input="searchMail"-->
+<!--                           style="width: 100%; padding: 8px 40px 8px 15px; border-radius: 20px; border: 1px solid #ccc; background: #f9f9f9; font-size: 14px;"/>-->
+<!--                </form>-->
+<!--            </header>-->
+
+            <header class="head"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #fff; border-bottom: 1px solid #ddd; position: relative;">
+
+                <!-- Left: Logo -->
+                <div class="header-group" style="flex: 1; display: flex; align-items: center;">
                     <img t-attf-src="data:image/png;base64,{{mailState.loadLogo}}"
-                         style="height: 40px; width: auto; object-fit: contain;"/>
+                        style="height: 40px; width: auto; object-fit: contain;"/>
                 </div>
-                <!-- Search Section -->
-                <form class="header-search" action="" style="align-items: center; position: relative; min-width: 250px;">
-                    <div class="icons" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1;">
-                        <button id="js-header-search"
+
+                <!-- Center: Search -->
+                <div style="flex: 2; display: flex; justify-content: center; ">
+                    <form class="header-search"
+                        style="position: relative; min-width: 250px; width: 100%; background: #fff;">
+                        <div class="icons"
+                            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1;">
+                            <button id="js-header-search"
                                 class="btn btn-nofill tooltip"
                                 data-info="Search"
                                 style="background: transparent; border: none; padding: 0;">
-                            <img src="/odoo_mail_management/static/src/img/search_black_24dp.svg"
-                                 alt="Search"
-                                 class="btn-icon btn-icon-alt"
-                                 style="width: 20px; height: 20px;"/>
-                        </button>
-                    </div>
-                    <input type="search"
-                           class="header-search-input"
-                           placeholder="Search mail"
-                           t-on-input="searchMail"
-                           style="width: 100%; padding: 8px 40px 8px 15px; border-radius: 20px; border: 1px solid #ccc; background: #f9f9f9; font-size: 14px;"/>
-                </form>
+                                <img src="/odoo_mail_management/static/src/img/search_black_24dp.svg"
+                                    alt="Search"
+                                    class="btn-icon btn-icon-alt"
+                                    style="width: 20px; height: 20px;"/>
+                            </button>
+                        </div>
+                        <input type="search"
+                            class="header-search-input"
+                            placeholder="Search mail"
+                            t-on-input="searchMail"
+                            style="width: 100%; padding: 8px 40px 8px 15px; border-radius: 20px; border: 1px solid #ccc; background: #f9f9f9; font-size: 14px;"/>
+                    </form>
+                </div>
+
+<!--                &lt;!&ndash; Right: Placeholder for future actions &ndash;&gt;-->
+                <div style="flex: 1; background: #f9f;"></div>
             </header>
+
+
             <!-- LEFT SIDEBAR -->
-            <section class="left-sidebar" style="width: 260px; background: #f5f7f9; padding: 20px 10px; height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.05); overflow-y: auto;">
+            <section class="left-sidebar"
+                     style="width: 260px; background: #f5f7f9; padding: 20px 10px; height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.05); overflow-y: auto;">
                 <div class="left-sidebar-compose" style="margin-bottom: 20px;">
                     <button class="sidebar-btn-compose compose"
                             t-on-click="composeMail"
@@ -58,8 +101,8 @@
                                 </svg>
                                 <span class="category-item-title" style="font-size: 14px; color: #333;">Inbox</span>
                             </div>
-<!--                            <span class="category-item-number inbox_count"-->
-<!--                                  t-out="mailState.getCount.inbox_count"/>-->
+                            <!--                            <span class="category-item-number inbox_count"-->
+                            <!--                                  t-out="mailState.getCount.inbox_count"/>-->
                         </li>
                         <li class="category-item active all_mail"
                             id="all_mail" t-on-click="allMailView"
@@ -76,8 +119,8 @@
                                       style="font-size: 14px; color: #333;">All mail
                                 </span>
                             </div>
-<!--                            <span class="category-item-number all_count"-->
-<!--                                  t-out="mailState.getCount.all_count"/>-->
+                            <!--                            <span class="category-item-number all_count"-->
+                            <!--                                  t-out="mailState.getCount.all_count"/>-->
                         </li>
                         <li class="category-item sent" id="sent"
                             t-on-click="sentMail"
@@ -92,11 +135,12 @@
                                 </svg>
                                 <span class="category-item-title" style="font-size: 14px; color: #333;">Sent</span>
                             </div>
-<!--                            <span class="category-item-number sent_count"-->
-<!--                                  t-out="mailState.getCount.sent_count"/>-->
+                            <!--                            <span class="category-item-number sent_count"-->
+                            <!--                                  t-out="mailState.getCount.sent_count"/>-->
                         </li>
                         <li class="category-item sent-mail" id="starred_mails"
-                            t-on-click="starredMail" style="padding: 10px 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center;">
+                            t-on-click="starredMail"
+                            style="padding: 10px 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center;">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <svg class="category-item-icon"
                                      xmlns="http://www.w3.org/2000/svg"
@@ -108,11 +152,12 @@
                                 <span class="category-item-title" style="font-size: 14px; color: #333;">Starred
                                 </span>
                             </div>
-<!--                            <span class="category-item-number starred_count"-->
-<!--                                  t-out="mailState.getCount.starred_count"/>-->
+                            <!--                            <span class="category-item-number starred_count"-->
+                            <!--                                  t-out="mailState.getCount.starred_count"/>-->
                         </li>
                         <li class="category-item archieved-mail" id="archived_mails"
-                            t-on-click="archivedMail" style="padding: 10px 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center;">
+                            t-on-click="archivedMail"
+                            style="padding: 10px 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center;">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <svg class="category-item-icon"
                                      xmlns="http://www.w3.org/2000/svg"
@@ -124,8 +169,8 @@
                                 <span class="category-item-title" style="font-size: 14px; color: #333;">Archived
                                 </span>
                             </div>
-<!--                            <span class="category-item-number archived_count"-->
-<!--                                  t-out="mailState.getCount.archived_count"/>-->
+                            <!--                            <span class="category-item-number archived_count"-->
+                            <!--                                  t-out="mailState.getCount.archived_count"/>-->
                         </li>
                         <li class="category-item trash-mail" id="trash_mails" t-on-click="trashView"
                             style="padding: 10px 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center;">   <!-- here code for trash view-->
@@ -140,46 +185,46 @@
                                 <span class="category-item-title" style="font-size: 14px; color: #333;">Trash
                                 </span>
                             </div>
-<!--                            <span class="category-item-number trash_count"-->
-<!--                                  t-out="mailState.getCount.trash_count"/>-->
+                            <!--                            <span class="category-item-number trash_count"-->
+                            <!--                                  t-out="mailState.getCount.trash_count"/>-->
                         </li>
-<!--                        <li class="category-item outbox" id="outbox" t-on-click="outboxMailView"-->
-<!--                            style="padding: 10px 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center;">-->
-<!--                            <div style="display: flex; align-items: center; gap: 10px;">-->
-<!--                                <svg class="category-item-icon"-->
-<!--                                     xmlns="http://www.w3.org/2000/svg"-->
-<!--                                     height="24px" viewBox="0 96 960 960" width="24px" fill="#009688">-->
-<!--                                    <path d="M453 634V445l-79 79-43-43 152-152 152 152-43 43-79-79v189h-60ZM180 936q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm300-173q41 0 74-23.5t56-59.5h170V276H180v404h170q23 36 56 59.5t74 23.5Z"/>-->
-<!--                                </svg>-->
-<!--                                <span class="category-item-title" style="font-size: 14px; color: #333;">Outbox</span>-->
-<!--                            </div>-->
-<!--&lt;!&ndash;                            <span class="category-item-number outbox_count"&ndash;&gt;-->
-<!--&lt;!&ndash;                                  t-out="mailState.getCount.outbox_count"/>&ndash;&gt;-->
-<!--                        </li>-->
-<!--                        <li class="category-item done" id="done" t-on-click="doneMailView"-->
-<!--                            style="padding: 10px 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center;">-->
-<!--                            <div style="display: flex; align-items: center; gap: 10px;">-->
-<!--                                <svg class="category-item-icon"-->
-<!--                                     xmlns="http://www.w3.org/2000/svg"-->
-<!--                                     height="24px" viewBox="0 96 960 960" width="24px" fill="#66bb6a">-->
-<!--                                    <path d="M453 634V445l-79 79-43-43 152-152 152 152-43 43-79-79v189h-60ZM180 936q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm300-173q41 0 74-23.5t56-59.5h170V276H180v404h170q23 36 56 59.5t74 23.5Z"/>-->
-<!--                                </svg>-->
-<!--                                <span class="category-item-title" style="font-size: 14px; color: #333;">Done</span>-->
-<!--                            </div>-->
-<!--&lt;!&ndash;                            <span class="category-item-number done_count" t-out="mailState.getCount.done_count"/>&ndash;&gt;-->
-<!--                        </li>-->
-<!--                        <li class="category-item snoozed" id="snoozed"-->
-<!--                            t-on-click="snoozedMailView">-->
-<!--                            <div>-->
-<!--                                <svg class="category-item-icon"-->
-<!--                                     xmlns="http://www.w3.org/2000/svg"-->
-<!--                                     height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">-->
-<!--                                    <path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/>-->
-<!--                                </svg>-->
-<!--                                <span class="category-item-title">Snoozed</span>-->
-<!--                            </div>-->
-<!--                            <span class="category-item-number snoozed_count" t-out="mailState.getCount.snoozed_count"/>-->
-<!--                        </li>-->
+                        <!--                        <li class="category-item outbox" id="outbox" t-on-click="outboxMailView"-->
+                        <!--                            style="padding: 10px 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center;">-->
+                        <!--                            <div style="display: flex; align-items: center; gap: 10px;">-->
+                        <!--                                <svg class="category-item-icon"-->
+                        <!--                                     xmlns="http://www.w3.org/2000/svg"-->
+                        <!--                                     height="24px" viewBox="0 96 960 960" width="24px" fill="#009688">-->
+                        <!--                                    <path d="M453 634V445l-79 79-43-43 152-152 152 152-43 43-79-79v189h-60ZM180 936q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm300-173q41 0 74-23.5t56-59.5h170V276H180v404h170q23 36 56 59.5t74 23.5Z"/>-->
+                        <!--                                </svg>-->
+                        <!--                                <span class="category-item-title" style="font-size: 14px; color: #333;">Outbox</span>-->
+                        <!--                            </div>-->
+                        <!--&lt;!&ndash;                            <span class="category-item-number outbox_count"&ndash;&gt;-->
+                        <!--&lt;!&ndash;                                  t-out="mailState.getCount.outbox_count"/>&ndash;&gt;-->
+                        <!--                        </li>-->
+                        <!--                        <li class="category-item done" id="done" t-on-click="doneMailView"-->
+                        <!--                            style="padding: 10px 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center;">-->
+                        <!--                            <div style="display: flex; align-items: center; gap: 10px;">-->
+                        <!--                                <svg class="category-item-icon"-->
+                        <!--                                     xmlns="http://www.w3.org/2000/svg"-->
+                        <!--                                     height="24px" viewBox="0 96 960 960" width="24px" fill="#66bb6a">-->
+                        <!--                                    <path d="M453 634V445l-79 79-43-43 152-152 152 152-43 43-79-79v189h-60ZM180 936q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm300-173q41 0 74-23.5t56-59.5h170V276H180v404h170q23 36 56 59.5t74 23.5Z"/>-->
+                        <!--                                </svg>-->
+                        <!--                                <span class="category-item-title" style="font-size: 14px; color: #333;">Done</span>-->
+                        <!--                            </div>-->
+                        <!--&lt;!&ndash;                            <span class="category-item-number done_count" t-out="mailState.getCount.done_count"/>&ndash;&gt;-->
+                        <!--                        </li>-->
+                        <!--                        <li class="category-item snoozed" id="snoozed"-->
+                        <!--                            t-on-click="snoozedMailView">-->
+                        <!--                            <div>-->
+                        <!--                                <svg class="category-item-icon"-->
+                        <!--                                     xmlns="http://www.w3.org/2000/svg"-->
+                        <!--                                     height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">-->
+                        <!--                                    <path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/>-->
+                        <!--                                </svg>-->
+                        <!--                                <span class="category-item-title">Snoozed</span>-->
+                        <!--                            </div>-->
+                        <!--                            <span class="category-item-number snoozed_count" t-out="mailState.getCount.snoozed_count"/>-->
+                        <!--                        </li>-->
                     </ul>
                 </div>
             </section>
@@ -237,18 +282,18 @@
                                  alt="restore mail"
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_restore"/>
                         </button>
-<!--                        <button class="btn mark_as_done"-->
-<!--                                t-on-click="doneMail">-->
-<!--                            <img src="/odoo_mail_management/static/src/img/check_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg"-->
-<!--                                 alt="mark as done mail"-->
-<!--                                 class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_done"/>-->
-<!--                        </button>-->
-<!--                        <button class="btn mark_as_undone"-->
-<!--                                t-on-click="undoneMail">-->
-<!--                            <img src="/odoo_mail_management/static/src/img/undone.svg"-->
-<!--                                 alt="mark as undone mail"-->
-<!--                                 class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_undone"/>-->
-<!--                        </button>-->
+                        <!--                        <button class="btn mark_as_done"-->
+                        <!--                                t-on-click="doneMail">-->
+                        <!--                            <img src="/odoo_mail_management/static/src/img/check_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg"-->
+                        <!--                                 alt="mark as done mail"-->
+                        <!--                                 class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_done"/>-->
+                        <!--                        </button>-->
+                        <!--                        <button class="btn mark_as_undone"-->
+                        <!--                                t-on-click="undoneMail">-->
+                        <!--                            <img src="/odoo_mail_management/static/src/img/undone.svg"-->
+                        <!--                                 alt="mark as undone mail"-->
+                        <!--                                 class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_undone"/>-->
+                        <!--                        </button>-->
                         <button class="btn mark_read_checked"
                                 t-on-click="markSelectedAsRead">
                             <img src="/odoo_mail_management/static/src/img/mark_email_read_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg"
@@ -262,35 +307,37 @@
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_unread"/>
                         </button>
 
-                        <button class="btn delete_forever" t-on-click="delete_forever" t-if="mailState.mailType === 'trash'"
-                            style="color: black; padding: 5px 10px; border-radius: 4px; border: none; margin-left: 5px;">
+                        <button class="btn delete_forever" t-on-click="delete_forever"
+                                t-if="mailState.mailType === 'trash'"
+                                style="color: black; padding: 5px 10px; border-radius: 4px; border: none; margin-left: 5px;">
                             Delete Forever
                         </button>
 
                         <div class="pagination-controls" t-if="mailState.mode !== 'form'">
                             <span>
                                 Viewing
-                                <t t-esc="mailState.offset + 1"/> –
+                                <t t-esc="mailState.offset + 1"/>
+                                –
                                 <t t-esc="Math.min(mailState.offset + mailState.limit, mailState.totalRecords)"/>
                                 of
                                 <t t-esc="mailState.totalRecords"/>
                             </span>
                             <!-- Previous Button -->
                             <button class="btn"
-                                t-on-click="previousPage"
-                                t-att-disabled="mailState.offset === 0">
+                                    t-on-click="previousPage"
+                                    t-att-disabled="mailState.offset === 0">
                                 <img src="/odoo_mail_management/static/src/img/chevron_left_24.svg"
-                                 alt="Previous"
-                                 class="btn-icon btn-icon-sm btn-icon-alt btn-icon-hover"/>
+                                     alt="Previous"
+                                     class="btn-icon btn-icon-sm btn-icon-alt btn-icon-hover"/>
                             </button>
 
                             <!-- Next Button -->
                             <button class="btn"
-                                t-on-click="nextPage"
-                                t-att-disabled="mailState.allRecordsLoaded">
+                                    t-on-click="nextPage"
+                                    t-att-disabled="mailState.allRecordsLoaded">
                                 <img src="/odoo_mail_management/static/src/img/chevron_right_24.svg"
-                                 alt="Next"
-                                 class="btn-icon btn-icon-sm btn-icon-alt btn-icon-hover"/>
+                                     alt="Next"
+                                     class="btn-icon btn-icon-sm btn-icon-alt btn-icon-hover"/>
                             </button>
                         </div>
                     </div>
@@ -324,30 +371,30 @@
                 </div>
             </section>
             <!-- RIGHT SIDEBAR -->
-            <section class="app-container" style="display: flex;align-items: center;">
-                <div class="app-group">
-                    <div class="app-item">
-                        <button class="btn google_calender"
-                                t-on-click="redirectCalender">
-                            <img src="/odoo_mail_management/static/src/img/calendar_month_FILL0_wght400_GRAD0_opsz48.svg"
-                                 alt="Calendar"
-                                 class="btn-icon btn-icon-sm"
-                                 style="width: 35px; height: 40px; filter: invert(41%) sepia(75%) saturate(532%) hue-rotate(165deg) brightness(92%) contrast(91%);"/>
-                        </button>
-<!--                        <p t-on-click="redirectCalender">Calendar</p>-->
-                    </div>
-                    <div class="app-item" style="margin-top: -13px;">
-                        <button class=" btn contacts"
-                                t-on-click="redirectContacts">
-                            <img src="/odoo_mail_management/static/src/img/contact_page_FILL0_wght400_GRAD0_opsz48.svg"
-                                 alt="Contacts"
-                                 class="btn-icon btn-icon-sm"
-                                 style="width: 35px; height: 40px; filter: invert(85%) sepia(12%) saturate(1123%) hue-rotate(29deg) brightness(91%) contrast(90%);"/>
-                        </button>
-<!--                        <p t-on-click="redirectContacts">Contacts</p>-->
-                    </div>
-                </div>
-            </section>
+<!--            <section class="app-container" style="display: flex;align-items: center;">-->
+<!--                <div class="app-group">-->
+<!--                    <div class="app-item">-->
+<!--                        <button class="btn google_calender"-->
+<!--                                t-on-click="redirectCalender">-->
+<!--                            <img src="/odoo_mail_management/static/src/img/calendar_month_FILL0_wght400_GRAD0_opsz48.svg"-->
+<!--                                 alt="Calendar"-->
+<!--                                 class="btn-icon btn-icon-sm"-->
+<!--                                 style="width: 35px; height: 40px; filter: invert(41%) sepia(75%) saturate(532%) hue-rotate(165deg) brightness(92%) contrast(91%);"/>-->
+<!--                        </button>-->
+<!--                        &lt;!&ndash;                        <p t-on-click="redirectCalender">Calendar</p>&ndash;&gt;-->
+<!--                    </div>-->
+<!--                    <div class="app-item" style="margin-top: -13px;">-->
+<!--                        <button class=" btn contacts"-->
+<!--                                t-on-click="redirectContacts">-->
+<!--                            <img src="/odoo_mail_management/static/src/img/contact_page_FILL0_wght400_GRAD0_opsz48.svg"-->
+<!--                                 alt="Contacts"-->
+<!--                                 class="btn-icon btn-icon-sm"-->
+<!--                                 style="width: 35px; height: 40px; filter: invert(85%) sepia(12%) saturate(1123%) hue-rotate(29deg) brightness(91%) contrast(90%);"/>-->
+<!--                        </button>-->
+<!--                        &lt;!&ndash;                        <p t-on-click="redirectContacts">Contacts</p>&ndash;&gt;-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </section>-->
             <!--            large modal-->
             <div class="modal fade" id="large_modal" tabindex="-1"
                  aria-labelledby="send_message_label" aria-hidden="true">
@@ -382,11 +429,11 @@
                                         class="btn btn-primary"
                                         t-on-click="sentMail">Send
                                 </button>
-                                    <div class="image-upload">
+                                <div class="image-upload">
                                         <label for="file-input">
                                             <img src="/odoo_mail_management/static/src/img/attachment.svg"/>
                                         </label>
-                                        <input id="file-input" type="file"/>
+                                    <input id="file-input" type="file"/>
                                     </div>
                             </div>
                         </form>

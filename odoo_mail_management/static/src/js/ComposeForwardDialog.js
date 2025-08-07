@@ -12,6 +12,7 @@ export class ComposeForwardDialog extends Component {
         this.action = useService("action");
         this.notification = useService("notification");
 
+        // remove the dialog
         if(document.querySelector('.compose-mail-container')){
             document.querySelectorAll('.compose-mail-container').forEach(el => {
                 el.remove();

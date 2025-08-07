@@ -2,6 +2,8 @@
 import base64
 from odoo import api, fields, models, tools
 from odoo.exceptions import ValidationError
+from odoo.tools import format_datetime
+
 from datetime import datetime
 
 from bs4 import BeautifulSoup
@@ -26,16 +28,16 @@ class MailMail(models.Model):
     document_model_id = fields.Many2one('ir.model', string="Document Model")
     document_record_id = fields.Integer(string="Document Record ID")
     mail_template_id = fields.Many2one('mail.template', string="Template")
-    is_active = fields.Boolean(default=True,help="Flag indicating whether the mail is active.")
+    is_active = fields.Boolean(help="Flag indicating whether the mail is active.")
     # is_thread_root = fields.Boolean(store=True, string="Thread Root")
     mail_message_id = fields.Many2one('mail.message', string="Related Message", ondelete='set null')
     is_odoo_mail = fields.Boolean('Odoo Mail')
 
-    # @api.model_create_multi
-    # def create(self, vals_list):
-    #     for vals in vals_list:
-    #         vals['is_active'] = True
-    #     return super(MailMail, self).create(vals_list)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            vals['is_active'] = True
+        return super(MailMail, self).create(vals_list)
 
     @api.model
     def load_template(self, template_id, doc):
@@ -467,17 +469,22 @@ class MailMail(models.Model):
         if not original:
             return []
 
+        # convert time current user timezone
+        dt = fields.Datetime.from_string(original.create_date)
+        user_tz = self.env.user.tz or 'UTC'
+        mail_date = format_datetime(self.env, dt, tz=user_tz)
+
         body_html = None
         if isinstance(mail_id, str) and mail_id.startswith('msg-'):
             body_html = (
                     reply_content.replace('\n', '<br>')
-                    + f"<br><br>On {original.create_date}, {original.email_from} wrote:"
+                    + f"<br><br>On {mail_date}, {original.email_from} wrote:"
                     + f"<blockquote>{original.body or ''}</blockquote>"
             )
         else:
             body_html = (
                     reply_content.replace('\n', '<br>')
-                    + f"<br><br>On {original.create_date}, {original.email_from} wrote:"
+                    + f"<br><br>On {mail_date}, {original.email_from} wrote:"
                     + f"<blockquote>{original.body_html or ''}</blockquote>"
             )
         reply_subject = f"{original.subject or ''}"
@@ -744,19 +751,33 @@ class MailMessage(models.Model):
         data = super().search_read(domain)
         if mailType:
             search_data = self.search(domain)
-            for index, res in enumerate(search_data):
-                if res.child_ids:
-                    last_mail_message = self.get_last_child_message(res,mailType)
-                    if last_mail_message.preview:
-                        data[index]['Last_Message'] = last_mail_message.preview
-                        data[index]['Last_Message_Date'] = last_mail_message.date
-                else:
-                    data[index]['Last_Message_Date'] = res.date
-
-            # Show latest mail in teh top
-            sorted_data = sorted(data, key=lambda x: x['Last_Message_Date'], reverse=True)
-            return sorted_data
+            return self.sorted_mail_data(search_data)
         return data
+
+    def sorted_mail_data(self,result):
+        data=result.read()
+        for index, res in enumerate(result):
+            if res.child_ids:
+                last_mail_message = self.get_last_child_message(res)
+                if last_mail_message.preview:
+                    data[index]['Last_Message'] = last_mail_message.preview
+                    data[index]['Last_Date'] = last_mail_message.date
+
+                    dt = fields.Datetime.from_string(last_mail_message.date)
+                    user_tz = self.env.user.tz or 'UTC'
+                    converted_mail_date = format_datetime(self.env, dt, tz=user_tz)
+
+                    data[index]['Last_Message_Date'] = converted_mail_date
+            else:
+                dt = fields.Datetime.from_string(res.date)
+                user_tz = self.env.user.tz or 'UTC'
+                converted_mail_date = format_datetime(self.env, dt, tz=user_tz)
+
+                data[index]['Last_Message_Date'] = converted_mail_date
+
+        # Show latest mail in teh top
+        sorted_data = sorted(data, key=lambda x:datetime.strptime( x['Last_Message_Date'],"%d-%b-%Y, %I:%M:%S %p"), reverse=True)
+        return sorted_data
 
     @api.model
     def get_inbox_mails(self):
@@ -790,20 +811,8 @@ class MailMessage(models.Model):
                 for child in msg.child_ids
             )
         )
-        data=result.read()
-        # This is used to show replies (child messages) within the mail body content
-        for index, res in enumerate(result):
-            if res.child_ids:
-                last_mail_message = self.get_last_child_message(res)
-                if last_mail_message.preview:
-                    data[index]['Last_Message'] = last_mail_message.preview
-                    data[index]['Last_Message_Date'] = last_mail_message.date
-            else:
-                data[index]['Last_Message_Date'] = res.date
 
-        # Show latest mail in teh top
-        sorted_data = sorted(data, key=lambda x: x['Last_Message_Date'], reverse=True)
-        return sorted_data
+        return self.sorted_mail_data(result)
 
     @api.model
     def delete_mail(self, ids):
@@ -831,19 +840,8 @@ class MailMessage(models.Model):
                 "subject": record.subject,
                 "date": fields.Date.to_date(record.create_date),
             }
-        data= mails.read()
-        for index, res in enumerate(mails):
-            if res.child_ids:
-                last_mail_message = self.get_last_child_message(res)
-                if last_mail_message.preview:
-                    data[index]['Last_Message'] = last_mail_message.preview
-                    data[index]['Last_Message_Date'] = last_mail_message.date
-            else:
-                data[index]['Last_Message_Date'] = res.date
 
-        # Show latest mail in teh top
-        sorted_data = sorted(data, key=lambda x: x['Last_Message_Date'], reverse=True)
-        return sorted_data
+        return self.sorted_mail_data(mails)
 
     @api.model
     def restore_mail(self, ids):
@@ -889,20 +887,8 @@ class MailMessage(models.Model):
                     "sender": ", ".join(record.partner_ids.mapped('name')) if record.partner_ids else False,
                     "subject": record.subject,
                     "date": fields.Date.to_date(record.create_date), })
-        data=mails.read()
-        for index, res in enumerate(mails):
-            if res.child_ids:
-                last_mail_message = self.get_last_child_message(res)
-                if last_mail_message.preview:
-                    data[index]['Last_Message'] = last_mail_message.preview
-                    data[index]['Last_Message_Date'] = last_mail_message.date
-            else:
-                data[index]['Last_Message_Date'] = res.date
 
-        # Show latest mail in teh top
-        sorted_data = sorted(data, key=lambda x: x['Last_Message_Date'], reverse=True)
-        return sorted_data
-        # return mails.read()
+        return self.sorted_mail_data(mails)
 
     @api.model
     def unarchive_mail(self, *args):

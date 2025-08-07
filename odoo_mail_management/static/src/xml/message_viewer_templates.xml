@@ -150,10 +150,10 @@
 
                     <div class="d-flex align-items-center justify-content-between border-top pt-3">
                         <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary btn-sm" t-on-click="() => replyMail(mail, env)" style="border-radius:4px; padding:6px 12px; font-size:13px;">
+                            <button class="btn btn-outline-secondary btn-sm"  t-on-click="() => replyMail(mail, env)" style="border-radius:20px; padding:6px 12px; font-size:13px;">
                                 Reply
                             </button>
-                            <button class="btn btn-outline-secondary btn-sm" t-on-click="() => forwardMail(mail, env)" style="border-radius:4px; padding:6px 12px; font-size:13px;">
+                            <button class="btn btn-outline-secondary btn-sm" t-on-click="() => forwardMail(mail, env)" style="border-radius:20px; padding:6px 12px; font-size:13px;">
                                 Forward
                             </button>
                         </div>

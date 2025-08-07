@@ -30,9 +30,9 @@
                 </div>
                 <div>
                     <div class="o_setting_right_pane">
-                        <label for="model_selection_for_email"/>
+                        <label for="model_selection_for_email" class="m-3"/>
                         <field name="model_selection_for_email"
-                               string="Custom Mail Logo" widget="many2many_tags"/>
+                               string="Model Selection For Email" widget="many2many_tags"/>
                     </div>
                 </div>
             </xpath>

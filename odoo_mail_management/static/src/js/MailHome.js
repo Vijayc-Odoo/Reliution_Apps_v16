@@ -110,9 +110,10 @@ class odooMail extends  Component {
         else{
             if(this.mailState.formData.id){
                 await this.orm.call('mail.message','write', [[this.mailState.formData.id], { is_read: true }]);
-//                this.refreshPage()
+//
             }
         }
+        this.refreshPage()
     }
 
     async markSelectedAsUnread() {
@@ -126,9 +127,10 @@ class odooMail extends  Component {
         else{
             if(this.mailState.formData.id){
                 await this.orm.call('mail.message','write', [[this.mailState.formData.id], { is_read: false }]);
-//                this.refreshPage()
+//
             }
         }
+        this.refreshPage()
     }
        /**
      * Method to reset the mail view.
@@ -448,13 +450,17 @@ class odooMail extends  Component {
         ];
         const total = await this.orm.searchCount('mail.message', domain);
         this.mailState.totalRecords = total;
-        const records = await this.orm.call(
+        const paginatedRecords = await this.orm.call(
             'mail.message', 'search_read',
             [domain, []],
             { limit: this.mailState.limit,
               offset: this.mailState.offset,
               order: "create_date desc",
               mailType:this.mailState.mailType }
+        );
+        const records = paginatedRecords.slice(
+            this.mailState.offset,
+            this.mailState.offset + this.mailState.limit
         );
         this.mailState.loadMail = records;
         this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;
