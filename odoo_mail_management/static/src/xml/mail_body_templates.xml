@@ -14,11 +14,6 @@
                           t-on-click="onClickSelect">
                    </input>
                </button>
-<!--               <button style="background-color: white; color: black; padding: 5px 10px;">-->
-<!--                <input type="checkbox"-->
-<!--                       style="background:#f9fafb": #ffffff; accent-color: #000000; width: 16px; height: 16px;"-->
-<!--                       t-on-click="onClickSelect"/>-->
-<!--            </button>-->
            </div>
             <div>
         <button class="btn star" data-id="' + name.id + '" style="margin: 0;"
@@ -89,13 +84,6 @@
                      id="retry"
                      t-on-click="resendMail"/>
             </button>
-<!--            <button class="btn done_btn" t-if="!props.mail.is_done"-->
-<!--                    t-on-click="() => this.toggleDone(props.mail)">✅</button>-->
-
-<!--            <button class="btn undone_btn" t-elif="props.mail.is_done"-->
-<!--                    t-on-click="() => this.toggleDone(props.mail)">❌</button>-->
-
-            <!--            <button class="btn snooze_btn" t-on-click="() => this.snoozeMail(mail)">Snooze</button>-->
             <button class="btn read_btn" t-if="!props.mail.is_read"
                     t-on-click="() => this.markAsRead(props.mail)">📩</button>
             <button class="btn unread_btn" t-if="props.mail.is_read"

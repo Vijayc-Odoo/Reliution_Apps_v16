@@ -15,10 +15,6 @@
                     <h1 class="title fs-5" id="send_message_label"
                         style="font-size: 16px; font-weight: 600; color: #333;">New Message</h1>
                     <div class="ms-auto" style="display: flex; gap: 8px;">
-<!--                        <button class="btn" id="minimizeButton" type="button" t-on-click="minimizeMail"-->
-                        <!--                                style="background: none; border: none; color: #777; cursor: pointer;">-->
-                        <!--                            <i class="fa fa-window-minimize" aria-hidden="true"/>-->
-                        <!--                        </button>-->
                         <button class="btn" id="minimizeButton"
                                 type="button"
                                 t-on-click="minimizeMail"

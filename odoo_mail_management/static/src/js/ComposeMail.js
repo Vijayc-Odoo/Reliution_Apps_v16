@@ -67,10 +67,6 @@ export class ComposeMail extends Component {
             images: [],
         });
 
-//        this.validateEmail = (email) => {
-//            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//            return re.test(String(email).toLowerCase());
-//        };
 
         this.handleKeyDown = (ev) => {
             if (ev.key === 'Enter' && this.state.currentSearchTerm.trim() && this.state.currentSearchTerm.includes("@")) {
@@ -182,11 +178,6 @@ export class ComposeMail extends Component {
         }
         else if (typeof partnerOrEmail === 'string') {
             const email = partnerOrEmail.trim();
-
-//            if (!this.validateEmail(email)) {
-//                console.warn("Invalid email format");
-//                return;
-//            }
 
             if (this.state.recipients.some(r => r.email === email)) {
                 return;
@@ -429,12 +420,6 @@ export class ComposeMail extends Component {
 
         let hasErrors = false;
 
-//        if (recipients.length === 0) {
-//            // Show error - at least one recipient required
-//            console.warn("No recipients selected");
-//            return;
-//        }
-
         // Validate recipients
         if (recipients.length === 0) {
             this.state.errors.recipients = "Please add at least one recipient";
@@ -473,26 +458,6 @@ export class ComposeMail extends Component {
         }
     }
     /* Method to maximize or restore the mail composition window. */
-//    maximizeMail() {
-//        const mailBody = this.root.el;
-//        const TextArea = this.root.el.querySelector("#content");
-//
-//        if (mailBody.classList.contains('maximized')) {
-//            mailBody.style.height = '532px';
-//            mailBody.style.right = '5%';
-//            mailBody.style.width = '30%';
-//            mailBody.style.position = 'fixed';
-//            TextArea.style.height = '300px';
-//        } else {
-//            mailBody.style.height = '900px';
-//            mailBody.style.right = '5%';
-//            mailBody.style.width = '100%';
-//            mailBody.style.position = 'absolute';
-//
-//        }
-//        mailBody.classList.toggle('maximized');
-//    }
-
     maximizeMail(ev) {
         // Prevent event bubbling
         ev.stopPropagation();

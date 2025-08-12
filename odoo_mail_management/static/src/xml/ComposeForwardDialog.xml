@@ -56,36 +56,3 @@
     </t>
 </templates>
 
-
-<!--<?xml version="1.0" encoding="UTF-8"?>-->
-<!--<templates xml:space="preserve">-->
-<!--    <t t-name="ComposeForwardDialog" owl="1">-->
-<!--        <div class="compose-forward-container" style="position:fixed; bottom:0; right:10px; width:400px; background:white; border:1px solid #ccc; border-radius:8px; z-index:1000; box-shadow:0 4px 6px rgba(0,0,0,0.1);">-->
-<!--            <div class="header d-flex justify-content-between align-items-center p-2 border-bottom">-->
-<!--                <span><strong>Forward</strong></span>-->
-<!--                <div>-->
-<!--                    <button class="btn btn-sm" t-on-click="closePopup">-->
-<!--                        <i class="fa fa-times"></i>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="body p-2">-->
-<!--                <div class="mb-2">-->
-<!--                    <label>To:</label>-->
-<!--                    <input type="email" class="form-control" t-model="state.recipient" placeholder="Recipient email"/>-->
-<!--                </div>-->
-<!--                <div class="mb-2">-->
-<!--                    <label>Subject:</label>-->
-<!--                    <input type="text" class="form-control" t-model="state.subject"/>-->
-<!--                </div>-->
-<!--                <div class="mb-2">-->
-<!--                    <label>Message:</label>-->
-<!--                    <textarea class="form-control" rows="6" t-model="state.content"></textarea>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="footer d-flex justify-content-end p-2 border-top">-->
-<!--                <button class="btn btn-primary" t-on-click="sendForward">Send</button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </t>-->
-<!--</templates>-->

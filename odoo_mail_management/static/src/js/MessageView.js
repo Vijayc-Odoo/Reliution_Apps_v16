@@ -55,16 +55,6 @@ export class MessageView extends  Component {
             url: "/web/content/" + value+ "?download=true",
         });
     }
-    /**
-     * Method to reply the mail.
-     */
-//    async replyMail() {
-//        const replyContent = prompt("Enter your reply:"); // Or use a popup dialog
-//        if (replyContent) {
-//            await this.orm.call('mail.mail', 'reply_mail', [this.props.mail.id], { reply_content: replyContent });
-//            window.location.reload();
-//        }
-//    }
 
     async onClickAttachment(attachmentId) {
         this.action.doAction({
@@ -86,11 +76,6 @@ export class MessageView extends  Component {
         await this.mailUtils.markAsDone(this.props.mail.id);
         window.location.reload(); // optional: reload or navigate back
     }
-
-//    async snoozeMail() {
-//        await this.mailUtils.snoozeMail(this.props.mail.id);
-//        window.location.reload();
-//    }
 
     async markAsReadOnOpen() {
         if (!this.props.mail?.id || this.props.mail.is_read) return;

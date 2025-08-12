@@ -20,9 +20,6 @@ export class MailBody extends  Component {
         this.state = useState({ starred: false });
         this.state.latest_mail=[];
         this.state.date='';
-//        this.state.latest_mail=await this.orm.call('mail.message', 'get_inbox_mails', [this.props.mail.child_ids,true])
-//        this.state.date=formatDateTime(this.state.latest_mail[0]?.date || this.props.mail.date)
-//        this.state.date=formatDateTime(DateTime.fromISO(this.state.latest_mail[0]?.date || this.props.mail.date))
         this.handleSelectAll = (event) => {
             if (this.ref.el) {
                 const checkbox = this.ref.el.querySelector(".mail_check_box");
@@ -116,36 +113,6 @@ export class MailBody extends  Component {
         await this.markAsRead(mail);
     }
    }
-    /**
-     * Method to reply the mail.
-     */
-//    async replyMail() {
-//        const replyContent = prompt("Enter your reply:"); // Or use a popup dialog
-//        if (replyContent) {
-//            await this.orm.call('mail.mail', 'reply_mail', [this.props.mail.id], { reply_content: replyContent });
-//            window.location.reload();
-//        }
-//    }
-
-//    async replyMail() {
-//        this.env.services.dialog.add(ComposeReplyDialog, { mail: this.props.mail });
-//    }
-
-//    async markAsDone(mail) {
-//        var mail = this.props.mail.id
-//        await this.orm.call('mail.mail','mark_done',[mail]);
-//        window.location.reload();
-////        this.props.getCount();
-////        this.props.allMailView();
-
-//    async markAsUndone(mail) {
-////        await this.mailUtils.markAsUndone(mail.id);
-////        this.props.getCount();
-////        this.props.allMailView();
-//        var mail = this.props.mail.id
-//        await this.orm.call('mail.mail','mark_undone',[mail]);
-//        window.location.reload();
-//    }
 
     async toggleDone(mail) {
         mail.is_done = !mail.is_done;
@@ -155,16 +122,7 @@ export class MailBody extends  Component {
             await this.orm.call('mail.mail', 'mark_undone', [mail.id]);
         }
         window.location.reload();
-//        this.props.getCount();     // Refresh counter
-//        this.props.allMailView();  // Refresh mail list
     }
-
-//    async snoozeMail(mail) {
-//        await this.mailUtils.snoozeMail(mail.id);
-//        this.props.getCount();
-//        this.props.allMailView();
-//    }
-
     async markAsRead(mail) {
         if (!mail?.id || mail.is_read) return;
         await this.orm.call('mail.message', 'mark_as_read', [mail.id]);

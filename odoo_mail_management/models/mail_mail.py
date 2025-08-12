@@ -24,12 +24,10 @@ class MailMail(models.Model):
                                 help='Replies and forwards of this mail')
     thread_id = fields.Many2one('mail.mail', string='Threads', help='Root mail of the thread')
     is_read = fields.Boolean(string="Is Read")
-    # bcc_email = fields.Char(string="BCC Email")
     document_model_id = fields.Many2one('ir.model', string="Document Model")
     document_record_id = fields.Integer(string="Document Record ID")
     mail_template_id = fields.Many2one('mail.template', string="Template")
     is_active = fields.Boolean(help="Flag indicating whether the mail is active.")
-    # is_thread_root = fields.Boolean(store=True, string="Thread Root")
     mail_message_id = fields.Many2one('mail.message', string="Related Message", ondelete='set null')
     is_odoo_mail = fields.Boolean('Odoo Mail')
 
@@ -89,11 +87,6 @@ class MailMail(models.Model):
         soup = BeautifulSoup(html, 'html.parser')
         return soup.get_text()
 
-    # @api.depends('parent_id')
-    # def _compute_is_thread_root(self):
-    #     for record in self:
-    #         record.is_thread_root = not bool(record.parent_id)
-
     @api.model
     def get_mail_count(self):
         """Method to get count of all mails,sent mails
@@ -121,11 +114,7 @@ class MailMail(models.Model):
             ('email_to', 'ilike', user_email), ('recipient_ids.email', 'ilike', user_email), ('is_trashed', '=', False),
             ('is_done', '=', True)
         ])
-        # snoozed_count = self.sudo().search_count([
-        #     '|',
-        #     ('email_to', 'ilike', user_email),('recipient_ids.email', 'ilike', user_email),('is_trashed', '=', False),
-        #     ('snoozed_until', '>', now)
-        # ])
+
 
         mail_dict = {'all_count': all_count,
                      'sent_count': sent_count,
@@ -150,36 +139,6 @@ class MailMail(models.Model):
             [('is_starred', '=', True), ('create_uid', '=', self.env.user.id)])
         return mails.read()
 
-    # @api.model
-    # def delete_mail(self, ids):
-    #     # """Method to unlink mail."""
-    #     """Move mails to Trash instead of deleting."""
-    #     mails = self.sudo().search(
-    #         [('id', 'in', ids), ('create_uid', '=', self.env.user.id), '|',
-    #          ('active', '=', False), ('id', 'in', ids),
-    #          ('create_uid', '=', self.env.user.id)])
-    #     for mail in mails:
-    #         mail.is_trashed = True
-    #         mail.active = True
-    # mail.sudo().unlink()
-
-    # @api.model
-    # def get_trash_mail(self):
-    #     """Method to get trashed mails."""
-    #     mail_dict = {}
-    #     mails = self.sudo().search([
-    #         ('is_trashed', '=', True),
-    #         ('create_uid', '=', self.env.user.id)
-    #     ])
-    #     for record in mails:
-    #         mail_dict[str(record.mail_message_id)] = {
-    #             "id": record.id,
-    #             "sender": record.email_to or record.recipient_ids.name,
-    #             "subject": record.subject,
-    #             "date": fields.Date.to_date(record.create_date),
-    #         }
-    #     return mails.read()
-
     @api.model
     def open_mail(self, *args):
         """Method to open a mail and show its content."""
@@ -188,56 +147,6 @@ class MailMail(models.Model):
              ('is_active', '=', False), ('id', '=', *args),
              ('create_uid', '=', self.env.user.id)]).body_html
         return detail
-
-    # @api.model
-    # def archive_mail(self, *args):
-    #     """Method to archive mail."""
-    #     """Call thay che js mathi and """
-    #     self.sudo().search([('id', '=', *args),
-    #                         ('create_uid', '=', self.env.user.id)]). \
-    #         write({"active": False})
-
-    # @api.model
-    # def get_archived_mail(self):
-    #     """Method to get archived mails"""
-    #     mail_dict = {}
-    #     mails = self.sudo().search([('active', '=', False),('is_trashed', '=', False),
-    #                                 ('create_uid', '=', self.env.user.id)])
-    #     for record in mails:
-    #         if record.email_to:
-    #             mail_dict[str(record.mail_message_id)] = ({
-    #                 "id": record.id,
-    #                 "sender": record.email_to,
-    #                 "subject": record.subject,
-    #                 "date": fields.Date.to_date(record.create_date), })
-    #         elif record.recipient_ids:
-    #             mail_dict[str(record.mail_message_id)] = ({
-    #                 "id": record.id,
-    #                 "sender": record.recipient_ids.name,
-    #                 "subject": record.subject,
-    #                 "date": fields.Date.to_date(record.create_date), })
-    #     return mails.read()
-
-    # @api.model
-    # def unarchive_mail(self, *args):
-    #     """Method to make mail unarchived."""
-    #     self.sudo().search([('active', '=', False), ('id', '=', *args),
-    #                         ('create_uid', '=', self.env.user.id)]). \
-    #         write({'active': True})
-
-    # @api.model
-    # def delete_checked_mail(self, *args):
-    #     """Method to delete checked mails."""
-    #     self.search(
-    #         [('id', '=', *args), '|', ('id', '=', *args),
-    #          ('active', '=', False)]).sudo().unlink()
-
-    # @api.model
-    # def archive_checked_mail(self, *args):
-    #     """Method to archive checked mails."""
-    #     self.sudo().search([('id', 'in', *args),
-    #                         ('create_uid', '=', self.env.user.id)]). \
-    #         write({"active": False})
 
     @api.model
     def mark_done(self, mail_ids):
@@ -252,18 +161,6 @@ class MailMail(models.Model):
         mails = self.sudo().browse(mail_ids)
         mails.write({'is_done': False})
         return True
-
-    # @api.model
-    # def snooze_mail(self, mail_id, snoozed_until):
-    #     mail = self.sudo().browse(mail_id)
-    #     mail.snoozed_until = snoozed_until
-    #     return True
-
-    # @api.model
-    # def unsnooze_mail(self, mail_id):
-    #     mail = self.sudo().browse(mail_id)
-    #     mail.snoozed_until = False
-    #     return True
 
     @api.model
     def get_mail_folders(self):
@@ -286,12 +183,6 @@ class MailMail(models.Model):
         content = kwargs.get('content')
         image = kwargs.get('images')
 
-        # partner = self.env['res.partner'].search([('email', '=', recipient)], limit=1)
-        # if not partner:
-        #     partner = self.env['res.partner'].create({
-        #         'name': recipient.split('@')[0],  # Use the local-part of the email as name
-        #         'email': recipient,
-        #     })
         # Process recipients - create partners if needed
         recipient_emails = [r.strip() for r in recipient.split(',') if r.strip()]
         partner_ids = []
@@ -357,12 +248,6 @@ class MailMail(models.Model):
         mail.mark_outgoing()
         mail.send()
 
-    # @api.model
-    # def restore_mail(self, ids):
-    #     """Restore mail from trash."""
-    #     mails = self.sudo().search([('id', 'in', ids)])
-    #     mails.write({'is_trashed': False})
-
     @api.model
     def get_done_mails(self):
         user_email = self.env.user.email
@@ -376,38 +261,6 @@ class MailMail(models.Model):
             ('is_done', '=', True)
         ], order='create_date desc')
         return done_mails.read()
-
-    # @api.model
-    # def get_snoozed_mails(self):
-    #     user_email = self.env.user.email
-    #     now = fields.Datetime.now()
-    #     snoozed_mails = self.sudo().search([
-    #         '|',
-    #         ('email_to', 'ilike', user_email),
-    #         ('recipient_ids.email', 'ilike', user_email),
-    #         ('is_trashed', '=', False),
-    #         ('snoozed_until', '>', now)
-    #     ], order='snoozed_until asc')
-    #     return snoozed_mails.read()
-
-    # @api.model
-    # def get_inbox_mails(self):
-    #     """Return only top-level, not-done, not-trashed mails addressed to the current user."""
-    #     user_email = self.env.user.email
-    #     now = fields.Datetime.now()
-    #
-    #     inbox_mails = self.sudo().search([
-    #         '|',
-    #         '|',
-    #         ('email_from', 'ilike', user_email),
-    #         ('email_to', 'ilike', user_email),
-    #         ('recipient_ids.email', 'ilike', user_email),
-    #         ('is_trashed', '=', False),
-    #         ('is_done', '=', False),
-    #         ('mail_message_id.child_ids', '!=', False),
-    #         ('is_odoo_mail', '=', True),
-    #     ], order='create_date desc')
-    #     return inbox_mails.read()
 
     @api.model
     def get_mail_thread(self, mail_id):
@@ -514,7 +367,6 @@ class MailMail(models.Model):
             'subject': reply_subject,
             'body': body_html,
             'email_from': self.env.user.email,
-            # 'email_msg_to': original.email_from,
             'email_msg_to': email_msg_to,
             'email_msg_cc': cc,
             'message_type': 'email_outgoing',
@@ -524,23 +376,17 @@ class MailMail(models.Model):
             'subtype_id': self.env.ref('mail.mt_comment').id,
             'partner_ids': [(6, 0, [self.env.user.partner_id.id])],
             'attachment_ids': attachment_ids,
-            # 'is_odoo_mail_message': True
         }
         msg = self.env['mail.message'].create(msg_vals)
 
         mail_vals = {
             'subject': reply_subject,
-            # 'email_to': recipient,
             'email_to': email_msg_to,
             'email_from': self.env.user.email,
             'email_cc': cc,
             'body_html': body_html,
-            # 'parent_id': original.id,
-            # 'thread_id': original.thread_id.id or original.id,
             'mail_message_id': msg.id,
             'attachment_ids': attachment_ids,
-            # 'document_model_id': original.document_model_id.id,
-            # 'document_record_id': original.document_record_id,
         }
         reply_mail = self.create(mail_vals)
         reply_mail.send()
@@ -620,10 +466,6 @@ class MailMail(models.Model):
                     })
                     attachment_vals.append((4, new_attachment.id))
 
-        # Add new attachments
-        # if new_attachment_ids:
-        #     for attachment_id in new_attachment_ids:
-        #         attachment_vals.append((4, attachment_id))
         if new_attachment_ids:
             for att in new_attachment_ids:
                 if att.get('datas') and att.get('name'):
@@ -646,11 +488,7 @@ class MailMail(models.Model):
             'email_from': self.env.user.email,
             'email_cc': cc,
             'body_html': body_html,
-            # 'parent_id': original_mail.id,
-            # 'thread_id': original.thread_id.id or original.id,
             'mail_message_id': msg.id,
-            # 'document_model_id': original.document_model_id.id,
-            # 'document_record_id': original.document_record_id,
         }
         forward_mail = self.create(mail_vals)
         forward_mail.send()
@@ -706,15 +544,11 @@ class MailMessage(models.Model):
     @api.model
     def star_mail(self, *args):
         """Method to make a mail starred."""
-        # self.search([('id', '=', *args),
-        #              ('create_uid', '=', self.env.user.id)]).sudo().write({"is_starred": True})
         self.search([('id', '=', *args)]).sudo().write({"is_starred": True})
 
     @api.model
     def unstar_mail(self, *args):
         """Method to make a mail not starred."""
-        # self.sudo().search([('id', '=', *args),
-        #                     ('create_uid', '=', self.env.user.id)]).write({"is_starred": False})
         self.search([('id', '=', *args)]).sudo().write({"is_starred": False})
 
     # This function is used to retrieve the ID of the most recent mail
@@ -785,25 +619,11 @@ class MailMessage(models.Model):
         user_email = self.env.user.email
         now = fields.Datetime.now()
 
-        # domain = [
-        #     ('parent_id', '=', False),
-        #     # ('child_ids', '!=', False),
-        #     ('is_trashed', '=', False),
-        #     ('is_odoo_mail_message', '=', True),
-        #     '|',
-        #     '|',
-        #     ('email_from', 'ilike', user_email),
-        #     ('email_msg_to', 'ilike', user_email),
-        #     ('partner_ids', 'in', self.env.user.partner_id.ids),
-        # ]
         domain = ['&', '&', ('parent_id', '=', False), ('is_trashed', '=', False), ('is_odoo_mail_message', '=', True),
                   '|', '|', ('email_from', 'ilike', user_email), ('email_msg_to', 'ilike', user_email),
                   ('partner_ids', 'in', self.env.user.partner_id.ids)]
-        # domain = ['&', '&', ('parent_id', '=', False), ('is_trashed', '=', False), ('is_odoo_mail_message', '=', True),
-        #           '|',('email_from', 'ilike', user_email), ('email_msg_to', 'ilike', user_email)]
 
         parent_messages = self.sudo().search(domain)
-        # parent_messages = self.sudo().search([('is_odoo_mail_message', '=', True),('parent_id','=',False)])
 
         result = parent_messages.filtered(
             lambda msg:not msg.message_type == 'email_outgoing' and not msg.parent_id or any(
@@ -855,24 +675,17 @@ class MailMessage(models.Model):
         self.search(
             [('id', '=', *args), '|', ('id', '=', *args), ('is_active', '=', False)]).sudo().unlink()
 
-    # @api.model
-    # def delete_checked_mail(self, *args):
-    #     """Method to delete checked mails."""
-    #     self.search(
-    #         [('id', '=', *args), '|', ('id', '=', *args), ('active', '=', False)]).sudo().unlink()
 
     @api.model
     def archive_mail(self, *args):
         """Method to archive mail."""
         """Call thay che js mathi and """
-        # self.sudo().search([('id', '=', *args), ('create_uid', '=', self.env.user.id)]).write({"active": False})
         self.sudo().search([('id', '=', *args)]).write({"is_active": False})
 
     @api.model
     def get_archived_mail(self):
         """Method to get archived mails"""
         mail_dict = {}
-        # mails = self.sudo().search([('active', '=', False), ('is_trashed', '=', False),('create_uid', '=', self.env.user.id)])
         mails = self.sudo().search([('is_active', '=', False), ('is_trashed', '=', False)])
         for record in mails:
             if record.email_msg_to:
@@ -893,15 +706,7 @@ class MailMessage(models.Model):
     @api.model
     def unarchive_mail(self, *args):
         """Method to make mail unarchived."""
-        # self.sudo().search([('active', '=', False), ('id', '=', *args),('create_uid', '=', self.env.user.id)]).write({'active': True})
         self.sudo().search([('is_active', '=', False), ('id', '=', *args)]).write({'is_active': True})
-
-    # @api.model
-    # def delete_checked_mail(self, *args):
-    #     """Method to delete checked mails."""
-    #     self.search(
-    #         [('id', '=', *args), '|', ('id', '=', *args),
-    #          ('active', '=', False)]).sudo().unlink()
 
     @api.model
     def delete_checked_mail(self,*args):
