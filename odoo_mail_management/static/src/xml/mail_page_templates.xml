@@ -3,7 +3,7 @@
         <!-- OdooMail template for the main application -->
     <t t-name="OdooMail" owl="1">
         <div class="odoo_mails" t-ref="root">
-        <div class="body-wrapper">
+        <div class="body-wrapper" style="background:#f9fafb">
             <!-- HEADER -->
 <!--            <header class="head"-->
 <!--                    style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #fff; border-bottom: 1px solid #ddd;">-->
@@ -78,14 +78,18 @@
                      style="width: 260px; background: #f5f7f9; padding: 20px 10px; height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.05); overflow-y: auto;">
                 <div class="left-sidebar-compose" style="margin-bottom: 20px;">
                     <button class="sidebar-btn-compose compose"
-                            t-on-click="composeMail"
-                            style="display: flex; align-items: center; background-color: #1976d2; color: white; border: none; border-radius: 25px; font-weight: 500; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        t-on-click="composeMail"
+                        style="display: flex; align-items: center; background-color: #c2e7ff; color: white; border: none; border-radius: 15px; font-weight: 500; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: box-shadow 0.2s ease-in-out; padding: 8px 12px;"
+                            onmouseover="this.style.boxShadow='0 4px 8px rgba(0,0,0,0.4)'"
+                            onmouseout="this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">
+
                         <img src="/odoo_mail_management/static/src/img/edit_square_FILL0_wght400_GRAD0_opsz48.svg"
                              alt="Compose a new email"
                              class="sidebar-btn-compose-icon"
-                             style="width: 20px; height: 20px;"/>
+                             style="width: 20px; height: 20px; margin-right: 6px;"/>
                         <span class="sidebar-btn-compose-title">Compose</span>
                     </button>
+
                 </div>
                 <div class="left-siderbar-label">
                     <ul class="labels category-item-list" style="list-style: none; padding-left: 0; margin: 0;">

@@ -776,7 +776,7 @@ class MailMessage(models.Model):
                 data[index]['Last_Message_Date'] = converted_mail_date
 
         # Show latest mail in teh top
-        sorted_data = sorted(data, key=lambda x:datetime.strptime( x['Last_Message_Date'],"%d-%b-%Y, %I:%M:%S %p"), reverse=True)
+        sorted_data = sorted(data, key=lambda x:datetime.strptime( x['Last_Message_Date'],"%b %d, %Y, %I:%M:%S %p"), reverse=True)
         return sorted_data
 
     @api.model

@@ -2,8 +2,6 @@
 <templates id="template" xml:space="preserve">
         <!-- MailBody template for displaying individual mail items in the inbox -->
     <t t-name="MailBody" owl="1">
-<!--        <div class="inbox-message-item  message-default-unread"-->
-<!--             data-id="' + name.id + '" t-ref="root">-->
         <div t-ref="root" class="inbox-message-item  message-default-unread"
              t-att-class="{ 'inbox-message-item': true, 'message-default-unread': !props.mail.is_read, 'message-default-read': props.mail.is_read }"
              data-id="' + name.id + '">
@@ -11,10 +9,16 @@
                <button class="btn">
                    <input type="checkbox" id="checkbox"
                           data-id="' + name.id + '"
+                          style="background: #f1f1f1; border: 1px solid white;"
                           class="checkbox checkbox_func mail_check_box"
                           t-on-click="onClickSelect">
                    </input>
                </button>
+<!--               <button style="background-color: white; color: black; padding: 5px 10px;">-->
+<!--                <input type="checkbox"-->
+<!--                       style="background:#f9fafb": #ffffff; accent-color: #000000; width: 16px; height: 16px;"-->
+<!--                       t-on-click="onClickSelect"/>-->
+<!--            </button>-->
            </div>
             <div>
         <button class="btn star" data-id="' + name.id + '" style="margin: 0;"
@@ -31,66 +35,9 @@
                  id="starred"/>
         </button>
         </div>
-            <!--            <div class="message-default" data-id="' + name.id + '"-->
-            <!--                 t-on-click="openMail">-->
-            <!--            <div class="message-sender message-content">-->
-            <!--                <t t-if="props.mail.email_msg_to">-->
-            <!--                    <span t-out="props.mail.email_msg_to"/>-->
-            <!--                </t>-->
-            <!--                <t t-else="">-->
-
-            <!--                <span t-out="props.mail.email_from"/>-->
-            <!--                </t>-->
-            <!--            </div>-->
-            <!--            <div class="message-subject message-content" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-->
-            <!--                <span t-out="props.mail.subject"/>-->
-            <!--                - -->
-            <!--                <span t-out="props.mail.preview"/>-->
-            <!--            </div>-->
-            <!--                &lt;!&ndash;                <div>-</div>&ndash;&gt;-->
-            <!--                &lt;!&ndash;                <div class="message-body message-content">&ndash;&gt;-->
-            <!--                &lt;!&ndash;                    <span t-out="props.mail.preview"/>&ndash;&gt;-->
-            <!--                &lt;!&ndash;                </div>&ndash;&gt;-->
-            <!--                &lt;!&ndash;                <div>&ndash;&gt;-->
-            <!--                &lt;!&ndash;                    <span out="props.mail.body"/>&ndash;&gt;-->
-            <!--                &lt;!&ndash;                </div>&ndash;&gt;-->
-            <!--&lt;!&ndash;                <div class="gap message-content"> </div>&ndash;&gt;-->
-            <!--                <div class="message-date center-text" style="margin-left: 10px; white-space: nowrap;">-->
-            <!--                    <span t-out="props.mail.date"/>-->
-            <!--               </div>-->
-            <!--    </div>-->
-<!--<div class="message-default" style="display: flex; align-items: center; width: 100%; border-bottom: 1px solid #f1f1f1;"-->
-<!--     data-id="' + name.id + '"-->
-<!--     t-on-click="openMail">-->
-
-
-<!--    <div class="message-sender" style="width: 200px; min-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-->
-<!--        <t t-if="props.mail.email_msg_to">-->
-<!--            <span t-out="props.mail.email_msg_to"/>-->
-<!--        </t>-->
-<!--        <t t-else="">-->
-<!--            <span t-out="props.mail.email_from"/>-->
-<!--        </t>-->
-<!--    </div>-->
-
-<!--    <div class="message-subject" style="flex: 1; min-width: 0; display: flex; overflow: hidden; margin: 0 8px;">-->
-<!--        <span style="white-space: nowrap;">-->
-<!--            <span t-out="props.mail.subject"/>-->
-<!--        </span>-->
-<!--        <span style="margin: 0 4px;">-</span>-->
-<!--        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-->
-<!--            <span t-out="props.mail.preview"/>-->
-<!--        </span>-->
-<!--    </div>-->
-
-<!--    <div class="message-date" style="white-space: nowrap; font-size: 0.8rem; margin-left: auto; padding-left: 12px;">-->
-<!--        <span t-out="props.mail.date"/>-->
-<!--    </div>-->
-<!--</div>-->
             <div class="message-default" style="display: flex; align-items: center; width: 100%; border-bottom: 1px solid #f1f1f1;" data-id="' + name.id + '" t-on-click="openMail">
-            <div class="message-sender" style="width: 200px; min-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            <div class="message-sender" style="width: 200px; min-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: black;">
                 <t t-if="props.mail.email_msg_to">
-                    <span t-debug="props.mail.email_msg_to"/>
                     <span t-out="props.mail.email_msg_to"/>
                 </t>
                 <t t-else="">
@@ -98,7 +45,7 @@
                 </t>
             </div>
 
-            <div class="message-subject" style="flex: 1; min-width: 0; display: flex; overflow: hidden; margin: 0 8px;">
+            <div class="message-subject" style="flex: 1; min-width: 0; display: flex; overflow: hidden; margin: 0 8px; color: black;">
                 <span style="white-space: nowrap;">
                     <span t-out="props.mail.subject"/>
                 </span>
@@ -109,12 +56,8 @@
                 </span>
             </div>
 
-            <div class="message-date" style="white-space: nowrap; font-size: 0.8rem; margin-left: auto; padding-left: 12px;">
+            <div class="message-date" style="white-space: nowrap; font-size: 0.8rem; margin-left: auto; padding-left: 12px; color: black;">
                 <span t-out="props.mail.Last_Message_Date || props.mail.date"/>
-<!--                <span>-&#45;&#45;</span>-->
-<!--                <span t-out="props.mail.date"/>-->
-<!--                <span t-out="state.date"/>-->
-<!--                <span t-out="(state.latest_mail[0]?.date) || props.mail.date"/>-->
             </div>
         </div>
 
