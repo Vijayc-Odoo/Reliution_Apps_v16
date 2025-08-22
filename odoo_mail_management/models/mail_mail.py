@@ -18,7 +18,7 @@ class MailMail(models.Model):
     snoozed_until = fields.Datetime(string="Snoozed Until")
     folder_id = fields.Many2one('mail.folder', string="Folder")
     tag_ids = fields.Many2many('mail.tag', string="Tags")
-    is_trashed = fields.Boolean(string="Is Trashed", default=False)
+    trashed = fields.Boolean(string="Is Trashed", default=False)
     parent_id = fields.Many2one('mail.mail', string='Parent Mail', help='The parent mail of this thread')
     child_ids = fields.One2many('mail.mail', 'parent_id', string='Child Mails',
                                 help='Replies and forwards of this mail')
@@ -28,6 +28,7 @@ class MailMail(models.Model):
     document_record_id = fields.Integer(string="Document Record ID")
     mail_template_id = fields.Many2one('mail.template', string="Template")
     is_active = fields.Boolean(help="Flag indicating whether the mail is active.")
+    archived= fields.Boolean(help="Flag indicating whether the mail is archived.")
     mail_message_id = fields.Many2one('mail.message', string="Related Message", ondelete='set null')
     is_odoo_mail = fields.Boolean('Odoo Mail')
 
@@ -95,23 +96,23 @@ class MailMail(models.Model):
         now = fields.Datetime.now()
 
         all_count = self.sudo().search_count(
-            [('create_uid', '=', self.env.user.id), ('is_trashed', '=', False)])
+            [('create_uid', '=', self.env.user.id), ('trashed', '=', False)])
         sent_count = self.sudo().search_count(
-            [('create_uid', '=', self.env.user.id), ('state', '=', 'sent'), ('is_trashed', '=', False)])
+            [('create_uid', '=', self.env.user.id), ('state', '=', 'sent'), ('trashed', '=', False),('archived','=', False)])
         outbox_count = self.sudo().search_count(
             [('state', '=', 'exception'),
              ('create_uid', '=', self.env.user.id)])
         stared_count = self.sudo().search_count(
-            [('is_starred', '=', True), ('create_uid', '=', self.env.user.id), ('is_trashed', '=', False)])
+            [('is_starred', '=', True), ('create_uid', '=', self.env.user.id), ('trashed', '=', False),('archived','=', False)])
         archived_count = self.sudo().search_count(
-            [('is_active', '=', False), ('create_uid', '=', self.env.user.id), ('is_trashed', '=', False)])
+            [('archived', '=', True), ('create_uid', '=', self.env.user.id), ('trashed', '=', False),('archived','=', True)])
         trash_count = self.sudo().search_count(
-            [('is_trashed', '=', True), ('create_uid', '=', self.env.user.id)])
+            [('trashed', '=', True), ('create_uid', '=', self.env.user.id)])
         inbox_count = self.sudo().search_count(
             [('create_uid', '=', self.env.user.id)])
         done_count = self.sudo().search_count([
             '|',
-            ('email_to', 'ilike', user_email), ('recipient_ids.email', 'ilike', user_email), ('is_trashed', '=', False),
+            ('email_to', 'ilike', user_email), ('recipient_ids.email', 'ilike', user_email), ('trashed', '=', False),
             ('is_done', '=', True)
         ])
 
@@ -257,13 +258,13 @@ class MailMail(models.Model):
             ('email_from', 'ilike', user_email),
             ('email_to', 'ilike', user_email),
             ('recipient_ids.email', 'ilike', user_email),
-            ('is_trashed', '=', False),
+            ('trashed', '=', False),
             ('is_done', '=', True)
         ], order='create_date desc')
         return done_mails.read()
 
     @api.model
-    def get_mail_thread(self, mail_id):
+    def get_mail_thread(self, mail_id,id=False):
         """Return every message (out + in) of the conversation, oldest → newest."""
         mail_msg = self.env['mail.message']
         MailMail = self.env['mail.mail']
@@ -283,7 +284,9 @@ class MailMail(models.Model):
 
         all_msgs = _walk(root_msg)  # mail.message objects
         all_msgs.sort(key=lambda m: m.date or m.create_date)
-
+        if id:
+            ids = [rec.id for rec in all_msgs]
+            return ids
         # ── 3.  Build a unified thread list  ─────────────────────────────────────────
         allowed_types = {'email', 'comment', 'email_outgoing'}
         thread = []
@@ -504,8 +507,9 @@ class MailMessage(models.Model):
     is_read = fields.Boolean(string="Is Read")
     is_starred = fields.Boolean(string="Starred Mail", default=False,
                                 help="Flag indicating whether the mail is starred.")
-    is_trashed = fields.Boolean(string="Is Trashed", default=False)
-    is_active = fields.Boolean(default=True,help="Flag indicating whether the mail is active.")
+    trashed = fields.Boolean(string="Is Trashed", default=False)
+    is_active = fields.Boolean(help="Flag indicating whether the mail is active.")
+    archived = fields.Boolean(help="Flag indicating whether the mail is archived.")
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -515,6 +519,7 @@ class MailMessage(models.Model):
                 vals['is_odoo_mail_message'] = True
                 vals['is_read'] = False
                 is_email_or_comment=True
+            vals['is_active'] = True
         result= super(MailMessage, self).create(vals_list)
 
         # This is used to highlight the main mail so that the user can easily identify a new mail.
@@ -552,33 +557,69 @@ class MailMessage(models.Model):
         self.search([('id', '=', *args)]).sudo().write({"is_starred": False})
 
     # This function is used to retrieve the ID of the most recent mail
-    def get_last_child_message(self,msg,mailType=False):
-        if not mailType:
-            if msg.child_ids:
-                # Find the latest child (by date or ID)
-                last_child = max(msg.child_ids, key=lambda m: m.date or m.create_date)
-                # Recurse into its children
-                return self.get_last_child_message(last_child)
-        else:
-            if mailType and mailType in ['starred', 'allMail']:
-                if msg.child_ids:
-                    # Find the latest child (by date or ID)
-                    last_child = max(msg.child_ids, key=lambda m: m.date or m.create_date)
-                    # Recurse into its children
-                    return self.get_last_child_message(last_child)
-            else:
-                def collect_email_outgoings(message):
-                    outgoing_emails = []
-                    if message.message_type == 'email_outgoing':
-                        outgoing_emails.append(message)
-                    for child in message.child_ids:
-                        outgoing_emails += collect_email_outgoings(child)
-                    return outgoing_emails
+    # def get_last_child_message(self,msg,mailType=False):
+    #     if not mailType:
+    #         if msg.child_ids:
+    #             # # Find the latest child (by date or ID)
+    #             # last_child = max(msg.child_ids, key=lambda m: m.date or m.create_date)
+    #             # # Recurse into its children
+    #             # return self.get_last_child_message(last_child)
+    #             return msg
+    #     else:
+    #         if mailType and mailType in ['starred', 'allMail']:
+    #             if msg.child_ids:
+    #                 # Find the latest child (by date or ID)
+    #                 last_child = max(msg.child_ids, key=lambda m: m.date or m.create_date)
+    #                 # Recurse into its children
+    #                 return self.get_last_child_message(last_child)
+    #         else:
+    #             def collect_email_outgoings(message):
+    #                 outgoing_emails = []
+    #                 if message.message_type == 'email_outgoing':
+    #                     outgoing_emails.append(message)
+    #                 for child in message.child_ids:
+    #                     outgoing_emails += collect_email_outgoings(child)
+    #                 return outgoing_emails
+    #
+    #             all_outgoing = collect_email_outgoings(msg)
+    #             if all_outgoing:
+    #                 return max(all_outgoing, key=lambda m: m.date or m.create_date)
+    #     return msg
 
-                all_outgoing = collect_email_outgoings(msg)
-                if all_outgoing:
-                    return max(all_outgoing, key=lambda m: m.date or m.create_date)
-        return msg
+    def get_last_child_message(self, msg, mailType=False, is_sorted_data=False):
+        """Return the latest relevant child message based on type."""
+
+        visited = set()
+
+        def _walk(message):
+            """Recursively collect all child messages without infinite loops."""
+            if message.id in visited:
+                return []
+            visited.add(message.id)
+
+            res = [message]
+            for child in message.child_ids:
+                res += _walk(child)
+            return res
+
+        # Step 1: Collect the whole thread (msg + all descendants safely)
+        all_msgs = _walk(msg)
+
+        # Step 2: Handle specific mailType cases
+        if mailType in ['starred', 'allMail']:
+            return max(all_msgs, key=lambda m: m.date or m.create_date)
+
+        if mailType not in (False, None, ''):
+            outgoing = [m for m in all_msgs if m.message_type == 'email_outgoing']
+            if outgoing:
+                return max(outgoing, key=lambda m: m.date or m.create_date)
+
+        # Step 3: If sorted_data requested, return latest by ID
+        if is_sorted_data:
+            return max(all_msgs, key=lambda rec: rec.id)
+
+        # Step 4: Fallback → latest by date
+        return max(all_msgs, key=lambda m: m.date or m.create_date)
 
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None,mailType=False, **read_kwargs):
@@ -589,7 +630,8 @@ class MailMessage(models.Model):
         return data
 
     def sorted_mail_data(self,result):
-        data=result.read()
+        data=result.read(['id', 'subject', 'date', 'preview', 'parent_id', 'child_ids','model', 'res_id', 'message_type', 'email_from', 'author_id', 'partner_ids', 'starred', 'reply_to','is_read', 'is_starred', 'trashed', 'is_active','archived'])
+        last=[]
         for index, res in enumerate(result):
             if res.child_ids:
                 last_mail_message = self.get_last_child_message(res)
@@ -611,6 +653,7 @@ class MailMessage(models.Model):
 
         # Show latest mail in teh top
         sorted_data = sorted(data, key=lambda x:datetime.strptime( x['Last_Message_Date'],"%b %d, %Y, %I:%M:%S %p"), reverse=True)
+        # print(test)
         return sorted_data
 
     @api.model
@@ -619,7 +662,7 @@ class MailMessage(models.Model):
         user_email = self.env.user.email
         now = fields.Datetime.now()
 
-        domain = ['&', '&', ('parent_id', '=', False), ('is_trashed', '=', False), ('is_odoo_mail_message', '=', True),
+        domain = ['&','&', '&', '&', ('parent_id', '=', False), ('trashed', '=', False), ('is_odoo_mail_message', '=', True),('is_active','=',True),('archived','=',False),
                   '|', '|', ('email_from', 'ilike', user_email), ('email_msg_to', 'ilike', user_email),
                   ('partner_ids', 'in', self.env.user.partner_id.ids)]
 
@@ -632,6 +675,42 @@ class MailMessage(models.Model):
             )
         )
 
+        # user_email = self.env.user.email
+        # partner_id = self.env.user.partner_id.id
+        #
+        # query = """
+        #     SELECT DISTINCT *
+        #     FROM mail_message mm
+        #     LEFT JOIN mail_message_res_partner_rel rel
+        #            ON mm.id = rel.mail_message_id
+        #     WHERE mm.parent_id IS NULL
+        #       AND mm.trashed = FALSE
+        #       AND mm.is_odoo_mail_message = TRUE
+        #       AND mm.is_active = TRUE
+        #       AND (
+        #             mm.email_from ILIKE %(email)s
+        #          OR mm.email_msg_to ILIKE %(email)s
+        #          OR rel.res_partner_id = %(partner_id)s
+        #       )
+        #       AND (
+        #            mm.message_type != 'email_outgoing'
+        #            OR EXISTS (
+        #                SELECT 1 FROM mail_message child
+        #                WHERE child.parent_id = mm.id
+        #                  AND child.message_type = 'email'
+        #            )
+        #       )
+        #     ORDER BY mm.id DESC
+        #     LIMIT 50
+        # """
+        #
+        # self.env.cr.execute(query, {
+        #     "email": f"%{user_email}%",
+        #     "partner_id": partner_id,
+        # })
+        # ids = [row[0] for row in self.env.cr.fetchall()]
+        # result = self.env['mail.message'].browse(ids)
+
         return self.sorted_mail_data(result)
 
     @api.model
@@ -643,20 +722,20 @@ class MailMessage(models.Model):
              ('is_active', '=', False), ('id', 'in', ids),
              ('create_uid', '=', self.env.user.id)])
         for mail in mails:
-            mail.is_trashed = True
+            mail.trashed = True
             mail.is_active = True
 
     @api.model
     def get_trash_mail(self):
         """Method to get trashed mails."""
         mail_dict = {}
-        # mails = self.sudo().search([('is_trashed', '=', True),('create_uid', '=', self.env.user.id)])
-        mails = self.sudo().search([('is_trashed', '=', True)])
+        # mails = self.sudo().search([('trashed', '=', True),('create_uid', '=', self.env.user.id)])
+        mails = self.sudo().search([('trashed', '=', True)])
         for record in mails:
             mail_dict[str(record)] = {
                 "id": record.id,
                 "sender": record.email_msg_to or ", ".join(
-                    record.partner_ids.mapped('name')) if record.partner_ids else False,
+                    record.partner_ids.mapped('name')) if record.partner_ids else "",
                 "subject": record.subject,
                 "date": fields.Date.to_date(record.create_date),
             }
@@ -667,26 +746,37 @@ class MailMessage(models.Model):
     def restore_mail(self, ids):
         """Restore mail from trash."""
         mails = self.sudo().search([('id', 'in', ids)])
-        mails.write({'is_trashed': False})
+        mails.write({'trashed': False,'archived': False})
 
     @api.model
     def delete_forever_mail(self, *args):
         """Method to delete forever mails."""
+        data=[]
+        id=args[0]
+        for i in id:
+            res=self.env['mail.mail'].get_mail_thread(i,True)
+            data.append(res)
+        result = [x for sublist in data for x in (sublist if isinstance(sublist, (list, tuple)) else [sublist])]
+
+        # self.search(
+        #     [('id', '=', *args), '|', ('id', '=', *args), ('is_active', '=', False)]).sudo().unlink()
+        # print(data)
         self.search(
-            [('id', '=', *args), '|', ('id', '=', *args), ('is_active', '=', False)]).sudo().unlink()
+            [('id', '=', result), '|', ('id', '=', result), ('is_active', '=', False)]).sudo().unlink()
+
 
 
     @api.model
     def archive_mail(self, *args):
         """Method to archive mail."""
         """Call thay che js mathi and """
-        self.sudo().search([('id', '=', *args)]).write({"is_active": False})
+        self.sudo().search([('id', '=', *args)]).write({"archived": True})
 
     @api.model
     def get_archived_mail(self):
         """Method to get archived mails"""
         mail_dict = {}
-        mails = self.sudo().search([('is_active', '=', False), ('is_trashed', '=', False)])
+        mails = self.sudo().search([('archived', '=', True), ('trashed', '=', False)])
         for record in mails:
             if record.email_msg_to:
                 mail_dict[str(record)] = ({
@@ -697,7 +787,7 @@ class MailMessage(models.Model):
             elif record.partner_ids:
                 mail_dict[str(record)] = ({
                     "id": record.id,
-                    "sender": ", ".join(record.partner_ids.mapped('name')) if record.partner_ids else False,
+                    "sender": ", ".join(record.partner_ids.mapped('name')) if record.partner_ids else "",
                     "subject": record.subject,
                     "date": fields.Date.to_date(record.create_date), })
 
@@ -706,7 +796,7 @@ class MailMessage(models.Model):
     @api.model
     def unarchive_mail(self, *args):
         """Method to make mail unarchived."""
-        self.sudo().search([('is_active', '=', False), ('id', '=', *args)]).write({'is_active': True})
+        self.sudo().search([('archived', '=', True), ('id', '=', *args)]).write({'archived': False})
 
     @api.model
     def delete_checked_mail(self,*args):
@@ -714,7 +804,7 @@ class MailMessage(models.Model):
         mails = self.sudo().search([('id', '=', *args), '|', ('id', '=', *args),('is_active', '=', False)])
 
         for mail in mails:
-            mail.is_trashed = True
+            mail.trashed = True
             mail.is_active = True
 
     @api.model
@@ -722,7 +812,7 @@ class MailMessage(models.Model):
         """Method to archive checked mails."""
         self.sudo().search([('id', 'in', *args),
                             ('create_uid', '=', self.env.user.id)]). \
-            write({"is_active": False})
+            write({"archived": True})
 
 
 class ResUsers(models.Model):

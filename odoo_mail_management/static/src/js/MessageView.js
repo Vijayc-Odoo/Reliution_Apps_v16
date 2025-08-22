@@ -38,7 +38,7 @@ export class MessageView extends  Component {
 
     async fetchThread() {
          const thread = await this.orm.call('mail.mail', 'get_mail_thread', [this.props.mail.id]);
-
+          debugger;
          thread.reverse()
         this.state.thread = thread;
         for (const mail of thread) {

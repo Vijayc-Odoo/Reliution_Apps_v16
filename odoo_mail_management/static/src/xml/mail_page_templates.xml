@@ -158,7 +158,8 @@
                 <div class="inbox-menu">
                     <div class="inbox-menu-group">
                         <div class="inbox-btn-group">
-                            <button class="btn-alt checkbox"
+                            <button class="btn-alt checkbox" t-if="mailState.mode != 'form'"
+                                    title="Select All"
                                     style="margin-top:6px;">
                                 <input type="checkbox" id="checkall"
                                        t-on-click="onClickSelectAll"/>
@@ -167,6 +168,7 @@
                         <!-- Back button -->
                         <button class="btn back-button"
                                 t-if="mailState.mode == 'form'"
+                                title="Go Back"
                                 t-on-click="() => this.resetView(true)">
                             <img src="/odoo_mail_management/static/src/img/arrow_left_alt.svg"
                                  alt="Back"
@@ -177,53 +179,63 @@
                         </t>
 
                         <!-- Refresh button -->
-                        <button class="btn refresh" t-on-click="refreshPage">
+                        <button class="btn refresh" t-on-click="refreshPage"
+                                title="Refresh">
                             <img src="/odoo_mail_management/static/src/img/refresh_black_24dp.svg"
                                  alt="Refresh"
                                  class="btn-icon btn-icon-sm btn-icon-alt btn-icon-hover"/>
                         </button>
                         <button class="btn delete_checked"
-                                t-on-click="deleteMail">
+                                t-on-click="deleteMail"
+                                title="Delete">
                             <img src="/odoo_mail_management/static/src/img/delete_black_24dp.svg"
                                  alt="Delete"
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_delete"/>
                         </button>
                         <button class="btn archive_checked"
+                                title="Archived"
+                                t-if="mailState.mailType !== 'all'"
                                 t-on-click="archiveMail">
                             <img src="/odoo_mail_management/static/src/img/archive_black_24dp.svg"
                                  alt="archive"
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_archive"/>
                         </button>
                         <button class="btn unarchive_checked"
+                                title="Unarchived"
+                                t-if="mailState.mailType !== 'all'"
                                 t-on-click="unarchiveMail">
                             <img src="/odoo_mail_management/static/src/img/unarchive_FILL1_wght400_GRAD0_opsz48.svg"
                                  alt="unarchive"
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_unarchive"/>
                         </button>
                         <button class="btn restore"
+                                title="Restore"
+                                t-if="mailState.mailType === 'trash'"
                                 t-on-click="restoreMail">
                             <img src="/odoo_mail_management/static/src/img/restore_from_trash_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg"
                                  alt="restore mail"
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_restore"/>
                         </button>
                         <button class="btn mark_read_checked"
+                                title="Mark Read"
                                 t-on-click="markSelectedAsRead">
                             <img src="/odoo_mail_management/static/src/img/mark_email_read_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg"
                                  alt="mark as read mail"
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_read"/>
                         </button>
                         <button class="btn mark_unread_checked"
+                                title="Mark Unread"
                                 t-on-click="markSelectedAsUnread">
                             <img src="/odoo_mail_management/static/src/img/mark_email_unread_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg"
                                  alt="mark as unread mail"
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_unread"/>
                         </button>
 
-                        <button class="btn delete_forever" t-on-click="delete_forever"
-                                t-if="mailState.mailType === 'trash'"
-                                style="color: black; padding: 5px 10px; border-radius: 4px; border: none; margin-left: 5px;">
-                            Delete Forever
-                        </button>
+<!--                        <button class="btn delete_forever" t-on-click="delete_forever"-->
+<!--                                t-if="mailState.mailType === 'trash'"-->
+<!--                                style="color: black; padding: 5px 10px; border-radius: 4px; border: none; margin-left: 5px;">-->
+<!--                            Delete Forever-->
+<!--                        </button>-->
 
                         <div class="pagination-controls" t-if="mailState.mode !== 'form'">
                             <span>
@@ -236,6 +248,7 @@
                             </span>
                             <!-- Previous Button -->
                             <button class="btn"
+                                    title="Newer"
                                     t-on-click="previousPage"
                                     t-att-disabled="mailState.offset === 0">
                                 <img src="/odoo_mail_management/static/src/img/chevron_left_24.svg"
@@ -245,6 +258,7 @@
 
                             <!-- Next Button -->
                             <button class="btn"
+                                    title="Older"
                                     t-on-click="nextPage"
                                     t-att-disabled="mailState.allRecordsLoaded">
                                 <img src="/odoo_mail_management/static/src/img/chevron_right_24.svg"
@@ -258,6 +272,7 @@
                     <div class="inbox-category">
                         <div id="ctg-primary"
                              class="inbox-category-item active">
+<!--                             class="inbox-category-item active">-->
                             <svg class="inbox-category-icon btn-icon btn-icon-sm btn-icon-alt active"
                                  xmlns="http://www.w3.org/2000/svg"
                                  height="24px"
@@ -270,7 +285,7 @@
                         </div>
                     </div>
                     <!-- MAIL CONTENT -->
-                    <div class="content" style="max-height: 70vh; overflow-y: auto;">
+                    <div class="mailContent" style="max-height: 70vh; overflow-y: auto; ">
                         <t t-if="mailState.mode == 'list'">
                             <MailBody t-foreach="mailState.loadMail"
                                       t-as="mail" t-key="mail_index"

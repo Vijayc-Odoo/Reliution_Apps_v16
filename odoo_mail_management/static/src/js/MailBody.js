@@ -42,20 +42,24 @@ export class MailBody extends  Component {
     onClickSelect(ev) {
         const checked = ev.target.checked;
         this.props.onSelectMail(this.props.mail.id, checked);
+        debugger;
     }
      /**
      * Method to archive the mail.
      * @param {Object} event - Event object.
      */
      async archiveMail(event){
+     debugger
       var mail = this.props.mail.id
       await this.orm.call('mail.message','archive_mail',[mail])
+      window.location.reload();
     }
     /**
      * Method to unarchive the mail.
      * @param {Object} event - Event object.
      */
      async unArchive(event){
+     debugger;
       var mail = this.props.mail.id
        await this.orm.call('mail.message','unarchive_mail',[mail])
        window.location.reload();
@@ -74,9 +78,10 @@ export class MailBody extends  Component {
      */
 
     async deleteMail(event){
+    debugger
        var mail = this.props.mail.id
        if(this.props.mailType === 'trash'){
-        await this.orm.call('mail.message','delete_forever_mail',[mail])
+        await this.orm.call('mail.message','delete_forever_mail',[[mail]])
        }
        else{
         await this.orm.call('mail.message','delete_checked_mail',[mail])

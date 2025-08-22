@@ -326,8 +326,8 @@ class odooMail extends  Component {
 //    const params = new URLSearchParams(queryString);
 //    const uid = params.get('uid');
 
-    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['state', '=', 'sent'], ['is_trashed', '=', false]],[], { order: "create_date desc"})
-//    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', this.env.uid],['state', '=', 'sent'],['is_trashed', '=', false]], [], { order: "create_date desc" });
+    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['state', '=', 'sent'], ['trashed', '=', false]],[], { order: "create_date desc"})
+//    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', this.env.uid],['state', '=', 'sent'],['trashed', '=', false]], [], { order: "create_date desc" });
 //    this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', session.uid],['state', '=', 'sent']],[], { order: "create_date desc"})
     }
 

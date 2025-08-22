@@ -30,6 +30,7 @@ class odooMail extends  Component {
             limit: 20, // Number of records to load at once
             offset: 0, // Starting point for loading records
             allRecordsLoaded: false, // Whether all records are loaded
+            selectedMails:[],
         })
         this.dialogService = useService("dialog")
         this.root = useRef('root');
@@ -39,6 +40,7 @@ class odooMail extends  Component {
         this.messageViewProps = {
             onGoBack: this.resetView.bind(this)
         };
+
         onMounted(() => {
 //            this.allMailView()
             this.inboxMailView()
@@ -76,10 +78,10 @@ class odooMail extends  Component {
         if (checked) {
 
             // Add visible mails
-            this.selectedMails = [...new Set([...this.selectedMails, ...visibleMails])];
+            this.mailState.selectedMails = [...new Set([...this.mailState.selectedMails, ...visibleMails])];
         } else {
             // Remove visible mails
-            this.selectedMails = this.selectedMails.filter(id => !visibleMails.includes(id));
+            this.mailState.selectedMails = this.mailState.selectedMails.filter(id => !visibleMails.includes(id));
         }
          this.env.bus.trigger("SELECT:ALL", { checked, visibleMails });
         // Trigger bus event to update UI
@@ -100,8 +102,8 @@ class odooMail extends  Component {
     }
 
     async markSelectedAsRead() {
-        if (this.selectedMails.length){
-            for (const mailId of this.selectedMails) {
+        if (this.mailState.selectedMails.length){
+            for (const mailId of this.mailState.selectedMails) {
                 await this.orm.call('mail.message', 'write', [[mailId], { is_read: true }]);
             }
             this.getCount();
@@ -117,8 +119,8 @@ class odooMail extends  Component {
     }
 
     async markSelectedAsUnread() {
-        if (this.selectedMails.length){
-            for (const mailId of this.selectedMails) {
+        if (this.mailState.selectedMails.length){
+            for (const mailId of this.mailState.selectedMails) {
                 await this.orm.call('mail.message', 'write', [[mailId], { is_read: false }]);
             }
             this.getCount();
@@ -169,19 +171,23 @@ class odooMail extends  Component {
      */
     onSelectMail(mailId, check) {
         if (check) {
-            if (!this.selectedMails.includes(mailId)) {
-                this.selectedMails.push(mailId);
+            if (!this.mailState.selectedMails.includes(mailId)) {
+                this.mailState.selectedMails.push(mailId);
             }
         } else {
-            this.selectedMails = this.selectedMails.filter(item => item !== mailId);
+            debugger;
+            document.getElementById("checkall").checked = false;
+            this.mailState.selectedMails = this.mailState.selectedMails.filter(item => item !== mailId);
+//            this.selectedMails.pop(mailId);
         }
+
     }
     clearSelections() {
     const selectAllCheckbox = this.root.el.querySelector('#checkall');
     if (selectAllCheckbox) {
         selectAllCheckbox.checked = false;
     }
-    this.selectedMails = [];
+    this.mailState.selectedMails = [];
     const visibleMails = this.mailState.loadMail.map(mail => mail.id);
     this.env.bus.trigger("SELECT:ALL", { checked: false, visibleMails });
     }
@@ -198,9 +204,9 @@ class odooMail extends  Component {
      */
     //content na header ma aa call thase
     async archiveMail(event){
-        if (this.selectedMails.length){
-            this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
-             await this.orm.call('mail.message','archive_mail',[this.selectedMails])
+        if (this.mailState.selectedMails.length){
+            this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.mailState.selectedMails.includes(item.id))
+             await this.orm.call('mail.message','archive_mail',[this.mailState.selectedMails])
              this.getCount()
              this.clearSelections();
         }
@@ -213,9 +219,9 @@ class odooMail extends  Component {
     }
 
     async unarchiveMail(event){
-        if (this.selectedMails.length){
-            this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
-             await this.orm.call('mail.message','unarchive_mail',[this.selectedMails])
+        if (this.mailState.selectedMails.length){
+            this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.mailState.selectedMails.includes(item.id))
+             await this.orm.call('mail.message','unarchive_mail',[this.mailState.selectedMails])
              this.getCount()
              this.clearSelections();
         }
@@ -271,13 +277,17 @@ class odooMail extends  Component {
      * @param {Object} event - Event object.
      */
     async deleteMail(event){
-            if (this.selectedMails.length){
-                this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
+        debugger
+        console.log("Delete Mail")
+        console.log(this.mailState.selectedMails)
+
+            if (this.mailState.selectedMails.length){
+                this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.mailState.selectedMails.includes(item.id))
                 if (this.mailState.mailType === 'trash'){
-                    await this.orm.call('mail.message','delete_forever_mail',[this.selectedMails])
+                    await this.orm.call('mail.message','delete_forever_mail',[this.mailState.selectedMails])
                 }
                 else{
-                    await this.orm.call('mail.message','delete_checked_mail',[this.selectedMails])
+                    await this.orm.call('mail.message','delete_checked_mail',[this.mailState.selectedMails])
                 }
                  this.getCount()
                  this.clearSelections();
@@ -298,11 +308,11 @@ class odooMail extends  Component {
     }
 
     async delete_forever(event){
-            if (this.selectedMails.length){
-                this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
-                 await this.orm.call('mail.message','delete_forever_mail',[this.selectedMails])
+            if (this.mailState.selectedMails.length){
+                this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.mailState.selectedMails.includes(item.id))
+                 await this.orm.call('mail.message','delete_forever_mail',[this.mailState.selectedMails])
                  this.getCount()
-                 this.selectedMails = []
+                 this.mailState.selectedMails = []
             }
     }
  /**
@@ -361,11 +371,11 @@ class odooMail extends  Component {
     }
 
     async restoreMail(event) {
-        if (this.selectedMails.length) {
-            this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
-            await this.orm.call('mail.message', 'restore_mail',  [this.selectedMails]);
+        if (this.mailState.selectedMails.length) {
+            this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.mailState.selectedMails.includes(item.id))
+            await this.orm.call('mail.message', 'restore_mail',  [this.mailState.selectedMails]);
             this.getCount();
-            this.selectedMails = []
+            this.mailState.selectedMails = []
         }
         else{
             if(this.mailState.formData.id){
@@ -407,57 +417,8 @@ class odooMail extends  Component {
         this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;
         this.addPaginationControls();
     }
-    /**
-     * Method to view all mails.
-     */
-     async allMailView() {
-             const root = this.root.el;
-             root.querySelector('.all_mail')?.classList.add('active');
-             root.querySelector('.archieved-mail')?.classList.remove('active');
-             root.querySelector('.sent-mail')?.classList.remove('active');
-             root.querySelector('.outbox')?.classList.remove('active');
-             root.querySelector('.sent')?.classList.remove('active');
-             root.querySelector('.trash-mail')?.classList.remove('active');
-             root.querySelector('.inbox')?.classList.remove('active');
-             root.querySelector('.done')?.classList.remove('active');
-//             root.querySelector('.snoozed')?.classList.remove('active');
-        this.mailState.mailType = 'all'
-        if (this.mailState.currMailType != 'allMail'){
-            this.mailState.prevMailType = this.mailState.currMailType
-        }
-        if (this.mailState.prevMailType != 'allMail' &&  this.mailState.currMailType != 'allMail'){
-            this.mailState.offset = 0
-        }
-        this.mailState.currMailType = 'allMail'
-        this.resetView()
-        const currentUserId = await this.orm.call('res.users', 'get_current_user_id', []);
-        const currentUser = await this.orm.call('res.users', 'read', [[currentUserId], ['email']]);
-        const currentUserEmail = currentUser[0].email;
-        const domain = [
-            ['is_odoo_mail_message', '=', true],
-           ['is_trashed', '=', false],
-            ['parent_id', '=', false],
-            ['message_type', 'in', ['comment','email','email_outgoing']],
-        ];
-        const total = await this.orm.searchCount('mail.message', domain);
-        this.mailState.totalRecords = total;
-        const paginatedRecords = await this.orm.call(
-            'mail.message', 'search_read',
-            [domain, []],
-            { limit: this.mailState.limit,
-              offset: this.mailState.offset,
-              order: "create_date desc",
-              mailType:this.mailState.mailType }
-        );
-        const records = paginatedRecords.slice(
-            this.mailState.offset,
-            this.mailState.offset + this.mailState.limit
-        );
-        this.mailState.loadMail = records;
-        this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;
-        this.addPaginationControls();
-        this.clearSelections();
-     }
+
+
       /**
      * Method to view starred mails.
      */
@@ -483,7 +444,7 @@ class odooMail extends  Component {
         const currentUserId = await this.orm.call('res.users', 'get_current_user_id', []);
                const domain = [
                 ['is_odoo_mail_message', '=', true],
-                ['is_trashed', '=', false],
+                ['trashed', '=', false],
                 ['message_type', 'in', ['comment','email','email_outgoing','email']],
                 ['is_starred', '=', true]
         ];
@@ -649,6 +610,59 @@ class odooMail extends  Component {
 //       this.mailState.loadMail = await this.orm.searchRead('mail.mail',[['create_uid', '=', currentUserId],['state', '=', 'exception']],[], { order: "create_date desc"})
     }
 
+
+    /**
+     * Method to view all mails.
+     */
+     async allMailView() {
+             const root = this.root.el;
+             root.querySelector('.all_mail')?.classList.add('active');
+             root.querySelector('.archieved-mail')?.classList.remove('active');
+             root.querySelector('.sent-mail')?.classList.remove('active');
+             root.querySelector('.outbox')?.classList.remove('active');
+             root.querySelector('.sent')?.classList.remove('active');
+             root.querySelector('.trash-mail')?.classList.remove('active');
+             root.querySelector('.inbox')?.classList.remove('active');
+             root.querySelector('.done')?.classList.remove('active');
+//             root.querySelector('.snoozed')?.classList.remove('active');
+        this.mailState.mailType = 'all'
+        if (this.mailState.currMailType != 'allMail'){
+            this.mailState.prevMailType = this.mailState.currMailType
+        }
+        if (this.mailState.prevMailType != 'allMail' &&  this.mailState.currMailType != 'allMail'){
+            this.mailState.offset = 0
+        }
+        this.mailState.currMailType = 'allMail'
+        this.resetView()
+        const currentUserId = await this.orm.call('res.users', 'get_current_user_id', []);
+        const currentUser = await this.orm.call('res.users', 'read', [[currentUserId], ['email']]);
+        const currentUserEmail = currentUser[0].email;
+        const domain = [
+            ['is_odoo_mail_message', '=', true],
+           ['trashed', '=', false],
+            ['parent_id', '=', false],
+            ['message_type', 'in', ['comment','email','email_outgoing']],
+        ];
+        const total = await this.orm.searchCount('mail.message', domain);
+        this.mailState.totalRecords = total;
+        const paginatedRecords = await this.orm.call(
+            'mail.message', 'search_read',
+            [domain, []],
+            { limit: this.mailState.limit,
+              offset: this.mailState.offset,
+              order: "create_date desc",
+              mailType:this.mailState.mailType }
+        );
+        const records = paginatedRecords.slice(
+            this.mailState.offset,
+            this.mailState.offset + this.mailState.limit
+        );
+        this.mailState.loadMail = records;
+        this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;
+        this.addPaginationControls();
+        this.clearSelections();
+     }
+
       /**
      * Method to view sent mails.
      */
@@ -673,19 +687,25 @@ async sentMail(){
        const currentUserId = await this.orm.call('res.users', 'get_current_user_id', []);
        const domain = [
             ['is_odoo_mail_message', '=', true],
-            ['is_trashed', '=', false],
+            ['trashed', '=', false],
+            ['is_active', '=', true],
+            ['archived', '=', false],
             ['message_type', 'in', ['comment','email_outgoing']]
 //            ['message_type', 'in', ['comment','email_outgoing','email']]
         ];
         const total = await this.orm.searchCount('mail.message', domain);
         this.mailState.totalRecords = total;
-        const records = await this.orm.call(
+        const paginatedRecords = await this.orm.call(
             'mail.message', 'search_read',
             [domain, []],
             { limit: this.mailState.limit,
               offset: this.mailState.offset,
               order: "create_date desc",
               mailType:this.mailState.mailType}
+        );
+        const records = paginatedRecords.slice(
+            this.mailState.offset,
+            this.mailState.offset + this.mailState.limit
         );
         this.mailState.loadMail = records;
         this.mailState.allRecordsLoaded = this.mailState.offset + this.mailState.limit >= this.mailState.totalRecords;
