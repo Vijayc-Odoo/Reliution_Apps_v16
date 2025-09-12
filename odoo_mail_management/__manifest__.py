@@ -21,6 +21,8 @@
         'views/mail_attachment_views.xml',
         'views/mail_message_views.xml',
         'views/fetch_incoming_mail_views.xml',
+        'views/fetchmail_server_view.xml',
+        'wizard/mail_specific_date.xml',
     ],
     'assets': {
         'web.assets_backend': [

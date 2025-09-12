@@ -13,6 +13,7 @@ import { formatDateTime } from "@web/core/l10n/dates";
  */
 export class MailBody extends  Component {
     async setup() {
+
         this.ref = useRef('root');
         this.orm = useService('orm');
         this.mailUtils = useMailUtils();
@@ -20,6 +21,7 @@ export class MailBody extends  Component {
         this.state = useState({ starred: false });
         this.state.latest_mail=[];
         this.state.date='';
+        debugger;
         this.handleSelectAll = (event) => {
             if (this.ref.el) {
                 const checkbox = this.ref.el.querySelector(".mail_check_box");
@@ -30,6 +32,7 @@ export class MailBody extends  Component {
             }
         };
         this.env.bus.addEventListener("SELECT:ALL", this.handleSelectAll);
+
     }
 
     onWillUnmount() {

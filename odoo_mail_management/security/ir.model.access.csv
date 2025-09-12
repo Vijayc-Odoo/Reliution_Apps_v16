@@ -4,6 +4,6 @@ access_mail_icon,access.mail.icon,model_mail_icon,base.group_user,1,1,1,1
 access_mail_folder,access.mail.folder,model_mail_folder,base.group_user,1,1,1,1
 access_mail_folder,access.mail.folder,model_mail_folder,base.group_user,1,1,1,1
 access_fetch_incoming_mail,access.fetch.incoming.mail,model_fetch_incoming_mail,base.group_user,1,1,1,1
-
+access_fetch_mails_between_dates_user,fetch.mails.between.dates.user,model_fetch_mails_between_dates,base.group_user,1,1,1,1
 
 

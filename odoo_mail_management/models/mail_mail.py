@@ -288,7 +288,7 @@ class MailMail(models.Model):
             ids = [rec.id for rec in all_msgs]
             return ids
         # ── 3.  Build a unified thread list  ─────────────────────────────────────────
-        allowed_types = {'email', 'comment', 'email_outgoing'}
+        allowed_types = {'email', 'email_outgoing'}
         thread = []
         for msg in all_msgs:
             if msg.message_type in allowed_types:
@@ -515,7 +515,7 @@ class MailMessage(models.Model):
     def create(self, vals_list):
         is_email_or_comment=False
         for vals in vals_list:
-            if vals.get('message_type') in ['comment', 'email']:
+            if vals.get('message_type') in ['email']:
                 vals['is_odoo_mail_message'] = True
                 vals['is_read'] = False
                 is_email_or_comment=True
@@ -622,22 +622,49 @@ class MailMessage(models.Model):
         return max(all_msgs, key=lambda m: m.date or m.create_date)
 
     @api.model
-    def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None,mailType=False, **read_kwargs):
-        data = super().search_read(domain)
+    def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None, mailType=False, **read_kwargs):
         if mailType:
             search_data = self.search(domain)
+            # search_data = self.search(domain, offset=offset, limit=limit, order=order)
+            # query_string = f"select id from mail_message where is_odoo_mail_message=True and trashed=False and parent_id IS NULL and message_type in {tuple(['comment', 'email', 'email_outgoing'])}"
+            # self.env.cr.execute(query_string)
+            # search_result = self.env.cr.fetchall()
+            # search_data = self.browse([r[0] for r in search_result])
             return self.sorted_mail_data(search_data)
-        return data
 
-    def sorted_mail_data(self,result):
-        data=result.read(['id', 'subject', 'date', 'preview', 'parent_id', 'child_ids','model', 'res_id', 'message_type', 'email_from', 'author_id', 'partner_ids', 'starred', 'reply_to','is_read', 'is_starred', 'trashed', 'is_active','archived'])
-        last=[]
+        return super().search_read(domain, fields=fields, offset=offset, limit=limit, order=order, **read_kwargs)
+
+    def sorted_mail_data(self, result):
+        '''
+
+        :param result: list of mail.message records
+        :return: dic to get all records data in dic formate
+
+        '''
+        def get_date(item):
+            val = item['Last_Message_Date']
+            if isinstance(val, datetime):
+                return val
+            elif isinstance(val, str) and val.strip():
+                try:
+                    return datetime.strptime(val, "%b %d, %Y, %I:%M:%S %p")
+                except ValueError:
+                    return datetime.min  # fallback if format doesn't match
+            else:
+                return datetime.min  # fallback for empty or invalid
+
+        data = result.read(
+            ['id', 'subject', 'date', 'preview', 'parent_id', 'child_ids', 'model', 'res_id', 'message_type','email_msg_to',
+             'email_from', 'author_id', 'partner_ids', 'starred', 'reply_to', 'is_read', 'is_starred', 'trashed',
+             'is_active', 'archived'])
+        last = []
         for index, res in enumerate(result):
+            data[index]['Last_Message_Date'] = ""
             if res.child_ids:
                 last_mail_message = self.get_last_child_message(res)
                 if last_mail_message.preview:
                     data[index]['Last_Message'] = last_mail_message.preview
-                    data[index]['Last_Date'] = last_mail_message.date
+                    # data[index]['Last_Date'] = last_mail_message.date
 
                     dt = fields.Datetime.from_string(last_mail_message.date)
                     user_tz = self.env.user.tz or 'UTC'
@@ -651,9 +678,10 @@ class MailMessage(models.Model):
 
                 data[index]['Last_Message_Date'] = converted_mail_date
 
-        # Show latest mail in teh top
-        sorted_data = sorted(data, key=lambda x:datetime.strptime( x['Last_Message_Date'],"%b %d, %Y, %I:%M:%S %p"), reverse=True)
-        # print(test)
+        # Show latest mail in the top
+        # sorted_data = sorted(data, key=lambda x: datetime.strptime( x['Last_Message_Date'],"%b %d, %Y, %I:%M:%S %p"), reverse=True)
+        sorted_data = sorted(data, key=get_date, reverse=True)
+
         return sorted_data
 
     @api.model
@@ -674,42 +702,6 @@ class MailMessage(models.Model):
                 for child in msg.child_ids
             )
         )
-
-        # user_email = self.env.user.email
-        # partner_id = self.env.user.partner_id.id
-        #
-        # query = """
-        #     SELECT DISTINCT *
-        #     FROM mail_message mm
-        #     LEFT JOIN mail_message_res_partner_rel rel
-        #            ON mm.id = rel.mail_message_id
-        #     WHERE mm.parent_id IS NULL
-        #       AND mm.trashed = FALSE
-        #       AND mm.is_odoo_mail_message = TRUE
-        #       AND mm.is_active = TRUE
-        #       AND (
-        #             mm.email_from ILIKE %(email)s
-        #          OR mm.email_msg_to ILIKE %(email)s
-        #          OR rel.res_partner_id = %(partner_id)s
-        #       )
-        #       AND (
-        #            mm.message_type != 'email_outgoing'
-        #            OR EXISTS (
-        #                SELECT 1 FROM mail_message child
-        #                WHERE child.parent_id = mm.id
-        #                  AND child.message_type = 'email'
-        #            )
-        #       )
-        #     ORDER BY mm.id DESC
-        #     LIMIT 50
-        # """
-        #
-        # self.env.cr.execute(query, {
-        #     "email": f"%{user_email}%",
-        #     "partner_id": partner_id,
-        # })
-        # ids = [row[0] for row in self.env.cr.fetchall()]
-        # result = self.env['mail.message'].browse(ids)
 
         return self.sorted_mail_data(result)
 

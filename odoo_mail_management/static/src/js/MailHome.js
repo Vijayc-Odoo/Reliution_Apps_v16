@@ -406,9 +406,11 @@ class odooMail extends  Component {
         this.mailState.currMailType = 'inbox'
         this.mailState.mailType = 'inbox';
         this.resetView();
-        const total =  await this.orm.call('mail.message', 'get_inbox_mails', []);
-        this.mailState.totalRecords = total.length;
-        const paginatedRecords = await this.orm.call('mail.message', 'get_inbox_mails', []);
+        const paginatedRecords =  await this.orm.call('mail.message', 'get_inbox_mails', []);
+//        const total =  await this.orm.call('mail.message', 'get_inbox_mails', []);
+//        this.mailState.totalRecords = total.length;
+        this.mailState.totalRecords = paginatedRecords.length;
+//        const paginatedRecords = await this.orm.call('mail.message', 'get_inbox_mails', []);
         const records = paginatedRecords.slice(
             this.mailState.offset,
             this.mailState.offset + this.mailState.limit
@@ -445,7 +447,7 @@ class odooMail extends  Component {
                const domain = [
                 ['is_odoo_mail_message', '=', true],
                 ['trashed', '=', false],
-                ['message_type', 'in', ['comment','email','email_outgoing','email']],
+                ['message_type', 'in', ['email','email_outgoing']],
                 ['is_starred', '=', true]
         ];
         const total = await this.orm.searchCount('mail.message', domain);
@@ -485,9 +487,11 @@ class odooMail extends  Component {
         }
         this.mailState.currMailType = 'archivedMail'
         this.resetView()
-        const total =  await this.orm.call('mail.message', 'get_archived_mail', []);
-        this.mailState.totalRecords = total.length;
-        const paginatedRecords = await this.orm.call('mail.message','get_archived_mail',[])
+        const paginatedRecords =  await this.orm.call('mail.message', 'get_archived_mail', []);
+        this.mailState.totalRecords = paginatedRecords.length;
+//        const total =  await this.orm.call('mail.message', 'get_archived_mail', []);
+//        this.mailState.totalRecords = total.length;
+//        const paginatedRecords = await this.orm.call('mail.message','get_archived_mail',[])
         const records = paginatedRecords.slice(
             this.mailState.offset,
             this.mailState.offset + this.mailState.limit
@@ -521,9 +525,11 @@ class odooMail extends  Component {
         }
         this.mailState.currMailType = 'trashView'
         this.resetView();
-        const total =  await this.orm.call('mail.message', 'get_trash_mail', []);
-        this.mailState.totalRecords = total.length;
-        const paginatedRecords = await this.orm.call('mail.message','get_trash_mail',[])
+        const paginatedRecords =  await this.orm.call('mail.message', 'get_trash_mail', []);
+        this.mailState.totalRecords = paginatedRecords.length;
+//        const total =  await this.orm.call('mail.message', 'get_trash_mail', []);
+//        this.mailState.totalRecords = total.length;
+//        const paginatedRecords = await this.orm.call('mail.message','get_trash_mail',[])
         const records = paginatedRecords.slice(
             this.mailState.offset,
             this.mailState.offset + this.mailState.limit
@@ -641,7 +647,7 @@ class odooMail extends  Component {
             ['is_odoo_mail_message', '=', true],
            ['trashed', '=', false],
             ['parent_id', '=', false],
-            ['message_type', 'in', ['comment','email','email_outgoing']],
+            ['message_type', 'in', ['email','email_outgoing']],
         ];
         const total = await this.orm.searchCount('mail.message', domain);
         this.mailState.totalRecords = total;
@@ -690,8 +696,8 @@ async sentMail(){
             ['trashed', '=', false],
             ['is_active', '=', true],
             ['archived', '=', false],
-            ['message_type', 'in', ['comment','email_outgoing']]
-//            ['message_type', 'in', ['comment','email_outgoing','email']]
+            ['message_type', 'in', ['email_outgoing']]
+//            ['message_type', 'in', ['email_outgoing','email']]
         ];
         const total = await this.orm.searchCount('mail.message', domain);
         this.mailState.totalRecords = total;

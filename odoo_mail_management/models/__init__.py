@@ -5,4 +5,5 @@ from . import mail_mail
 from . import res_config_settings
 from . import mail_folder_tag
 from . import fetch_incoming_mail
+from . import fetchmail_server
 

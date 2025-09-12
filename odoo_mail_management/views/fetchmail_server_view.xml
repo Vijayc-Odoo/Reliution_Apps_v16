@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_email_server_form_inherit" model="ir.ui.view">
+        <field name="name">fetchmail.server.form.inherit</field>
+        <field name="model">fetchmail.server</field>
+        <field name="inherit_id" ref="mail.view_email_server_form"/>
+        <field name="arch" type="xml">
+<!--            Add a New Button To Open Wizard For Date Selection -->
+            <xpath expr="//header/button[@name='set_draft']" position="after">
+                <button string="Fetch Mail By Date" type="object" name="fetch_mail_by_dates" invisible="state != 'done'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
